@@ -1,0 +1,6 @@
+{
+    "dev": {
+        "app_function": "MBusVoice.app", 
+        "s3_bucket": "zappa-f93aj56ue"
+    }
+}
