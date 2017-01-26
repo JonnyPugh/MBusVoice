@@ -14,6 +14,3 @@ def get_buses_for_stop(stopNum):
 		return []
 
 	return resp.json()['etas'][str(stopNum)]['etas']
-
-
-print get_buses_for_stop(100)
