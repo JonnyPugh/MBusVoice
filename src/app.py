@@ -11,15 +11,12 @@ def launch():
 
 @ask.intent("GetNextBusforStop")
 def hello(StopID):
-	# Incomplete list of routes
-	routes = {100: "Pierpont", 597: "Northwood", 594: "Commuter South", 596: "Commuter North", 633: "Bursley-Baits"}
-	
-	bus_info = BusInfo(routes.keys())
-	estimated_times = bus_info.get_eta(StopID)["etas"][StopID]["etas"][0]
+	bus_info = BusInfo([100, 597, 594, 596, 633])
+	eta = bus_info.get_eta(StopID).values()[0]
 	options = {
 		"stopid": StopID,
-		"minutes": estimated_times["avg"],
-		"busline": routes[estimated_times["route"]]
+		"minutes": eta.time,
+		"busline": bus_info.routes[eta.route].name
 	}
 	text = render_template('GetNextBusforStop', **options)
 	return statement(text).simple_card('GetNextBusforStop', text)
