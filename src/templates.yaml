@@ -1,1 +1,1 @@
-GetNextBusforStop: A {{busline}} bus will be arriving at stop {{stopid}} in {{minutes}} minutes
+GetNextBusesForStop: A {{busline}} bus will be arriving at stop {{stopid}} in {{minutes}} minutes
