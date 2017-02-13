@@ -27,9 +27,16 @@ class BusInfo(object):
     	return {stop: self.get_eta(stop) for stop in self.__favorite_stops}
 
     def get_eta(self, stop):
-        # This is the only route that takes 
-        # parameters so it needs to be error checked
-        return OrderedDict([(eta["bus_id"], self.__Eta(eta)) for eta in self.__get_request_json("eta", {"stop": stop})["etas"][str(stop)]["etas"]], key=lambda t: t[1].time)
+        eta_json = self.__get_request_json("eta", {"stop": stop})
+        if "error" in eta_json:
+            # If the stop number is invalid, the JSON will contain "error"
+            raise InvalidStop(stop)
+
+        eta_json = eta_json["etas"][str(stop)]["etas"]
+        if len(eta_json) == 0:
+            # If there are no ETAs for the stop, return an empty dictionary
+            return {}
+        return OrderedDict([(eta["bus_id"], self.__Eta(eta)) for eta in eta_json], key=lambda t: t[1].time)
 
     class __Stop(object):
         def __init__(self, stop_json):
@@ -59,3 +66,7 @@ class BusInfo(object):
         def __init__(self, eta_json):
             self.route = eta_json["route"]
             self.time = eta_json["avg"]
+
+class InvalidStop(Exception):
+    def __init__(self, stop):
+        super(InvalidStop, self).__init__("There is no stop with the ID "+str(stop))
