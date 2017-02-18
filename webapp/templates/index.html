@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}MBus Voice Setup{% endblock %}
+{% block heading %}Welcome to MBus Voice Setup{% endblock %}
+{% block content %}
+	<p>{{alexaID}}</p>
+	<p>Please fill out the following form.</p>
+	<iframe src="http://mbus.doublemap.com/map/" height="650" width="1000"></iframe>
+	<div class="form-group" style="width:300px;">
+	<form>
+	 	<label class="control-label" for="focusedInput">Home Alias</label>
+ 		<input class="form-control" id=home_alias type="text">
+	 	<label class="control-label" for="focusedInput">Home Stop</label>
+ 		<input class="form-control" id=home_stop type="text">
+ 		<input type="hidden" name="alexaID" value={{alexaID}}>
+		<input type="submit" name="Home Submit" class="btn btn-default">
+	</form>
+		<form>
+	 	<label class="control-label" for="focusedInput">Destination Alias</label>
+ 		<input class="form-control" id=home_alias type="text">
+	 	<label class="control-label" for="focusedInput">Destination Stop</label>
+ 		<input class="form-control" id=home_stop type="text">
+ 		<input type="hidden" name="alexaID" value={{alexaID}}>
+		<input type="submit" name="Destination Submit" class="btn btn-default">
+	</form>
+	</div>
+{% endblock %}
