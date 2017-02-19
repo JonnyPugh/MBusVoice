@@ -1,4 +1,8 @@
 GetNextBuses when is the next bus
+GetNextBuses when are the next {NumBuses} buses
 GetNextBuses when is the next bus coming to {StartStop}
+GetNextBuses when are the next {NumBuses} buses coming to {StartStop}
+GetNextBuses when is the next bus going to {EndStop}
+GetNextBuses when are the next {NumBuses} buses going to {EndStop}
 GetNextBuses when is the next bus from {StartStop} to {EndStop}
 GetNextBuses when are the next {NumBuses} buses from {StartStop} to {EndStop}
