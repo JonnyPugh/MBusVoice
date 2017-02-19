@@ -1,0 +1,21 @@
+{
+  "intents": [
+    {
+      "intent": "GetNextBuses",
+      "slots": [
+        {
+          "name": "StartStop",
+          "type": "STOPS"
+        },
+        {
+          "name": "EndStop",
+          "type": "STOPS"
+        },
+        {
+          "name": "NumBuses",
+          "type": "AMAZON.NUMBER"
+        }
+      ]
+    }
+  ]
+}
