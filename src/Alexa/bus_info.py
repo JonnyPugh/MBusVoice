@@ -1,29 +1,42 @@
-from requests import get
+from requests import Session
 
 class BusInfo(object):
     def __init__(self, favorite_stops=[]):
         self.__favorite_stops = favorite_stops
+        self.__session = Session()
+        self.__stops = None
+        self.__buses = None
+        self.__routes = None
+        self.__etas = None
 
     def __get_request_json(self, route, params=None):
-    	r = get("https://mbus.doublemap.com/map/v2/"+route, params=params)
+    	r = self.__session.get("https://mbus.doublemap.com/map/v2/"+route, params=params)
     	r.raise_for_status()
     	return r.json()
 
     @property
     def stops(self):
-        return {stop["id"]: self.__Stop(stop) for stop in self.__get_request_json("stops")}
+        if not self.__stops:
+            self.__stops = {stop["id"]: self.__Stop(stop) for stop in self.__get_request_json("stops")}
+        return self.__stops
 
     @property
     def buses(self):
-        return {bus["id"]: self.__Bus(bus) for bus in self.__get_request_json("buses")}
+        if not self.__buses:
+            self.__buses = {bus["id"]: self.__Bus(bus) for bus in self.__get_request_json("buses")}
+        return self.__buses
 
     @property
     def routes(self):
-        return {route["id"]: self.__Route(route) for route in self.__get_request_json("routes")}
+        if not self.__routes:
+            self.__routes = {route["id"]: self.__Route(route) for route in self.__get_request_json("routes")}
+        return self.__routes
 
     @property
     def etas(self):
-    	return {stop: self.get_eta(stop) for stop in self.__favorite_stops}
+        if not self.__etas:
+            self.__etas = {stop: self.get_eta(stop) for stop in self.__favorite_stops}
+    	return self.__etas
 
     def get_eta(self, stop):
         eta_json = self.__get_request_json("eta", {"stop": stop})
