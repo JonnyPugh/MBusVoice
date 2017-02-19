@@ -1,2 +1,2 @@
-GetNextBus: A {{route}} bus to {{destination}} will be arriving at {{origin}} in {{minutes}} minutes
+GetNextBus: A {{route}} bus to {{destination}} will be arriving at {{origin}} in {{minutes}} {{"minute" if minutes == 1 else "minutes"}}
 GetNextBuses: The next buses to {{destination}} that are arriving at {{origin}} will be {{busInfo}}
