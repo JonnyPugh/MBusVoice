@@ -1,5 +1,4 @@
 from requests import get
-from collections import OrderedDict
 
 class BusInfo(object):
     def __init__(self, favorite_stops=[]):
@@ -31,12 +30,11 @@ class BusInfo(object):
         if "error" in eta_json:
             # If the stop number is invalid, the JSON will contain "error"
             raise InvalidStop(stop)
+        
+        return self.sort_etas([self.__Eta(eta) for eta in eta_json["etas"][str(stop)]["etas"]])
 
-        eta_json = eta_json["etas"][str(stop)]["etas"]
-        if len(eta_json) == 0:
-            # If there are no ETAs for the stop, return an empty dictionary
-            return {}
-        return OrderedDict([(eta["bus_id"], self.__Eta(eta)) for eta in eta_json], key=lambda t: t[1].time)
+    def sort_etas(self, etas):
+        return sorted(etas, key=lambda eta: eta.time)
 
     class __Stop(object):
         def __init__(self, stop_json):
@@ -64,6 +62,7 @@ class BusInfo(object):
 
     class __Eta(object):
         def __init__(self, eta_json):
+            self.bus_id = eta_json["bus_id"]
             self.route = eta_json["route"]
             self.time = eta_json["avg"]
 

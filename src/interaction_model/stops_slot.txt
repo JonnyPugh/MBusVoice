@@ -1,162 +1,164 @@
-Facilities Services Building
-Central Campus Transit Center: Church St
-Stockwell - Outbound
-Stockwell - Inbound
-CVC
-Lloyd/Observatory - Inbound
-Couzens/BSRB
-Couzens/Zina Pitcher
-BSRB
-Medical School
-Glen/Catherine - Outbound
-NCRC - Inbound
-North Campus Facilities Services Building - Outbound
-North Campus Facilities Services Building - Inbound
-NCAC - Inbound
-NCAC - Outbound
-NCRC - Huron Parkway SBD
-NCRC - Huron Parkway NBD
-Northwood Community Center - Outbound
-Hayward/Hubbard - Inbound
-Plymouth Rd Crosswalk - Outbound
-Northwood IV - Inbound
-Northwood IV - Outbound
-Northwood Community Center - Inbound
-Northwood II - Outbound
-Fire Station - Inbound
-Fire Station - Outbound
-Plymouth Rd Crosswalk - Inbound
-Markley
-MSRB II
-North Ingalls Bldg
-Glen/Catherine - Inbound
-Cancer Center - Inbound
-Taubman - Inbound
-Taubman - Outbound
-Mott Hospital
-Cancer Center - Outbound
-Cancer Center Circle Dr
-Forsythe Park
-Packard at Arch
-Packard EBD past Hill
-Packard WBD past Hill
-Power Center
-Rackham
-Oakland at Tappan
-E University at Tappan
-Fuller Rd at Lot NC-78, Mitchell Field (2nd)
-Fuller Rd at Lot NC-78, Mitchell Field (1st)
-Fuller Rd at Lot NC-78, Mitchell Field (3rd)
-Thompson SBD before E Madison
-Thompson NBD before E Madison
-NCRC - Outbound
-NCAC - Hubbard Outbound
-Northwood V (3)
-Northwood V (2)
-Northwood V (1)
-Huron/Hubbard - Outbound
-NCAC - Hubbard Inbound
-Hayward/Hubbard - Outbound Hayward
-Huron/Hubbard - Inbound
-Hayward/Hubbard - Outbound Hubbard
-Glazier Way, Lot NC-51 (West)
-VA Hospital Circle Drive - Inbound
-Intramural Building - Outbound
-Kellogg Eye Center
-Wall St @ Maiden Lane
-Maiden Lane Ct. @ Wall
-Institute for Continuing Legal Education
-Glazier Way, Lot NC-51 (East)
-Glazier Way, Lot NC-51 (North)
-Trotter House
-Oxford Housing
-Henderson House
-East Quad on Church
-East Quad on Williard
-Shapiro
-Michigan Union - South University
-Michigan Union - State Street
-Crisler Center - Lot SC 7
-Intramural Building - Inbound
-Hill Auditorium
-Kraus Building
-Bursley - Inbound
-Baits II - Inbound
-Transportation Gate
-Beal/Bishop
-Ford Library
-Cooley - Inbound
-VA Hospital on Fuller Rd
-BME
-FXB - Outbound
-Bursley - Outbound
-Cooley - Outbound
-FXB - Inbound
-Division and Packard
-Greene/Hoover
-Pierpont Commons - Bonisteel Inbound
-Domino's Farms Lobby C
-Pierpont Commons - Murfin Outbound
-Pierpont Commons - Murfin Inbound
-Art & Architecture
-Domino's Farms Lobby A
-Catherine St Structure on Ann St
-Elbel Field
-Crisler Center - Lot SC 5
-Liberty EBD before Maynard
-Liberty WBD past Maynard
-Domino's Farms Lobby M
-Domino's Farms Lobby H
-Fleming Administration Building
-Thompson NBD past E William
-Thompson SBD past E William
-Rachel Upjohn Building
-2101 Commonwealth
-Arbor Lakes
-East Ann Arbor Health & Geriatrics Center
-Green Rd Park & Ride - Inbound
-Green Rd Park & Ride - Outbound
-Michigan House
-Turner Senior Resource Center
-Lot M-75, Mitchell Field - Outbound
-Lot M-75, Mitchell Field - Inbound 2
-Lot M-75, Mitchell Field - Inbound
-Lot M-75, Mitchell Field - Outbound 2
-Fuller Rd at Lot M-75, Mitchell Field
-Northwood I - Inbound
-Northwood III - Outbound
-Cram Circle - Inbound
-Northwood I - Outbound
-Baits I
-Baits II - Outbound
-Northwood III - Inbound
-Murfin/Northwood III
-Central Campus Transit Center: CC Little
-Central Campus Transit Center: Ruthven Museum
-Northwood II - Inbound
-Cram Circle - Outbound
-Packard EBD before Arch
-Plymouth Road Park & Ride - Inbound
-VA Hospital Circle Drive - Outbound
-Plymouth Road Park & Ride - Outbound
-Wall Street Structure
-Lot M-69
-CVC Driveway
-MSRB III Lot M-69
-Hutchins Hall (Law Quad)
-South Quad
-Travis Pointe Country Club
-Justin's Hair Salon
-Thomas Stop
-Stop here route
-Division and Benjamin
-Hill and Greene
-Baxter at Dean
-Hubbard at Dean
-Hubbard at Stone
-Hubbard at Huron Parkway
-Huron Parkway at Baxter
-Transportation Services
-Hubbard at Green Rd
-Municipal League
-Property Disposition
+facilities services building
+central campus transit center: church st
+stockwell - outbound
+stockwell - inbound
+cvc
+lloyd/observatory - inbound
+couzens/bsrb
+couzens/zina pitcher
+bsrb
+medical school
+glen/catherine - outbound
+ncrc - inbound
+north campus facilities services building - outbound
+north campus facilities services building - inbound
+ncac - inbound
+ncac - outbound
+ncrc - huron parkway sbd
+ncrc - huron parkway nbd
+northwood community center - outbound
+hayward/hubbard - inbound
+plymouth rd crosswalk - outbound
+northwood iv - inbound
+northwood iv - outbound
+northwood community center - inbound
+northwood ii - outbound
+fire station - inbound
+fire station - outbound
+plymouth rd crosswalk - inbound
+markley
+msrb ii
+north ingalls bldg
+glen/catherine - inbound
+cancer center - inbound
+taubman - inbound
+taubman - outbound
+mott hospital
+cancer center - outbound
+cancer center circle dr
+forsythe park
+packard at arch
+packard ebd past hill
+packard wbd past hill
+power center
+rackham
+oakland at tappan
+e university at tappan
+fuller rd at lot nc-78, mitchell field (2nd)
+fuller rd at lot nc-78, mitchell field (1st)
+fuller rd at lot nc-78, mitchell field (3rd)
+thompson sbd before e madison
+thompson nbd before e madison
+ncrc - outbound
+ncac - hubbard outbound
+northwood v (3)
+northwood v (2)
+northwood v (1)
+huron/hubbard - outbound
+ncac - hubbard inbound
+hayward/hubbard - outbound hayward
+huron/hubbard - inbound
+hayward/hubbard - outbound hubbard
+glazier way, lot nc-51 (west)
+va hospital circle drive - inbound
+intramural building - outbound
+kellogg eye center
+wall st @ maiden lane
+maiden lane ct. @ wall
+institute for continuing legal education
+glazier way, lot nc-51 (east)
+glazier way, lot nc-51 (north)
+trotter house
+oxford housing
+henderson house
+east quad on church
+east quad on williard
+shapiro
+michigan union - south university
+michigan union - state street
+crisler center - lot sc 7
+intramural building - inbound
+hill auditorium
+kraus building
+bursley - inbound
+baits ii - inbound
+transportation gate
+beal/bishop
+ford library
+cooley - inbound
+va hospital on fuller rd
+bme
+fxb - outbound
+bursley - outbound
+cooley - outbound
+fxb - inbound
+division and packard
+greene/hoover
+pierpont commons - bonisteel inbound
+domino's farms lobby c
+pierpont commons - murfin outbound
+pierpont commons - murfin inbound
+art & architecture
+domino's farms lobby a
+catherine st structure on ann st
+elbel field
+crisler center - lot sc 5
+liberty ebd before maynard
+liberty wbd past maynard
+domino's farms lobby m
+domino's farms lobby h
+fleming administration building
+thompson nbd past e william
+thompson sbd past e william
+rachel upjohn building
+2101 commonwealth
+arbor lakes
+east ann arbor health & geriatrics center
+green rd park & ride - inbound
+green rd park & ride - outbound
+michigan house
+turner senior resource center
+lot m-75, mitchell field - outbound
+lot m-75, mitchell field - inbound 2
+lot m-75, mitchell field - inbound
+lot m-75, mitchell field - outbound 2
+fuller rd at lot m-75, mitchell field
+northwood i - inbound
+northwood iii - outbound
+cram circle - inbound
+northwood i - outbound
+baits i
+baits ii - outbound
+northwood iii - inbound
+murfin/northwood iii
+central campus transit center: cc little
+central campus transit center: ruthven museum
+northwood ii - inbound
+cram circle - outbound
+packard ebd before arch
+plymouth road park & ride - inbound
+va hospital circle drive - outbound
+plymouth road park & ride - outbound
+wall street structure
+lot m-69
+cvc driveway
+msrb iii lot m-69
+hutchins hall (law quad)
+south quad
+travis pointe country club
+justin's hair salon
+thomas stop
+stop here route
+division and benjamin
+hill and greene
+baxter at dean
+hubbard at dean
+hubbard at stone
+hubbard at huron parkway
+huron parkway at baxter
+transportation services
+hubbard at green rd
+municipal league
+property disposition
+cc little
+pierpont
