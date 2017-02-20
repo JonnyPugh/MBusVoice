@@ -9,6 +9,7 @@
  	- get from database object (can just have fill-in data at the moment)
  - write endpoints to accept forms
  	- check reqs for reqs
+ 	- check that posted alexaid is also session value?
  - 2 endpoints files
  	- one for creating new user data (post_favorites.py)
  	- one for editing/deleting user data (edit_favorites.py)

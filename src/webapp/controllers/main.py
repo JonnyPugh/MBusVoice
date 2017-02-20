@@ -12,7 +12,7 @@ def index():
 			session['alexaID'] = alexaID
 		return redirect(url_for('main.index'))
 	if not alexaID and not 'alexaID' in session:
-		return "welcome to hell", 404
+		abort(403)
 	options = {
 		'alexaID': session['alexaID'],
 		'stop_names': stops
