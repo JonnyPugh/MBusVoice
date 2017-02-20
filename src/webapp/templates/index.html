@@ -2,6 +2,8 @@
 {% block title %}MBus Voice Setup{% endblock %}
 {% block heading %}Welcome to MBus Voice Setup{% endblock %}
 {% block content %}
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
+	<script src={{ url_for('static', filename='js/index.js') }}></script>
 	{% if not alexaID %}
 		<h1 class="text-warning">Please only use the link from your Amazon Alexa App to view this page.</h1>
 	{% endif %}
@@ -13,7 +15,7 @@
 		<div class="form-group" style="width:300px;">
 		<form>
 		 	<label class="control-label" for="focusedInput">Home Stop</label>
-	 		<input class="form-control" id=home_stop type="text">
+	 		<input class="form-control" id=home_stop list="stops">
 		 	<label class="control-label" for="focusedInput">Home Alias</label>
 	 		<input class="form-control" id=home_alias type="text">
 	 		<input type="hidden" name="alexaID" value={{alexaID}}>
@@ -21,12 +23,18 @@
 		</form>
 			<form>
 		 	<label class="control-label" for="focusedInput">Destination Stop</label>
-	 		<input class="form-control" id=destination_alis type="text">
+	 		<input class="form-control" id=destination_stop list="stops">
 		 	<label class="control-label" for="focusedInput">Destination Alias</label>
-	 		<input class="form-control" id=destination_stop type="text">
+	 		<input class="form-control" id=destination_alias type="text">
+	 		<input type="checkbox" name="primary" value="primary" class="checkbox">Make primary destination?<br>
 	 		<input type="hidden" name="alexaID" value={{alexaID}}>
 			<input type="submit" name="Destination Submit" class="btn btn-default">
 		</form>
+		<datalist id="stops">
+			{% for stopname in stop_names %}
+				<option value="{{stopname}}">
+			{% endfor %}
+		</datalist>
 		</div>
 	{% endif %}
 {% endblock %}

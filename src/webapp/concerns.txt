@@ -1,0 +1,7 @@
+# Thoughts to be done but not in MVP1
+ - entire datalist for home and destination stops all display and fill screen
+ 	- fix here: http://stackoverflow.com/questions/15097563/limit-total-entries-displayed-by-datalist
+
+# Things to do
+ - convert stop name to stopid on form submission
+ 
