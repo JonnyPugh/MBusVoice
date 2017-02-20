@@ -3,5 +3,7 @@
  	- fix here: http://stackoverflow.com/questions/15097563/limit-total-entries-displayed-by-datalist
 
 # Things to do
- - convert stop name to stopid on form submission
- 
+ - seperate error logic in index.html into new html file to be returned in main.py
+ - display existing user preferences
+ 	- render data in jinja
+ - write endpoints to accept forms
