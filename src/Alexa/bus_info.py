@@ -21,6 +21,10 @@ class BusInfo(object):
         return self.__stops
 
     @property
+    def stops_by_name(self):
+        return {stop.name.lower(): [stop_id] for stop_id, stop in self.stops.items()}
+
+    @property
     def buses(self):
         if not self.__buses:
             self.__buses = {bus["id"]: self.__Bus(bus) for bus in self.__get_request_json("buses")}
@@ -44,10 +48,7 @@ class BusInfo(object):
             # If the stop number is invalid, the JSON will contain "error"
             raise InvalidStop(stop)
         
-        return self.sort_etas([self.__Eta(eta) for eta in eta_json["etas"][str(stop)]["etas"]])
-
-    def sort_etas(self, etas):
-        return sorted(etas, key=lambda eta: eta.time)
+        return sorted([self.__Eta(eta) for eta in eta_json["etas"][str(stop)]["etas"]], key=lambda eta: eta.time)
 
     class __Stop(object):
         def __init__(self, stop_json):
