@@ -6,4 +6,9 @@
  - seperate error logic in index.html into new html file to be returned in main.py
  - display existing user preferences
  	- render data in jinja
+ 	- get from database object (can just have fill-in data at the moment)
  - write endpoints to accept forms
+ 	- check reqs for reqs
+ - 2 endpoints files
+ 	- one for creating new user data (post_favorites.py)
+ 	- one for editing/deleting user data (edit_favorites.py)
