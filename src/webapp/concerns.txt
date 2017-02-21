@@ -10,8 +10,9 @@
  - write endpoints to accept forms
  	- check requirements documents for requirements
  	- check that posted alexaid is also session value?
- - sessions don't seem to be expiring properly (may have had two servers, not sure)
+ - give meaningful code for ajax failures
 
 # Things I'm waiting for
  - database wrapper interface
  - access to api wrapper object
+

@@ -4,6 +4,8 @@ post_favorites = Blueprint('post_favorites', __name__, template_folder='template
 
 @post_favorites.route('/api/v1/createfavorite', methods=["POST"])
 def create_favorite(): 
+	req_json =  request.get_json()
+	print req_json
 	# if a new home stop
 		# ensure there is a stopname and alias
 
@@ -20,7 +22,7 @@ def create_favorite():
 	# insert into db
 
 	# if destination and no primary destination has been set, make primary, or if indicated should be primary
-	return redirect(url_for('main.index'))
+	return jsonify(ok="ok")
 
 
 def verify_proper_request():

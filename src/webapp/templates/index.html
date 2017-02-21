@@ -2,29 +2,31 @@
 {% block title %}MBus Voice Setup{% endblock %}
 {% block heading %}Welcome to MBus Voice Setup{% endblock %}
 {% block content %}
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
+	<script src={{url_for('static', filename='js/index.js')}} ></script>
 	<p>This form will be used for setting your favorite home and destination stops. You will have the ability to provide an alias for these stops as well. Once your first home stop and destination stop is set, you will be able to ask Alexa “When is the next bus coming?”, and Alexa will be able to default the home and destination for you and respond appropriately. </p>
 	<p>Please use the map to locate your favorite home and destination stops and copy the stop name into the stop name field for home or destination. You can then assign an alias for your stops if you so choose. Some examples of aliases for destination stops could be home, work, class names, etc. If you do not provide an alias, we will provide an basic alias for you. </p>
 	<p>Please fill out the form below.</p>
 	<iframe src="http://mbus.doublemap.com/map/" height="650" width="1000"></iframe>
 	<div class="form-group" style="width:300px;">
-	<form action="{{ url_for('post_favorites.create_favorite') }}" >
+	<form destination="{{ url_for('post_favorites.create_favorite') }}" id="homeForm">
 	 	<label class="control-label" for="focusedInput">Home Stop</label>
- 		<input class="form-control" name="stop_name" list="system_stops">
+ 		<input class="form-control" name="stopName" list="systemStops">
 	 	<label class="control-label" for="focusedInput">Home Alias</label>
- 		<input class="form-control" name="stop_alias" type="text">
- 		<input type="hidden" name="alexaID" value={{alexaID}}>
-		<input type="submit" name="home_submit" class="btn btn-default">
+ 		<input class="form-control" name="stopAlias" type="text">
+ 		<input type="hidden" name="alexaId" value={{alexaID}}>
 	</form>
-	<form action="{{ url_for('post_favorites.create_favorite') }}" method="post">
+	<input type="button" value="Submit" id="homeSubmit" class="btn btn-default">
+	<form destination="{{ url_for('post_favorites.create_favorite') }}" id="destinationForm">
 	 	<label class="control-label" for="focusedInput">Destination Stop</label>
- 		<input class="form-control" name="stop_name" list="system_stops">
+ 		<input class="form-control" name="stopName" list="systemStops">
 	 	<label class="control-label" for="focusedInput">Destination Alias</label>
- 		<input class="form-control" name="stop_alias" type="text">
+ 		<input class="form-control" name="stopAlias" type="text">
+  		<input type="hidden" name="alexaID" value={{alexaID}}>
  		<input type="checkbox" name="primary" value="primary" class="checkbox">Make primary destination?<br>
- 		<input type="hidden" name="alexaID" value={{alexaID}}>
-		<input type="submit" name="destination_submit" class="btn btn-default">
 	</form>
-	<datalist id="system_stops">
+	<input type="button" value="Submit" id="destinationSubmit" class="btn btn-default">
+	<datalist id="systemStops">
 		{% for stopname in stop_names %}
 			<option value="{{stopname}}"></option>
 		{% endfor %}
@@ -56,17 +58,17 @@
 	</table>
 	<form>
 	 	<label class="control-label" for="focusedInput">Current Primary Destination (Alias)</label>
- 		<input class="form-control" id=primary_destination type="text" list="user_stops">
+ 		<input class="form-control" id=primaryDestination type="text" list="userStops">
  		<input type="hidden" name="alexaID" value={{alexaID}}>
 		<input type="submit" name="Destination Submit" class="btn btn-default">
 	</form>
 	<form>
 	 	<label class="control-label" for="focusedInput">Delete Destination (Alias)</label>
- 		<input class="form-control" id=delete_destination type="text" list="user_stops">
+ 		<input class="form-control" id=deleteDestination type="text" list="userStops">
  		<input type="hidden" name="alexaID" value={{alexaID}}>
 		<input type="submit" name="Delete Stop" class="btn btn-default">
 	</form>
-	<datalist id="user_stops">
+	<datalist id="userStops">
 		{% for stopname in user_stops %}
 			<option value="{{stopname[0]}}"></option>
 		{% endfor %}
