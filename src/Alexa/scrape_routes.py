@@ -3,6 +3,9 @@
 from bus_info import BusInfo
 from time import ctime
 
+# Change working directory to the directory of this script the files
+# are created in this directory no matter where the script is run
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 with open("interaction_model/routes.txt", "w") as routes_file:
 	routes_file.write("All Discovered Routes as of "+ctime()+":\n")
 	for route_id, route in BusInfo().routes.items():
