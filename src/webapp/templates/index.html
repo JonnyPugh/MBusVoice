@@ -4,37 +4,32 @@
 {% block content %}
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
 	<script src={{ url_for('static', filename='js/index.js') }}></script>
-	{% if not alexaID %}
-		<h1 class="text-warning">Please only use the link from your Amazon Alexa App to view this page.</h1>
-	{% endif %}
 	<p>This form will be used for setting your favorite home and destination stops. You will have the ability to provide an alias for these stops as well. Once your first home stop and destination stop is set, you will be able to ask Alexa “When is the next bus coming?”, and Alexa will be able to default the home and destination for you and respond appropriately. </p>
 	<p>Please use the map to locate your favorite home and destination stops and copy the stop name into the stop name field for home or destination. You can then assign an alias for your stops if you so choose. Some examples of aliases for destination stops could be home, work, class names, etc. If you do not provide an alias, we will provide an basic alias for you. </p>
 	<p>Please fill out the form below.</p>
 	<iframe src="http://mbus.doublemap.com/map/" height="650" width="1000"></iframe>
-	{% if alexaID %}
-		<div class="form-group" style="width:300px;">
+	<div class="form-group" style="width:300px;">
+	<form>
+	 	<label class="control-label" for="focusedInput">Home Stop</label>
+ 		<input class="form-control" id=home_stop list="stops">
+	 	<label class="control-label" for="focusedInput">Home Alias</label>
+ 		<input class="form-control" id=home_alias type="text">
+ 		<input type="hidden" name="alexaID" value={{alexaID}}>
+		<input type="submit" name="Home Submit" class="btn btn-default">
+	</form>
 		<form>
-		 	<label class="control-label" for="focusedInput">Home Stop</label>
-	 		<input class="form-control" id=home_stop list="stops">
-		 	<label class="control-label" for="focusedInput">Home Alias</label>
-	 		<input class="form-control" id=home_alias type="text">
-	 		<input type="hidden" name="alexaID" value={{alexaID}}>
-			<input type="submit" name="Home Submit" class="btn btn-default">
-		</form>
-			<form>
-		 	<label class="control-label" for="focusedInput">Destination Stop</label>
-	 		<input class="form-control" id=destination_stop list="stops">
-		 	<label class="control-label" for="focusedInput">Destination Alias</label>
-	 		<input class="form-control" id=destination_alias type="text">
-	 		<input type="checkbox" name="primary" value="primary" class="checkbox">Make primary destination?<br>
-	 		<input type="hidden" name="alexaID" value={{alexaID}}>
-			<input type="submit" name="Destination Submit" class="btn btn-default">
-		</form>
-		<datalist id="stops">
-			{% for stopname in stop_names %}
-				<option value="{{stopname}}">
-			{% endfor %}
-		</datalist>
-		</div>
-	{% endif %}
+	 	<label class="control-label" for="focusedInput">Destination Stop</label>
+ 		<input class="form-control" id=destination_stop list="stops">
+	 	<label class="control-label" for="focusedInput">Destination Alias</label>
+ 		<input class="form-control" id=destination_alias type="text">
+ 		<input type="checkbox" name="primary" value="primary" class="checkbox">Make primary destination?<br>
+ 		<input type="hidden" name="alexaID" value={{alexaID}}>
+		<input type="submit" name="Destination Submit" class="btn btn-default">
+	</form>
+	<datalist id="stops">
+		{% for stopname in stop_names %}
+			<option value="{{stopname}}">
+		{% endfor %}
+	</datalist>
+	</div>
 {% endblock %}
