@@ -9,7 +9,7 @@
 	<p>Please fill out the form below.</p>
 	<iframe src="http://mbus.doublemap.com/map/" height="650" width="1000"></iframe>
 	<div class="form-group" style="width:300px;">
-	<form destination="{{ url_for('post_favorites.create_favorite') }}" id="homeForm">
+	<form destination="{{ url_for('post_favorites.create_favorite') }}" id="newHome">
 	 	<label class="control-label" for="focusedInput">Home Stop</label>
  		<input class="form-control" name="stopName" list="systemStops">
 	 	<label class="control-label" for="focusedInput">Home Alias</label>
@@ -17,7 +17,7 @@
  		<input type="hidden" name="alexaId" value={{alexaID}}>
 	</form>
 	<input type="button" value="Submit" id="homeSubmit" class="btn btn-default">
-	<form destination="{{ url_for('post_favorites.create_favorite') }}" id="destinationForm">
+	<form destination="{{ url_for('post_favorites.create_favorite') }}" id="newDestination">
 	 	<label class="control-label" for="focusedInput">Destination Stop</label>
  		<input class="form-control" name="stopName" list="systemStops">
 	 	<label class="control-label" for="focusedInput">Destination Alias</label>

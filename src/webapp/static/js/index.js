@@ -13,12 +13,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 postDestination = function() {
-	formPostFavorite('destinationForm');
+	formPostFavorite('newDestination');
 	return false;
 }
 
 function postHome() {
-	formPostFavorite('homeForm');
+	formPostFavorite('newHome');
 	return false;
 }
 
@@ -26,12 +26,12 @@ function formPostFavorite(formId) {
 	var form = document.getElementById(formId)
 
 	formData = {
-		'form_id': formId,
+		'command_type': formId,
 		'stop_name': form.elements[0].value,
 		'stop_alias': form.elements[1].value,
 		'alexa_id': form.elements[2].value
 	}
-	if (formId === "destinationForm") {
+	if (formId === "newDestination") {
 		formData['primary'] = form.elements[3].checked
 	}
 
@@ -40,11 +40,11 @@ function formPostFavorite(formId) {
 		type: "POST",
 		contentType: "application/json",
 		data: JSON.stringify(formData),
-		success: function() {
-			console.log('sent');
+		success: function(data) {
+			console.log(data);
 		},
-		error: function() {
-			alert("failure");
+		error: function(data) {
+			console.log(data);
 		}
 	})
 } 
