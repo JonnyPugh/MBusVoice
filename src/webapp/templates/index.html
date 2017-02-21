@@ -11,24 +11,68 @@
 	<div class="form-group" style="width:300px;">
 	<form>
 	 	<label class="control-label" for="focusedInput">Home Stop</label>
- 		<input class="form-control" id=home_stop list="stops">
+ 		<input class="form-control" name="stop_name" list="system_stops">
 	 	<label class="control-label" for="focusedInput">Home Alias</label>
- 		<input class="form-control" id=home_alias type="text">
+ 		<input class="form-control" name="stop_alias" type="text">
  		<input type="hidden" name="alexaID" value={{alexaID}}>
+ 		<input type="hidden" name="favorite_type" value="home">
 		<input type="submit" name="Home Submit" class="btn btn-default">
 	</form>
-		<form>
+	<form>
 	 	<label class="control-label" for="focusedInput">Destination Stop</label>
- 		<input class="form-control" id=destination_stop list="stops">
+ 		<input class="form-control" name="stop_name" list="system_stops">
 	 	<label class="control-label" for="focusedInput">Destination Alias</label>
- 		<input class="form-control" id=destination_alias type="text">
+ 		<input class="form-control" name="stop_alias" type="text">
  		<input type="checkbox" name="primary" value="primary" class="checkbox">Make primary destination?<br>
+ 		<input type="hidden" name="alexaID" value={{alexaID}}>
+ 		<input type="hidden" name="favorite_type" value="destination">
+		<input type="submit" name="Destination Submit" class="btn btn-default">
+	</form>
+	<datalist id="system_stops">
+		{% for stopname in stop_names %}
+			<option value="{{stopname}}"></option>
+		{% endfor %}
+	</datalist>
+	</div>
+	<div>
+	<h2>Current User Stops</h2>
+	<table class="table table-striped table-hover ">
+		<thead>
+			<tr>
+				<th>Stop Type</th>
+				<th>Stop Alias</th>
+				<th>Stop name</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for stop in user_stops %}
+			{% if stop[0] == primary %}
+				<tr class="success">
+			{% else %}
+				<tr>
+			{% endif %}
+				<th>{{stop[0]}}</th>
+				<th>{{stop[1]}}</th>
+				<th>{{stop[2]}}</th>
+			</tr>
+		{% endfor%}
+		</tbody>
+	</table>
+	<form>
+	 	<label class="control-label" for="focusedInput">Current Primary Destination (Alias)</label>
+ 		<input class="form-control" id=primary_destination type="text" list="user_stops">
  		<input type="hidden" name="alexaID" value={{alexaID}}>
 		<input type="submit" name="Destination Submit" class="btn btn-default">
 	</form>
-	<datalist id="stops">
-		{% for stopname in stop_names %}
-			<option value="{{stopname}}">
+	<form>
+	 	<label class="control-label" for="focusedInput">Delete Destination (Alias)</label>
+ 		<input class="form-control" id=delete_destination type="text" list="user_stops">
+ 		<input type="hidden" name="alexaID" value={{alexaID}}>
+		<input type="submit" name="Delete Stop" class="btn btn-default">
+	</form>
+	<datalist id="user_stops">
+		{% for stopname in user_stops %}
+			<option value="{{stopname[0]}}"></option>
 		{% endfor %}
 	</datalist>
 	</div>
