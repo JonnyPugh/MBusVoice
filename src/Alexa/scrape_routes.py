@@ -2,6 +2,7 @@
 
 from bus_info import BusInfo
 from time import ctime
+import os
 
 # Change working directory to the directory of this script the files
 # are created in this directory no matter where the script is run
