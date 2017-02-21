@@ -28,12 +28,12 @@ def index():
 def get_user_origins(alexaID):
 	src = {"pierpoint1": 100, "pierpont2": 101}
 
-	return [("Home", alias, stopid) for alias, stopid in src.iteritems()] 
+	return [(alias, stopid, "Home") for alias, stopid in src.iteritems()] 
 
 def get_user_dests(alexaID):
 	src = {"class": 137, "work": 138}
 
-	return [("Destination", alias, stopid) for alias, stopid in src.iteritems()]
+	return [(alias, stopid, "Destination") for alias, stopid in src.iteritems()]
 
 def get_user_primary(alexaID):
 	return "class"
