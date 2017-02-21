@@ -3,10 +3,9 @@
  	- fix here: http://stackoverflow.com/questions/15097563/limit-total-entries-displayed-by-datalist
  - Make UI not look terrible (side by side divs & such)
  - prevent form submission if the stopname is not from the api
+ - use api responses to bring up alerts (bootswatch)
 
 # Things to do
- - make table reload on form submission
- 	- define api endpoint to get list of user stops
  - Convert comment scaffolding/skeleton code to database calls and api wrapper interaction
  	- needs
  		- does this user already exist in the database (get could also just return None if record does not exit)
@@ -17,6 +16,9 @@
  		- check (could be dropped)
  		- get
  		- put
+ - what do we want the webapp to show in the list of users stops if it is empty?
+ - Update ajax call to reload user info upon success
+ - add logo to webapp
 
 
 # Things I'm waiting for
