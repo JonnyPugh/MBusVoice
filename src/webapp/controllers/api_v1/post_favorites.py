@@ -2,7 +2,7 @@ from flask import *
 
 post_favorites = Blueprint('post_favorites', __name__, template_folder='templates')
 
-@post_favorites.route('/api/v1/createfavorite')
+@post_favorites.route('/api/v1/createfavorite', methods=["POST"])
 def create_favorite(): 
 	# if a new home stop
 		# ensure there is a stopname and alias
@@ -20,4 +20,8 @@ def create_favorite():
 	# insert into db
 
 	# if destination and no primary destination has been set, make primary, or if indicated should be primary
-	return 
+	return redirect(url_for('main.index'))
+
+
+def verify_proper_request():
+	return

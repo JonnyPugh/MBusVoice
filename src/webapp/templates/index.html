@@ -2,31 +2,27 @@
 {% block title %}MBus Voice Setup{% endblock %}
 {% block heading %}Welcome to MBus Voice Setup{% endblock %}
 {% block content %}
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
-	<script src={{ url_for('static', filename='js/index.js') }}></script>
 	<p>This form will be used for setting your favorite home and destination stops. You will have the ability to provide an alias for these stops as well. Once your first home stop and destination stop is set, you will be able to ask Alexa “When is the next bus coming?”, and Alexa will be able to default the home and destination for you and respond appropriately. </p>
 	<p>Please use the map to locate your favorite home and destination stops and copy the stop name into the stop name field for home or destination. You can then assign an alias for your stops if you so choose. Some examples of aliases for destination stops could be home, work, class names, etc. If you do not provide an alias, we will provide an basic alias for you. </p>
 	<p>Please fill out the form below.</p>
 	<iframe src="http://mbus.doublemap.com/map/" height="650" width="1000"></iframe>
 	<div class="form-group" style="width:300px;">
-	<form>
+	<form action="{{ url_for('post_favorites.create_favorite') }}" >
 	 	<label class="control-label" for="focusedInput">Home Stop</label>
  		<input class="form-control" name="stop_name" list="system_stops">
 	 	<label class="control-label" for="focusedInput">Home Alias</label>
  		<input class="form-control" name="stop_alias" type="text">
  		<input type="hidden" name="alexaID" value={{alexaID}}>
- 		<input type="hidden" name="favorite_type" value="home">
-		<input type="submit" name="Home Submit" class="btn btn-default">
+		<input type="submit" name="home_submit" class="btn btn-default">
 	</form>
-	<form>
+	<form action="{{ url_for('post_favorites.create_favorite') }}" method="post">
 	 	<label class="control-label" for="focusedInput">Destination Stop</label>
  		<input class="form-control" name="stop_name" list="system_stops">
 	 	<label class="control-label" for="focusedInput">Destination Alias</label>
  		<input class="form-control" name="stop_alias" type="text">
  		<input type="checkbox" name="primary" value="primary" class="checkbox">Make primary destination?<br>
  		<input type="hidden" name="alexaID" value={{alexaID}}>
- 		<input type="hidden" name="favorite_type" value="destination">
-		<input type="submit" name="Destination Submit" class="btn btn-default">
+		<input type="submit" name="destination_submit" class="btn btn-default">
 	</form>
 	<datalist id="system_stops">
 		{% for stopname in stop_names %}
@@ -39,9 +35,9 @@
 	<table class="table table-striped table-hover ">
 		<thead>
 			<tr>
-				<th>Stop Type</th>
 				<th>Stop Alias</th>
-				<th>Stop name</th>
+				<th>Stop Name</th>
+				<th>Stop Type</th>
 			</tr>
 		</thead>
 		<tbody>
