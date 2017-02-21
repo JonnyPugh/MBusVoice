@@ -1,2 +1,3 @@
 GetNextBus: A {{route}} bus from {{origin}} to {{destination}} will be arriving in {{minutes}} {{"minute" if minutes == 1 else "minutes"}}
 GetNextBuses: The next buses to {{destination}} are {{busInfo}}
+MissingFavorite: You don't have a {{favoriteType}} stop set. Please state a {{stopType}} stop or set a favorite {{favoriteType}} stop using our website. Please see your card in the alexa app for a link.
