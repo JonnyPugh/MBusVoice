@@ -24,6 +24,7 @@ function postHome() {
 
 function formPostFavorite(formId) {
 	var form = document.getElementById(formId)
+
 	formData = {
 		'form_id': formId,
 		'stop_name': form.elements[0].value,
@@ -31,9 +32,9 @@ function formPostFavorite(formId) {
 		'alexa_id': form.elements[2].value
 	}
 	if (formId === "destinationForm") {
-		console.log(form.elements[3].value)
 		formData['primary'] = form.elements[3].checked
 	}
+
 	$.ajax({
 		url: form.getAttribute('destination'),
 		type: "POST",
