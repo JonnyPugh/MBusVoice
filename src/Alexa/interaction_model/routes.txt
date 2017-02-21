@@ -1,11 +1,4 @@
-All Discovered Routes as of Mon Feb 20 21:19:06 2017:
-_____________________________________________________
-Route name: Commuter North
-ID: 596
-Description: The Commuter North begins at Crisler Center and ends at Glazier Way, connecting South Campus with North Campus via Central Campus, the Hill area, and the Medical Campus, and serving destinations including the Michigan Union, Central Campus Transit Center, University of Michigan Hospitals, and Pierpont Commons. Routing varies before 7:00 AM and after 7:30 PM; check our website for details.
-Start time: 19:15:00
-End time: 01:30:00
-Stops: [79, 85, 1, 97, 64, 149, 78, 82, 137, 7, 29, 35, 37, 128, 102, 93, 91, 59, 57, 62, 70]
+All Discovered Routes as of Tue Feb 21 01:05:26 2017:
 _____________________________________________________
 Route name: Commuter South
 ID: 594
@@ -14,12 +7,12 @@ Start time: 19:30:00
 End time: 01:30:00
 Stops: [70, 69, 89, 88, 98, 126, 125, 33, 34, 36, 5, 9, 44, 137, 75, 76, 77, 150, 80, 68, 108, 79]
 _____________________________________________________
-Route name: Oxford Shuttle
-ID: 660
-Description: Oxford Shuttle provides service between Oxford Housing, Trotter House, Shapiro Undergraduate Library, Michigan Union, the Central Campus Transit Center, and East Quadrangle. Oxford Shuttle operates weeknights and weekends only.
-Start time: 18:50:00
-End time: 02:00:00
-Stops: [72, 71, 76, 77, 82, 137, 74, 73]
+Route name: Commuter North
+ID: 596
+Description: The Commuter North begins at Crisler Center and ends at Glazier Way, connecting South Campus with North Campus via Central Campus, the Hill area, and the Medical Campus, and serving destinations including the Michigan Union, Central Campus Transit Center, University of Michigan Hospitals, and Pierpont Commons. Routing varies before 7:00 AM and after 7:30 PM; check our website for details.
+Start time: 19:15:00
+End time: 01:30:00
+Stops: [79, 85, 1, 97, 64, 149, 78, 82, 137, 7, 29, 35, 37, 128, 102, 93, 91, 59, 57, 62, 70]
 _____________________________________________________
 Route name: Northwood
 ID: 597
@@ -34,6 +27,13 @@ Description: Bursley-Baits provides service between the Central Campus Transit C
 Start time: 18:45:00
 End time: 02:30:00
 Stops: [137, 3, 5, 8, 10, 128, 100, 92, 134, 133, 84, 83, 101, 48, 32, 44]
+_____________________________________________________
+Route name: Oxford Shuttle
+ID: 660
+Description: Oxford Shuttle provides service between Oxford Housing, Trotter House, Shapiro Undergraduate Library, Michigan Union, the Central Campus Transit Center, and East Quadrangle. Oxford Shuttle operates weeknights and weekends only.
+Start time: 18:50:00
+End time: 02:00:00
+Stops: [72, 71, 76, 77, 82, 137, 74, 73]
 _____________________________________________________
 Route name: Wall Street Express
 ID: 607
