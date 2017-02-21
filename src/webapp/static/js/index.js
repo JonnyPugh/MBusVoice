@@ -3,38 +3,21 @@ document.addEventListener('DOMContentLoaded', function () {
 	{
 		postHome();
 	};
-
 	document.getElementById('destinationSubmit').onclick = function()
 	{
 		postDestination();
 	};
-
-	// need to add hanlders for delete/edit primaries
+	document.getElementById('submitChangePrimary').onclick = function()
+	{
+		postChangePrimary();
+	};
+	document.getElementById('submitDeleteFavorite').onclick = function()
+	{
+		postDeleteFavorite();
+	};
 });
 
-postDestination = function() {
-	formPostFavorite('newDestination');
-	return false;
-}
-
-function postHome() {
-	formPostFavorite('newHome');
-	return false;
-}
-
-function formPostFavorite(formId) {
-	var form = document.getElementById(formId)
-
-	formData = {
-		'command_type': formId,
-		'stop_name': form.elements[0].value,
-		'stop_alias': form.elements[1].value,
-		'alexa_id': form.elements[2].value
-	}
-	if (formId === "newDestination") {
-		formData['primary'] = form.elements[3].checked
-	}
-
+function formPost(form, formData) {
 	$.ajax({
 		url: form.getAttribute('destination'),
 		type: "POST",
@@ -48,3 +31,52 @@ function formPostFavorite(formId) {
 		}
 	})
 } 
+
+function postHome() {
+	var formId = "newHome"
+	var form = document.getElementById(formId)
+	var formData = {
+		'command_type': formId,
+		'stop_name': form.elements[0].value,
+		'stop_alias': form.elements[1].value,
+		'alexa_id': form.elements[2].value
+	}
+
+	formPost(form, formData);
+}
+
+function postDestination() {
+	var formId = "newDestination"
+	var form = document.getElementById(formId)
+	var formData = {
+		'command_type': formId,
+		'stop_name': form.elements[0].value,
+		'stop_alias': form.elements[1].value,
+		'alexa_id': form.elements[2].value,
+		'primary': form.elements[3].checked
+	}	
+
+	formPost(form, formData);
+}
+
+function postChangePrimary() {
+	var formId = "changePrimary"
+	var form = document.getElementById(formId)
+	var formData = {
+		'stop_alias': form.elements[0].value,
+		'alexa_id': form.elements[1].value
+	}
+
+	formPost(form, formData);
+}
+
+function postDeleteFavorite() {
+	var formId = "deleteFavorite"
+	var form = document.getElementById(formId)
+	var formData = {
+		'stop_alias': form.elements[0].value,
+		'alexa_id': form.elements[1].value
+	}
+
+	formPost(form, formData);
+}

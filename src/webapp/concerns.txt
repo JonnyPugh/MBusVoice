@@ -1,16 +1,23 @@
-# Thoughts to be done but not in MVP1
+# Thoughts to be done but probably not in MVP1
  - entire datalist for home and destination stops all display and fill screen
  	- fix here: http://stackoverflow.com/questions/15097563/limit-total-entries-displayed-by-datalist
  - Make UI not look terrible (side by side divs & such)
  - prevent form submission if the stopname is not from the api
 
 # Things to do
- - display existing user preferences
- 	- convert skeleton data providing functions to actual databse calls
- - write endpoints to accept forms
- 	- check requirements documents for requirements
- 	- check that posted alexaid is also session value?
- - give meaningful code for ajax failures
+ - make table reload on form submission
+ 	- define api endpoint to get list of user stops
+ - Convert comment scaffolding/skeleton code to database calls and api wrapper interaction
+ 	- needs
+ 		- does this user already exist in the database (get could also just return None if record does not exit)
+ 		- create user record
+ 		- set user record (probably same as create user)
+ 		- get user record
+ 	- fxns could be
+ 		- check (could be dropped)
+ 		- get
+ 		- put
+
 
 # Things I'm waiting for
  - database wrapper interface
