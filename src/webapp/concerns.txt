@@ -2,6 +2,7 @@
  - entire datalist for home and destination stops all display and fill screen
  	- fix here: http://stackoverflow.com/questions/15097563/limit-total-entries-displayed-by-datalist
  - Make UI not look terrible (side by side divs & such)
+ - prevent form submission if the stopname is not from the api
 
 # Things to do
  - display existing user preferences

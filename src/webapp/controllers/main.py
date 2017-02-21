@@ -24,7 +24,6 @@ def index():
 	}
 	return render_template("index.html", **options)
 
-
 def get_user_origins(alexaID):
 	src = {"pierpoint1": 100, "pierpont2": 101}
 
