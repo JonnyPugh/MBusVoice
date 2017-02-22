@@ -3,11 +3,7 @@ from data import stop_aliases
 from flask import Blueprint, render_template
 from flask_ask import Ask, statement, session
 from difflib import get_close_matches
-
-import boto3
-import json
-from boto3.dynamodb.conditions import Key, Attr
-from botocore.exceptions import ClientError
+from boto3 import resource
 
 blueprint = Blueprint("MBus_blueprint", __name__, url_prefix="/")
 ask = Ask(blueprint=blueprint)
@@ -57,53 +53,36 @@ def clarifyStopName(user_phrase):
 		"RouteName": None,
 		"NumBuses": 1
 	})
-
 def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	# If parameters are None, get user values from the database
-
 	if not StartStop or not EndStop:
-		dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-		table = dynamodb.Table('UserFavorites')
-		try:
-		    response = table.get_item(
-		        Key={
-					'AlexaID': str(session.user.userId)
-				}
-		    )
-		except ClientError as e:
-		    print(e.response['Error']['Message'])
-		else:
-		    item = response['Item']
-		    print (item)	
+	    item = resource("dynamodb", region_name="us-east-1").Table("UserFavorites").get_item(
+	        Key={
+				"AlexaID": str(session.user.userId)
+			}
+	    )["Item"]
+	    template = "MissingFavorite"
 
 	try:
 		# Try to understand which stop the user is talking about
 		if StartStop:
 			StartStop, start_stops = clarifyStopName(StartStop)
 		else:
-			start_stops = item['origins'].values()
-
+			start_stops = item["origins"].values()
 			if not start_stops:
-				template = 'MissingFavorite'
-				text = render_template(template, stopType='starting', favoriteType='home')
+				text = render_template(template, stopType="starting", favoriteType="home")
 				return statement(text).simple_card(template, text)
-
 		if EndStop:
 			EndStop, end_stops = clarifyStopName(EndStop)
 		else:
-			stopID = item['primary']
+			stopID = item["primary"]
 			end_stops = [stopID]
-
 			if not end_stops:
-				template = 'MissingFavorite'
 				text = render_template(template, stopType='ending', favoriteType='destination')
 				return statement(text).simple_card(template, text)
-
 			EndStop = {stopid: alias for alias, stopid in item['destinations'].items()}[stopID]
-
 	except InvalidStop as e:
 		return statement(e.message)
-
 
 	# If the origin and destination are the same, return an error message
 	if set(start_stops) == set(end_stops):
@@ -133,15 +112,11 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 		template = "GetNextBus"
 		eta_info = etas[0]
 		eta = eta_info[0]
-
 		stopID = eta_info[1]
-
 		if not StartStop:
-			StartStop = {stopid: alias for alias, stopid in item['origins'].items()}[stopID]
-			
-
+			StartStop = {stopid: alias for alias, stopid in item["origins"].items()}[stopID]	
 		options.update({
-			"origin": StartStop if len(start_stops) == 1 and StartStop else bus_info.stops[stopID].name,
+			"origin": StartStop if len(start_stops) == 1 else bus_info.stops[stopID].name,
 			"route": bus_info.routes[eta.route].name,
 			"minutes": eta.time
 		})
