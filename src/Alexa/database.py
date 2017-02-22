@@ -25,7 +25,7 @@ class Database(object):
 	#for updating one field of an item
 	#field must be 'origins', 'destinations', or 'default_destination'
 	#item must be the entire new JSON object for origins/destinations, or a new stopID for default_destination 
-	def update_item(self, alexaID, field, item):
+	def update_item_field(self, alexaID, field, item):
 		try:
 			response = self.__table.update_item(
 			    Key={
