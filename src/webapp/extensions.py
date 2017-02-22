@@ -1,22 +1,7 @@
-import MySQLdb, MySQLdb.cursors
-import config
+from flask import jsonify
 
-def connect_to_database():
-    options = {
-        'host': config.env['host'],
-        'user': config.env['user'],
-        'passwd': config.env['password'],
-        'db': config.env['db'],
-        'cursorclass' : MySQLdb.cursors.DictCursor
-      }
-    db = MySQLdb.connect(**options)
-    db.autocommit(True)
-    return db
-db = connect_to_database()
-
-def execute_query(query):
-    cur = db.cursor()
-    cur.execute(query)
-    results = cur.fetchall()
-    cur.close()
-    return results
+def verify_json_parameters(parameters, json):
+    for parameter in parameters:
+        if parameter not in json:
+            return jsonify({"errors": [{"message": "You did not provide the necessary fields"}]}), 400
+    return None
