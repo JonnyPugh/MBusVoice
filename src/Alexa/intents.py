@@ -17,33 +17,37 @@ def launch():
 
 # Exception class used to indicate invalid stop names
 class InvalidStop(Exception):
-	def __init__(self, message):
-		super(Exception, self).__init__(message)
+	def __init__(self, stop_name):
+		super(Exception, self).__init__(stop_name+" is not a valid stop name")
 
 # Take the user's spoken stop name and figure out which stop 
 # id(s) they are referring to and return it/them as a list.
 def clarifyStopName(user_phrase):
 	# Use system level aliases and the stops given by the API and 
 	# see if the user was referring to one of those stops
-	stops_by_name = bus_info.stops_by_name
-	stops_by_name.update(stop_aliases)
 	user_phrase = user_phrase.lower()
-	if user_phrase in stops_by_name:
-		return user_phrase, stops_by_name[user_phrase]
+	if user_phrase in bus_info.stops_by_name:
+		return user_phrase, [bus_info.stops_by_name[user_phrase]]
+	if user_phrase in stop_aliases:
+		return user_phrase, stop_aliases[user_phrase]
 
 	# If the specified stop name is similar to a user level alias,
 	# return all stop ids associated with that alias
 	user_aliases = {}
 
-	# If the specified stop name is similar to a system level alias,
-	# return all stop ids associated with that alias
-	close_matches = get_close_matches(user_phrase, stops_by_name.keys())
+	# If the specified stop name is similar to a system level alias or 
+	# a stop name, return all stop ids associated with it
+	close_matches = get_close_matches(user_phrase, bus_info.stops_by_name.keys())
 	if close_matches:
 		name = close_matches[0]
-		return name, stops_by_name[name]
+		return name, [stops_by_name[name]]
+	close_matches = get_close_matches(user_phrase, stop_aliases.keys())
+	if close_matches:
+		name = close_matches[0]
+		return name, stop_aliases[name]
 
 	# Raise an error if the user_phrase couldn't be clarified
-	raise InvalidStop(user_phrase+" is not a valid stop name")
+	raise InvalidStop(user_phrase)
 
 # Get bus information based on a variety of different parameters
 @ask.intent("GetNextBuses", 
@@ -102,7 +106,11 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 
 	# If there are no valid etas, return an error message
 	if not etas:
-		return statement("No "+(RouteName if RouteName else "")+" buses are currently going from "+StartStop+" to "+EndStop)
+		text = render_template("NoEtas", 
+			route=RouteName if RouteName else "", 
+			origin=StartStop if StartStop else "your home stops", 
+			destination=EndStop)
+		return statement(text).simple_card(template, text)
 
 	options = {
 		"destination": EndStop

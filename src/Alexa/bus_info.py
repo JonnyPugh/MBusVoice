@@ -22,7 +22,7 @@ class BusInfo(object):
 
     @property
     def stops_by_name(self):
-        return {stop.name.lower(): [stop_id] for stop_id, stop in self.stops.items()}
+        return {stop.name.lower(): stop_id for stop_id, stop in self.stops.items()}
 
     @property
     def buses(self):
