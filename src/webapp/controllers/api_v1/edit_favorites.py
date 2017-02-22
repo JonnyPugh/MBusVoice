@@ -7,15 +7,15 @@ edit_favorites = Blueprint('edit_favorites', __name__, template_folder='template
 def change_primary():
 	req_json = request.get_json()
 	
-	malformed_request_error = verify_json_parameters(['alexa_id', 'stop_alias'], req_json)
+	try:
+		verify_json_parameters(['alexa_id', 'stop_alias'], req_json)
 
-	if malformed_request_error is not None:
-		return malformed_request_error
+		# ensure user exists -- need db access
 
-	# ensure user exists -- need db access
+		# ensure the user already has this alias set in the database -- need db access
 
-	# ensure the user already has this alias set in the database -- need db access
-
+	except RequestError as e:
+		return e.json, e.code
 	# Update -- need db access
 
 	return jsonify(req_json), 200
@@ -24,15 +24,15 @@ def change_primary():
 def delete_favorite():
 	req_json = request.get_json()
 
-	malformed_request_error = verify_json_parameters(['alexa_id', 'stop_alias'], req_json)
+	try:
+		malformed_request_error = verify_json_parameters(['alexa_id', 'stop_alias'], req_json)
 
-	if malformed_request_error is not None:
-		return malformed_request_error
+		# check that the user exists -- need db access
 
-	# check that the user exists -- need db access
-
-	# check that this data exists in user home or destinations
-		# throw error if not
+		# check that this data exists in user home or destinations
+			# throw error if not
+	except RequestError as e:
+		return e.json, e.code
 
 	# if deleting primary
 		# clear primary field

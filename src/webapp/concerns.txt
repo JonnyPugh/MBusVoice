@@ -19,6 +19,8 @@
  - what do we want the webapp to show in the list of users stops if it is empty?
  - Update ajax call to reload user info upon success
  - add logo to webapp
+ - sessions are not ending when python server goes down
+ 	- do we want to officially end sessions
 
 
 # Things I'm waiting for
