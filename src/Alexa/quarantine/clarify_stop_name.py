@@ -34,3 +34,4 @@ def clarifyStopName(user_phrase):
 
 	# Raise an error if the user_phrase couldn't be clarified
 	raise InvalidStop(user_phrase)
+	
