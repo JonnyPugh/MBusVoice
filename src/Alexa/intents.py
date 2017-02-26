@@ -1,4 +1,4 @@
-from bus_info import BusInfo
+from quarantine import BusInfo
 from data import stop_aliases
 from flask import Blueprint, render_template
 from flask_ask import Ask, statement, session

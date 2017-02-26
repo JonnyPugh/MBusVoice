@@ -1,4 +1,4 @@
-from bus_info import BusInfo
+from quarantine import BusInfo
 from data import stop_aliases
 
 # Form the slot for all bus stops and aliases
