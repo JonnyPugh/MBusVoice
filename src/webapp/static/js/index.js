@@ -1,20 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
-	document.getElementById('homeSubmit').onclick = function()
-	{
-		postHome();
-	};
-	document.getElementById('destinationSubmit').onclick = function()
-	{
-		postDestination();
-	};
-	document.getElementById('submitChangePrimary').onclick = function()
-	{
-		postChangePrimary();
-	};
-	document.getElementById('submitDeleteFavorite').onclick = function()
-	{
-		postDeleteFavorite();
-	};
+	document.getElementById('homeSubmit').onclick = function() { postHome(); };
+	document.getElementById('destinationSubmit').onclick = function() { postDestination(); };
+	document.getElementById('submitChangePrimary').onclick = function() { postChangePrimary(); };
+	document.getElementById('submitDeleteFavorite').onclick = function() { postDeleteFavorite(); };
 
 	renderUserFavorites();
 });
@@ -26,7 +14,7 @@ function formPost(form, formData) {
 		contentType: "application/json",
 		data: JSON.stringify(formData),
 		success: function(data) {
-			console.log(data);
+			renderUserFavorites();
 		},
 		error: function(data) {
 			console.log(data);
@@ -84,44 +72,63 @@ function postDeleteFavorite() {
 }
 
 function renderUserFavorites() {
-	// hit api endpoint and get list of user stops and primary value
-	var favoriteTable = document.getElementById('userFavorites')
+
+	clearTable("userFavorites");
+	clearDatalist("userDestinations");
+	clearDatalist("userStops");
+
+	var favoriteTable = document.getElementById('userFavorites');
 	$.get(favoriteTable.getAttribute('destination'), function(data) {
 		
-		// Render the user Favorites table and the datalist of edit and delete
-		var tableRef = favoriteTable.getElementsByTagName('tbody')[0];
-		var userStopsFull = data['user_stops']
+		// Render the user favorites table and the datalist of edit and delete
+		var userStopsFull = data['user_stops'];
 		for (var stop in userStopsFull) {
-			var newRow = tableRef.insertRow();
-			for (var stopAttribute in userStopsFull[stop]){
-				var newCell = newRow.insertCell(-1);
-				var newText = document.createTextNode(userStopsFull[stop][stopAttribute]);
-				newCell.appendChild(newText);
-			}
+			var newRow = favoriteTable.getElementsByTagName('tbody')[0].insertRow();
+			populateRow(newRow, userStopsFull[stop]);
+
+			// Highlight the current primary row
 			if (userStopsFull[stop]['alias'] === data['primary']) {
 				newRow.className = "success";
 			}
-		}
 
-		// Iterating twice to improve readability, can change for effiency but probably not necessary
-		var fullListRef = document.getElementById("userStops");
-		var destinationsListRef = document.getElementById("userDestinations")
-		for (var stop in userStopsFull) {
-			var option = document.createElement('option')
-			option.value = userStopsFull[stop]['alias']
-			fullListRef.appendChild(option)
-
-			// Cannot append one option to two datalists
+			// Populate the datalists for primary editing and deletion forms
+			appendListElement("userStops", userStopsFull[stop]['alias']);
 			if (userStopsFull[stop]['favorite_type'] == "Destination") {
-				var copyOption = document.createElement('option')
-				copyOption.value = userStopsFull[stop]['alias']
-				destinationsListRef.appendChild(copyOption)
+				appendListElement("userDestinations", userStopsFull[stop]['alias']);
 			}
 		}
 
-		document.getElementById('primaryAlias').value = data['primary']
+		// Set default value for primary form
+		document.getElementById('primaryAlias').value = data['primary'];
 	});
+}
 
-	// render datalist for use with edit and delete, add primary to value of edit primary
+function clearTable(tableName) {
+	var table = document.getElementById(tableName);
+	if (table.rows.length > 1) {
+		var newBody = document.createElement('tbody');
+		table.replaceChild(newBody, table.getElementsByTagName('tbody')[0]);
+	}
+}
 
+function clearDatalist(listName) {
+	var listChildren = document.getElementById(listName).children;
+	if (listChildren.length > 0) {
+		document.getElementById(listName).removeChild(listChildren[0]);
+		clearDatalist(listName)
+	}
+}
+
+function appendListElement(listName, textValue) {
+	var option = document.createElement('option');
+	option.value = textValue;
+	document.getElementById(listName).appendChild(option);
+}
+
+function populateRow(row, rowData) {
+	for (var stopAttribute in rowData){
+		var newCell = row.insertCell(-1);
+		var newText = document.createTextNode(rowData[stopAttribute]);
+		newCell.appendChild(newText);
+	}
 }
