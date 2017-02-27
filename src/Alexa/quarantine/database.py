@@ -20,7 +20,16 @@ class Database(object):
 		    return None
 		else:
 		    item = response['Item']
+		    self.__castDecimalToInt(item)
 		    return item
+
+	def __castDecimalToInt(self, item):
+		for key in item:
+			if key == 'default_destination':
+				item[key] = int(item[key])
+			if key == 'destinations' or key == 'origins':
+				for stop_alias in item[key]:
+					item[key][stop_alias] = int(item[key][stop_alias])
 
 	#for updating one field of an item
 	#field must be 'origins', 'destinations', or 'default_destination'
