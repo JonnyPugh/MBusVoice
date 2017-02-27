@@ -2,7 +2,6 @@ from bus_info import *
 from database import *
 from data import stop_aliases
 
-
 bus_info = BusInfo()
 db = Database()
 

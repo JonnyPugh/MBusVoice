@@ -1,1 +1,1 @@
-from clarify_stop_name import *
+from shared import *

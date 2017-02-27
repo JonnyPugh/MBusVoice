@@ -33,14 +33,14 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	try:
 		# Try to understand which stop the user is talking about
 		if StartStop:
-			StartStop, start_stops = clarify_stop_name.clarifyStopName(StartStop)
+			StartStop, start_stops = shared.clarifyStopName(StartStop)
 		else:
 			start_stops = item["origins"].values()
 			if not start_stops:
 				text = render_template(template, stopType="starting", favoriteType="home")
 				return statement(text).simple_card(template, text)
 		if EndStop:
-			EndStop, end_stops = clarify_stop_name.clarifyStopName(EndStop)
+			EndStop, end_stops = shared.clarifyStopName(EndStop)
 		else:
 			stopID = item["primary"]
 			end_stops = [stopID]
@@ -48,7 +48,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 				text = render_template(template, stopType='ending', favoriteType='destination')
 				return statement(text).simple_card(template, text)
 			EndStop = {stopid: alias for alias, stopid in item['destinations'].items()}[stopID]
-	except clarify_stop_name.InvalidUserAlias as e:
+	except shared.InvalidUserAlias as e:
 		return statement(e.message)
 
 	# If the origin and destination are the same, return an error message
