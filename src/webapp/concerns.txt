@@ -11,5 +11,6 @@
  	- do we want to officially end sessions
  - prevent form submission if the stopname is not from the api
  - use api responses to bring up alerts (bootswatch)
+ - clear table right before rerendering
 
 
