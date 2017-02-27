@@ -8,11 +8,11 @@ class RequestError(Exception):
 
 class BadRequest(RequestError):
 	def __init__(self, message):
-		super(RequestError, self).__init__(message, 400)
+		super(BadRequest, self).__init__(message, 400)
 
 class UnprocessableEntity(RequestError):
 	def __init__(self, message):
-		super(RequestError, self).__init__(message, 422)
+		super(UnprocessableEntity, self).__init__(message, 422)
 
 def verify_json_parameters(parameters, json):
     for parameter in parameters:
