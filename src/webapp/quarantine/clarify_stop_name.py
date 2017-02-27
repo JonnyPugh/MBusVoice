@@ -1,8 +1,12 @@
-#####################################################
-#       DUPLICATED CODE FROM ALEXA.INTENTS.PY       #
-#####################################################
+from bus_info import *
+from database import *
+from data import stop_aliases
+
+bus_info = BusInfo()
+db = Database()
+
 # Exception class used to indicate invalid stop names
-class InvalidStop(Exception):
+class InvalidUserAlias(Exception):
 	def __init__(self, stop_name):
 		super(Exception, self).__init__(stop_name+" is not a valid stop name")
 
@@ -34,3 +38,4 @@ def clarifyStopName(user_phrase):
 
 	# Raise an error if the user_phrase couldn't be clarified
 	raise InvalidStop(user_phrase)
+	

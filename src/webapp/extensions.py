@@ -1,6 +1,5 @@
 from flask import jsonify
 
-
 class RequestError(Exception):
 	def __init__(self, message, code):
 		self.code = code

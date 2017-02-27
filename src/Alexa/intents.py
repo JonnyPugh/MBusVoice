@@ -1,5 +1,4 @@
-from quarantine import BusInfo
-from data import stop_aliases
+from quarantine import *
 from flask import Blueprint, render_template
 from flask_ask import Ask, statement, session
 from difflib import get_close_matches
@@ -8,46 +7,10 @@ from boto3 import resource
 blueprint = Blueprint("MBus_blueprint", __name__, url_prefix="/")
 ask = Ask(blueprint=blueprint)
 
-bus_info = BusInfo()
-
 # Introduce the skill and demonstrate how to use it
 @ask.launch
 def launch():
 	return statement("Hello, welcome to M-Bus Voice.")
-
-# Exception class used to indicate invalid stop names
-class InvalidStop(Exception):
-	def __init__(self, stop_name):
-		super(Exception, self).__init__(stop_name+" is not a valid stop name")
-
-# Take the user's spoken stop name and figure out which stop 
-# id(s) they are referring to and return it/them as a list.
-def clarifyStopName(user_phrase):
-	# Use system level aliases and the stops given by the API and 
-	# see if the user was referring to one of those stops
-	user_phrase = user_phrase.lower()
-	if user_phrase in bus_info.stops_by_name:
-		return user_phrase, [bus_info.stops_by_name[user_phrase]]
-	if user_phrase in stop_aliases:
-		return user_phrase, stop_aliases[user_phrase]
-
-	# If the specified stop name is similar to a user level alias,
-	# return all stop ids associated with that alias
-	user_aliases = {}
-
-	# If the specified stop name is similar to a system level alias or 
-	# a stop name, return all stop ids associated with it
-	close_matches = get_close_matches(user_phrase, bus_info.stops_by_name.keys())
-	if close_matches:
-		name = close_matches[0]
-		return name, [stops_by_name[name]]
-	close_matches = get_close_matches(user_phrase, stop_aliases.keys())
-	if close_matches:
-		name = close_matches[0]
-		return name, stop_aliases[name]
-
-	# Raise an error if the user_phrase couldn't be clarified
-	raise InvalidStop(user_phrase)
 
 # Get bus information based on a variety of different parameters
 @ask.intent("GetNextBuses", 
@@ -70,14 +33,14 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	try:
 		# Try to understand which stop the user is talking about
 		if StartStop:
-			StartStop, start_stops = clarifyStopName(StartStop)
+			StartStop, start_stops = clarify_stop_name.clarifyStopName(StartStop)
 		else:
 			start_stops = item["origins"].values()
 			if not start_stops:
 				text = render_template(template, stopType="starting", favoriteType="home")
 				return statement(text).simple_card(template, text)
 		if EndStop:
-			EndStop, end_stops = clarifyStopName(EndStop)
+			EndStop, end_stops = clarify_stop_name.clarifyStopName(EndStop)
 		else:
 			stopID = item["primary"]
 			end_stops = [stopID]
@@ -85,7 +48,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 				text = render_template(template, stopType='ending', favoriteType='destination')
 				return statement(text).simple_card(template, text)
 			EndStop = {stopid: alias for alias, stopid in item['destinations'].items()}[stopID]
-	except InvalidStop as e:
+	except clarify_stop_name.InvalidUserAlias as e:
 		return statement(e.message)
 
 	# If the origin and destination are the same, return an error message
