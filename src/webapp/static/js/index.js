@@ -87,7 +87,7 @@ function renderUserFavorites() {
 			populateRow(newRow, userStopsFull[stop]);
 
 			// Highlight the current primary row
-			if (userStopsFull[stop]['alias'] === data['primary']) {
+			if (userStopsFull[stop]['alias'] === findPrimaryAlias(data)) {
 				newRow.className = "success";
 			}
 
@@ -99,8 +99,17 @@ function renderUserFavorites() {
 		}
 
 		// Set default value for primary form
-		document.getElementById('primaryAlias').value = data['primary'];
+		document.getElementById('primaryAlias').value = findPrimaryAlias(data);
 	});
+}
+
+function findPrimaryAlias(data) {
+	for (var i = 0; i < data['user_stops'].length; i++) {
+		if (data['user_stops'][i]['stop_name'] === data['primary']) {
+			return data['user_stops'][i]['alias'];
+		}
+	}
+	return "";
 }
 
 function clearTable(tableName) {
@@ -126,9 +135,10 @@ function appendListElement(listName, textValue) {
 }
 
 function populateRow(row, rowData) {
-	for (var stopAttribute in rowData){
+	tableOrder = ['alias', 'stop_name', 'favorite_type']
+	for (var i = 0; i < tableOrder.length; i++){
 		var newCell = row.insertCell(-1);
-		var newText = document.createTextNode(rowData[stopAttribute]);
+		var newText = document.createTextNode(rowData[tableOrder[i]]);
 		newCell.appendChild(newText);
 	}
 }

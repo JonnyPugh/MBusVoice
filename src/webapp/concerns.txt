@@ -2,28 +2,14 @@
  - entire datalist for home and destination stops all display and fill screen
  	- fix here: http://stackoverflow.com/questions/15097563/limit-total-entries-displayed-by-datalist
  - Make UI not look terrible (side by side divs & such)
- - prevent form submission if the stopname is not from the api
- - use api responses to bring up alerts (bootswatch)
+ - get_favorites endpoint is based on the session['alexaID'] and cannot be used for general purpose access, consider amending this
 
 # Things to do
  - Convert comment scaffolding/skeleton code to database calls and api wrapper interaction
- 	- needs
- 		- does this user already exist in the database (get could also just return None if record does not exit)
- 		- create user record
- 		- set user record (probably same as create user)
- 		- get user record
- 	- fxns could be
- 		- check (could be dropped)
- 		- get
- 		- put
- - what do we want the webapp to show in the list of users stops if it is empty?
- - Update ajax call to reload user info upon success
  - add logo to webapp
  - sessions are not ending when python server goes down
  	- do we want to officially end sessions
+ - prevent form submission if the stopname is not from the api
+ - use api responses to bring up alerts (bootswatch)
 
-
-# Things I'm waiting for
- - database wrapper interface
- - access to api wrapper object
 

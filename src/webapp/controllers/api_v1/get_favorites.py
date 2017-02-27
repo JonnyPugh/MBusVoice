@@ -1,23 +1,20 @@
+from quarantine import *
 from flask import *
 
 get_favorites = Blueprint('get_favorites', __name__, template_folder='templates')
 
 @get_favorites.route('/api/v1/getfavorites', methods=["GET"])
 def get_favorite_list():
-	user_stops = get_user_origins(session['alexaID'])
-	user_stops.extend(get_user_dests(session['alexaID']))
-	primary = get_user_primary(session['alexaID'])
-	return jsonify({'primary': primary, 'user_stops': user_stops})
 
-def get_user_origins(alexaID):
-	src = {"pierpoint1": 100, "pierpont2": 101}
+	try:
+		record =  db.get_item(session['alexaID'])
+	except DatabaseFailure as e:
+		jsonify({"errors": [{"message": "Failed to retrieve user info."}]}), 502
 
-	return [{'alias': alias, 'stop_name' :stopid, 'favorite_type': "Home"} for alias, stopid in src.iteritems()] 
+	user_stops = get_list_with_stop_type(record['origins'], "Home")
+	user_stops.extend(get_list_with_stop_type(record['destinations'], "Destination"))
 
-def get_user_dests(alexaID):
-	src = {"class": 137, "work": 138}
+	return jsonify({'primary': bus_info.stops[record['default_destination']].name, 'user_stops': user_stops})
 
-	return [{'alias': alias, 'stop_name' :stopid, 'favorite_type': "Destination"} for alias, stopid in src.iteritems()]
-
-def get_user_primary(alexaID):
-	return "work"
+def get_list_with_stop_type(stops, stop_type):
+	return [{'alias': alias, 'stop_name': bus_info.stops[stopid].name, 'favorite_type': stop_type} for alias, stopid in stops.iteritems()] 
