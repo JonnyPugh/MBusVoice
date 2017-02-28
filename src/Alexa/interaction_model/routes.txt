@@ -1,4 +1,95 @@
-All Discovered Routes as of Tue Feb 21 01:05:26 2017:
+All Discovered Routes as of Mon Feb 27 21:28:01 2017:
+_____________________________________________________
+Route name: Diag to Diag to North Campus
+ID: 649
+Description: Diag to Diag provides service between Cooley Lab via Pierpont Commons to the Central Campus Transit Center. Diag to Diag operates on a limited schedule Monday through Friday during Fall and Winter terms. Check our website for details.
+Start time: 12:40:00
+End time: 20:00:00
+Stops: [73, 72, 71, 138, 43, 8, 10, 11, 128, 88]
+_____________________________________________________
+Route name: Diag to Diag to CCTC & Oxford
+ID: 650
+Description: Diag to Diag provides service between Cooley Lab via Pierpont Commons to the Central Campus Transit Center. Diag to Diag operates on a limited schedule Monday through Friday during Fall and Winter terms. Check our website for details.
+Start time: 12:40:00
+End time: 19:12:00
+Stops: [88, 98, 48, 32, 44, 137, 74, 73, 72]
+_____________________________________________________
+Route name: Bursley-Baits
+ID: 655
+Description: Bursley-Baits provides service between the Central Campus Transit Center, Bursley Hall and Vera Baits Houses on North Campus. Bursley-Baits operates seven days per week during Fall and Winter terms only. The evening and weekend Bursley-Baits route also provides outbound service to Stockwell Hall and the Cardiovascular Center along Observatory.
+Start time: 08:25:00
+End time: 03:15:00
+Stops: [137, 3, 5, 8, 128, 100, 92, 134, 133, 84, 83, 101, 48, 32, 44]
+_____________________________________________________
+Route name: Bursley-Baits
+ID: 656
+Description: Bursley-Baits provides service between the Central Campus Transit Center, Bursley Hall and Vera Baits Houses on North Campus. Bursley-Baits operates seven days per week during Fall and Winter terms only. The evening and weekend Bursley-Baits route also provides outbound service to Stockwell Hall and the Cardiovascular Center along Observatory.
+Start time: 18:45:00
+End time: 03:15:00
+Stops: [137, 3, 5, 8, 10, 128, 100, 92, 134, 133, 84, 83, 101, 48, 32, 44]
+_____________________________________________________
+Route name: Bursley-Baits
+ID: 659
+Description: Bursley-Baits provides service between the Central Campus Transit Center, Bursley Hall and Vera Baits Houses on North Campus. Bursley-Baits operates seven days per week during Fall and Winter terms only. The evening and weekend Bursley-Baits route also provides outbound service to Stockwell Hall and the Cardiovascular Center along Observatory.
+Start time: 06:30:00
+End time: 18:45:00
+Stops: [137, 8, 10, 128, 100, 92, 134, 133, 84, 83, 101, 48, 32, 44]
+_____________________________________________________
+Route name: Oxford Shuttle
+ID: 660
+Description: Oxford Shuttle provides service between Oxford Housing, Trotter House, Shapiro Undergraduate Library, Michigan Union, the Central Campus Transit Center, and East Quadrangle. Oxford Shuttle operates weeknights and weekends only.
+Start time: 18:50:00
+End time: 02:00:00
+Stops: [72, 71, 76, 77, 82, 137, 74, 73]
+_____________________________________________________
+Route name: Bursley-Baits
+ID: 667
+Description: Bursley-Baits provides service between the Central Campus Transit Center, Bursley Hall and Vera Baits Houses on North Campus. Bursley-Baits operates seven days per week during Fall and Winter terms only. The evening and weekend Bursley-Baits route also provides outbound service to Stockwell Hall and the Cardiovascular Center along Observatory.
+Start time: 06:30:00
+End time: 18:45:00
+Stops: [137, 8, 10, 128, 100, 92, 134, 133, 84, 83, 101, 48, 32, 44]
+_____________________________________________________
+Route name: Meijer Shuttle
+ID: 694
+Description: 
+Start time: 11:30:00
+End time: 19:00:00
+Stops: []
+_____________________________________________________
+Route name: Spring Break Northwood
+ID: 696
+Description: Northwood services Central Campus and Northwood Housing areas on North Campus. It operates 7 days a week, year round, except for University holidays. During the spring and summer terms there are weekend service gaps; check our website for details.
+Start time: 06:50:00
+End time: 00:35:00
+Stops: [138, 43, 8, 10, 128, 100, 92, 134, 133, 84, 83, 130, 132, 140, 25, 27, 21, 23, 19, 61, 53, 56, 55, 54, 58, 60, 20, 94, 88, 98, 47, 7, 6, 4]
+_____________________________________________________
+Route name: Spring Break Northwood
+ID: 697
+Description: Northwood services Central Campus and Northwood Housing areas on North Campus. It operates 7 days a week, year round, except for University holidays. During the spring and summer terms there are weekend service gaps; check our website for details.
+Start time: 08:15:00
+End time: 00:35:00
+Stops: [138, 43, 8, 10, 128, 100, 92, 134, 133, 84, 83, 130, 132, 140, 25, 27, 21, 23, 19, 61, 53, 56, 55, 54, 58, 60, 20, 94, 88, 98, 47, 7, 6, 4]
+_____________________________________________________
+Route name: Oxford Shuttle
+ID: 698
+Description: Oxford Shuttle provides service between Oxford Housing, Trotter House, Shapiro Undergraduate Library, Michigan Union, the Central Campus Transit Center, and East Quadrangle. Oxford Shuttle operates weeknights and weekends only.
+Start time: 07:15:00
+End time: 02:10:00
+Stops: [72, 71, 76, 77, 82, 137, 74, 73]
+_____________________________________________________
+Route name: Commuter South
+ID: 592
+Description: The Commuter South begins at Glazier Way and ends at Crisler Center, connecting North Campus with South Campus via the Medical Campus, the Hill area, and Central Campus, and serving destinations including Pierpont Commons, University of Michigan Hospitals, Central Campus Transit Center, and the Michigan Union. Routing varies before 7:00 AM and after 7:30 PM; check our website for details.
+Start time: 06:10:00
+End time: 07:00:00
+Stops: [70, 69, 89, 88, 98, 126, 125, 33, 34, 36, 5, 9, 44, 137, 75, 76, 77, 150, 80, 68, 108, 79]
+_____________________________________________________
+Route name: Commuter South
+ID: 593
+Description: The Commuter South begins at Glazier Way and ends at Crisler Center, connecting North Campus with South Campus via the Medical Campus, the Hill area, and Central Campus, and serving destinations including Pierpont Commons, University of Michigan Hospitals, Central Campus Transit Center, and the Michigan Union. Routing varies before 7:00 AM and after 7:30 PM; check our website for details.
+Start time: 06:45:00
+End time: 19:45:00
+Stops: [70, 69, 89, 88, 98, 49, 33, 34, 36, 5, 9, 44, 137, 75, 76, 77, 150, 80, 68, 108, 79]
 _____________________________________________________
 Route name: Commuter South
 ID: 594
@@ -6,6 +97,13 @@ Description: The Commuter South begins at Glazier Way and ends at Crisler Center
 Start time: 19:30:00
 End time: 01:30:00
 Stops: [70, 69, 89, 88, 98, 126, 125, 33, 34, 36, 5, 9, 44, 137, 75, 76, 77, 150, 80, 68, 108, 79]
+_____________________________________________________
+Route name: Commuter North
+ID: 595
+Description: The Commuter North begins at Crisler Center and ends at Glazier Way, connecting South Campus with North Campus via Central Campus, the Hill area, and the Medical Campus, and serving destinations including the Michigan Union, Central Campus Transit Center, University of Michigan Hospitals, and Pierpont Commons. Routing varies before 7:00 AM and after 7:30 PM; check our website for details.
+Start time: 05:45:00
+End time: 19:30:00
+Stops: [79, 85, 1, 97, 64, 149, 78, 82, 137, 7, 29, 35, 37, 128, 102, 93, 91, 59, 57, 62, 70]
 _____________________________________________________
 Route name: Commuter North
 ID: 596
@@ -21,19 +119,33 @@ Start time: 06:15:00
 End time: 02:40:00
 Stops: [138, 43, 8, 11, 128, 100, 130, 140, 25, 27, 21, 23, 19, 61, 53, 56, 55, 54, 58, 60, 20, 94, 88, 98, 47, 7, 6, 4]
 _____________________________________________________
-Route name: Bursley-Baits
-ID: 633
-Description: Bursley-Baits provides service between the Central Campus Transit Center, Bursley Hall and Vera Baits Houses on North Campus. Bursley-Baits operates seven days per week during Fall and Winter terms only. The evening and weekend Bursley-Baits route also provides outbound service to Stockwell Hall and the Cardiovascular Center along Observatory.
-Start time: 18:45:00
-End time: 02:30:00
-Stops: [137, 3, 5, 8, 10, 128, 100, 92, 134, 133, 84, 83, 101, 48, 32, 44]
+Route name: MedExpress
+ID: 599
+Description: MedExpress connects Glazier Way (NC51) Lot and Orange Fuller Road lots to Medical Campus locations: Cancer Center, Taubman Center/University Hospital and Mott Children's Hospital/M22. Trips prior to 7:00 AM enter the M75 "Mitchell Field" lot. Return trips should be made on Commuter North.
+Start time: 05:00:00
+End time: 07:05:00
+Stops: [70, 69, 89, 126, 125, 33, 34, 36, 5, 9]
 _____________________________________________________
-Route name: Oxford Shuttle
-ID: 660
-Description: Oxford Shuttle provides service between Oxford Housing, Trotter House, Shapiro Undergraduate Library, Michigan Union, the Central Campus Transit Center, and East Quadrangle. Oxford Shuttle operates weeknights and weekends only.
-Start time: 18:50:00
-End time: 02:00:00
-Stops: [72, 71, 76, 77, 82, 137, 74, 73]
+Route name: MedExpress
+ID: 600
+Description: MedExpress connects Glazier Way (NC51) Lot and Orange Fuller Road lots to Medical Campus locations: Cancer Center, Taubman Center/University Hospital and Mott Children's Hospital/M22. Trips prior to 7:00 AM enter the M75 "Mitchell Field" lot. Return trips should be made on Commuter North.
+Start time: 06:50:00
+End time: 19:25:00
+Stops: [70, 69, 89, 49, 33, 34, 36, 5, 9]
+_____________________________________________________
+Route name: Wall Street - NIB
+ID: 605
+Description: 
+Start time: 05:45:00
+End time: 19:00:00
+Stops: [31, 7, 29, 35, 37, 67, 145, 33, 34, 36, 5, 8]
+_____________________________________________________
+Route name: Wall Street Express
+ID: 606
+Description: 
+Start time: 04:55:00
+End time: 06:10:00
+Stops: [145, 33, 34, 36, 5, 29, 35, 37, 67]
 _____________________________________________________
 Route name: Wall Street Express
 ID: 607
@@ -41,3 +153,101 @@ Description:
 Start time: 18:55:00
 End time: 01:30:00
 Stops: [145, 33, 34, 36, 5, 29, 35, 37, 67]
+_____________________________________________________
+Route name: North-East Shuttle to Dominos via VA
+ID: 608
+Description: 
+Start time: 06:00:00
+End time: 19:40:00
+Stops: [33, 34, 36, 5, 8, 10, 30, 128, 143, 87, 91, 59, 52, 16, 13, 121, 144, 116]
+_____________________________________________________
+Route name: North-East Shuttle to Dominos
+ID: 609
+Description: 
+Start time: 06:15:00
+End time: 19:30:00
+Stops: [33, 34, 36, 5, 8, 10, 30, 128, 87, 91, 59, 52, 16, 13, 121, 144, 116, 119, 118]
+_____________________________________________________
+Route name: North-East Shuttle to UM Hospital
+ID: 610
+Description: 
+Start time: 06:00:00
+End time: 19:40:00
+Stops: [119, 118, 103, 99, 111, 112, 142, 122, 117, 120, 14, 15, 18, 12, 17, 60, 20, 94, 90, 49, 33, 34, 36, 5, 8]
+_____________________________________________________
+Route name: Bio-Research Shuttle
+ID: 611
+Description: 
+Start time: 08:00:00
+End time: 17:15:00
+Stops: [12, 88, 38, 147, 148, 93]
+_____________________________________________________
+Route name: Northwood
+ID: 618
+Description: Northwood services Central Campus and Northwood Housing areas on North Campus. It operates 7 days a week, year round, except for University holidays. During the spring and summer terms there are weekend service gaps; check our website for details.
+Start time: 06:15:00
+End time: 03:15:00
+Stops: [138, 43, 8, 10, 128, 100, 130, 132, 140, 25, 27, 21, 23, 19, 61, 53, 56, 55, 54, 58, 60, 20, 94, 88, 98, 47, 7, 6, 4]
+_____________________________________________________
+Route name: Northwood Express to CCTC & Oxford
+ID: 620
+Description: Northwood Express provides service between the North Campus Fire Station through Northwood Housing areas to the Central Campus Transit Center. Northwood Express operates on a limited schedule Monday through Friday during Fall and Winter terms. Check our website for details.
+Start time: 07:00:00
+End time: 13:10:00
+Stops: [26, 139, 131, 129, 135, 101, 47, 32, 44, 137, 74, 73, 72]
+_____________________________________________________
+Route name: Northwood Express to North Campus
+ID: 621
+Description: Northwood Express provides service between the North Campus Fire Station through Northwood Housing areas to the Central Campus Transit Center. Northwood Express operates on a limited schedule Monday through Friday during Fall and Winter terms. Check our website for details.
+Start time: 07:00:00
+End time: 13:10:00
+Stops: [73, 72, 71, 138, 43, 11, 128, 100, 136, 26]
+_____________________________________________________
+Route name: Northwood
+ID: 622
+Description: Northwood services Central Campus and Northwood Housing areas on North Campus. It operates 7 days a week, year round, except for University holidays. During the spring and summer terms there are weekend service gaps; check our website for details.
+Start time: 08:20:00
+End time: 03:15:00
+Stops: [138, 43, 8, 10, 128, 100, 130, 132, 140, 25, 27, 21, 23, 19, 61, 53, 56, 55, 54, 58, 60, 20, 94, 88, 98, 47, 7, 6, 4]
+_____________________________________________________
+Route name: Northwood
+ID: 623
+Description: Northwood services Central Campus and Northwood Housing areas on North Campus. It operates 7 days a week, year round, except for University holidays. During the spring and summer terms there are weekend service gaps; check our website for details.
+Start time: 08:20:00
+End time: 02:40:00
+Stops: [138, 43, 8, 10, 128, 100, 130, 132, 140, 25, 27, 21, 23, 19, 61, 53, 56, 55, 54, 58, 60, 20, 94, 88, 98, 47, 7, 6, 4]
+_____________________________________________________
+Route name: UM Paratransit
+ID: 628
+Description: 
+Start time: 07:20:00
+End time: 19:00:00
+Stops: []
+_____________________________________________________
+Route name: Bursley-Baits
+ID: 631
+Description: Bursley-Baits provides service between the Central Campus Transit Center, Bursley Hall and Vera Baits Houses on North Campus. Bursley-Baits operates seven days per week during Fall and Winter terms only. The evening and weekend Bursley-Baits route also provides outbound service to Stockwell Hall and the Cardiovascular Center along Observatory.
+Start time: 08:30:00
+End time: 02:40:00
+Stops: [137, 3, 5, 8, 10, 128, 100, 92, 134, 133, 84, 83, 101, 48, 32, 44]
+_____________________________________________________
+Route name: Oxford Shuttle
+ID: 632
+Description: Oxford Shuttle provides service between Oxford Housing, Trotter House, Shapiro Undergraduate Library, Michigan Union, the Central Campus Transit Center, and East Quadrangle. Oxford Shuttle operates weeknights and weekends only.
+Start time: 17:00:00
+End time: 22:00:00
+Stops: [72, 71, 76, 77, 82, 137, 74, 73]
+_____________________________________________________
+Route name: Bursley-Baits
+ID: 633
+Description: Bursley-Baits provides service between the Central Campus Transit Center, Bursley Hall and Vera Baits Houses on North Campus. Bursley-Baits operates seven days per week during Fall and Winter terms only. The evening and weekend Bursley-Baits route also provides outbound service to Stockwell Hall and the Cardiovascular Center along Observatory.
+Start time: 18:45:00
+End time: 02:30:00
+Stops: [137, 3, 5, 8, 10, 128, 100, 92, 134, 133, 84, 83, 101, 48, 32, 44]
+_____________________________________________________
+Route name: North-East Shuttle to UM Hospital via VA
+ID: 634
+Description: 
+Start time: 06:00:00
+End time: 19:40:00
+Stops: [119, 118, 103, 99, 111, 112, 142, 122, 117, 120, 14, 15, 18, 12, 17, 60, 20, 94, 90, 63, 49, 33]
