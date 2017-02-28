@@ -38,5 +38,5 @@ def clarifyStopName(user_phrase):
 		return name, stop_aliases[name]
 
 	# Raise an error if the user_phrase couldn't be clarified
-	raise InvalidStop(user_phrase)
+	raise InvalidUserAlias(user_phrase)
 	
