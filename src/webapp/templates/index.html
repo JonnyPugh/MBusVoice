@@ -11,15 +11,15 @@
 	<div class="form-group" style="width:300px;">
 	<form destination="{{ url_for('post_favorites.create_favorite') }}" id="newHome">
 	 	<label class="control-label" for="focusedInput">Home Stop</label>
- 		<input class="form-control" name="stopName" list="systemStops">
+ 		<input class="form-control" name="stopName" id="homeStopName" list="systemStops">
 	 	<label class="control-label" for="focusedInput">Home Alias</label>
  		<input class="form-control" name="stopAlias" type="text">
- 		<input type="hidden" name="alexaId" value={{alexaID}}>
+ 		<input type="hidden" name="alexaId" value={{alexaID}} class="disabled">
 	</form>
 	<input type="button" value="Submit" id="homeSubmit" class="btn btn-default">
 	<form destination="{{ url_for('post_favorites.create_favorite') }}" id="newDestination">
 	 	<label class="control-label" for="focusedInput">Destination Stop</label>
- 		<input class="form-control" name="stopName" list="systemStops">
+ 		<input class="form-control" name="stopName" id="destinationStopName" list="systemStops">
 	 	<label class="control-label" for="focusedInput">Destination Alias</label>
  		<input class="form-control" name="stopAlias" type="text">
   		<input type="hidden" name="alexaID" value={{alexaID}}>
@@ -28,7 +28,7 @@
 	<input type="button" value="Submit" id="destinationSubmit" class="btn btn-default">
 	<datalist id="systemStops">
 		{% for stopname in stop_names %}
-			<option value="{{stopname}}"></option>
+			<option value="{{stopname}}" class="systemLevelStop">{{stopname}}</option>
 		{% endfor %}
 	</datalist>
 	</div>

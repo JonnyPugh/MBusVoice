@@ -1,11 +1,35 @@
 document.addEventListener('DOMContentLoaded', function () {
+
+	// Add ajax call wrappers to onclick events for submit buttons
 	document.getElementById('homeSubmit').onclick = function() { postHome(); };
 	document.getElementById('destinationSubmit').onclick = function() { postDestination(); };
 	document.getElementById('submitChangePrimary').onclick = function() { postChangePrimary(); };
 	document.getElementById('submitDeleteFavorite').onclick = function() { postDeleteFavorite(); };
 
+	// Disable submit buttons for new home and destination stops
+	document.getElementById('homeSubmit').setAttribute('disabled', 'disabled')
+	document.getElementById('destinationSubmit').setAttribute('disabled', 'disabled')
+
+	populateSystemStops()
+
+	// Add event handlers to submit buttons to monitor for valid stop name
+	$('#homeStopName').bind('keyup input', function() {
+		disableInvalidSubmission('homeStopName', 'homeSubmit'); 
+	});
+	$('#destinationStopName').bind('keyup input', function() {
+		disableInvalidSubmission('destinationStopName', 'destinationSubmit'); 
+	});
+
 	renderUserFavorites();
 });
+
+function populateSystemStops() {
+	var listOptions = document.getElementsByClassName('systemLevelStop');
+	systemLevelStops = [];
+	for (var i = 0; i < listOptions.length; i++) {
+		 systemLevelStops.push(listOptions[i].value);
+	}
+}
 
 function formPost(form, formData) {
 	$.ajax({
@@ -19,7 +43,7 @@ function formPost(form, formData) {
 		error: function(data) {
 			console.log(data);
 		}
-	})
+	});
 } 
 
 function postHome() {
@@ -30,7 +54,7 @@ function postHome() {
 		'stop_name': form.elements[0].value,
 		'stop_alias': form.elements[1].value,
 		'alexa_id': form.elements[2].value
-	}
+	};
 
 	formPost(form, formData);
 }
@@ -44,7 +68,7 @@ function postDestination() {
 		'stop_alias': form.elements[1].value,
 		'alexa_id': form.elements[2].value,
 		'primary': form.elements[3].checked
-	}	
+	};
 
 	formPost(form, formData);
 }
@@ -55,7 +79,7 @@ function postChangePrimary() {
 	var formData = {
 		'stop_alias': form.elements[0].value,
 		'alexa_id': form.elements[1].value
-	}
+	};
 
 	formPost(form, formData);
 }
@@ -66,7 +90,7 @@ function postDeleteFavorite() {
 	var formData = {
 		'stop_alias': form.elements[0].value,
 		'alexa_id': form.elements[1].value
-	}
+	};
 
 	formPost(form, formData);
 }
@@ -124,7 +148,7 @@ function clearDatalist(listName) {
 	var listChildren = document.getElementById(listName).children;
 	if (listChildren.length > 0) {
 		document.getElementById(listName).removeChild(listChildren[0]);
-		clearDatalist(listName)
+		clearDatalist(listName);
 	}
 }
 
@@ -140,5 +164,23 @@ function populateRow(row, rowData) {
 		var newCell = row.insertCell(-1);
 		var newText = document.createTextNode(rowData[tableOrder[i]]);
 		newCell.appendChild(newText);
+	}
+}
+
+function disableInvalidSubmission(fieldId, buttonId) {
+	console.log(document.getElementById(fieldId).value)
+
+	var listOptions = document.getElementsByClassName('systemLevelStop');
+	systemLevelStops = [];
+	for (var i = 0; i < listOptions.length; i++) {
+		 systemLevelStops.push(listOptions[i].value);
+	}
+
+	// If the current value entered is not in the list of system stops
+	if (systemLevelStops.indexOf(document.getElementById(fieldId).value) === -1) {
+		document.getElementById(buttonId).setAttribute('disabled', 'disabled');
+	} 
+	else {
+		document.getElementById(buttonId).removeAttribute('disabled')
 	}
 }

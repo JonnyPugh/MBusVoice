@@ -68,7 +68,6 @@ def verify_non_duplicate(req_json, user_record):
 	if req_json['command_type'] == DESTINATION:
 		favorite_type = 'destinations'
 
-	print user_record
 	if bus_info.stops_by_name[req_json['stop_name']] in user_record[favorite_type].values():
 		raise UnprocessableEntity("Insertion of this stop would cause duplication")
 

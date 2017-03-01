@@ -12,5 +12,6 @@
  - prevent form submission if the stopname is not from the api
  - use api responses to bring up alerts (bootswatch)
  - clear table right before rerendering
+ - when in delete form and enter pressed, reloads page
 
 
