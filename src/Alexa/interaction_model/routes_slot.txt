@@ -1,6 +1,36 @@
-commuter south
-commuter north
-northwood
+diag to diag to north campus
+diag to diag to cctc & oxford
+bursley-baits
+bursley-baits
 bursley-baits
 oxford shuttle
+bursley-baits
+meijer shuttle
+spring break northwood
+spring break northwood
+oxford shuttle
+commuter south
+commuter south
+commuter south
+commuter north
+commuter north
+northwood
+medexpress
+medexpress
+wall street - nib
 wall street express
+wall street express
+north-east shuttle to dominos via va
+north-east shuttle to dominos
+north-east shuttle to um hospital
+bio-research shuttle
+northwood
+northwood express to cctc & oxford
+northwood express to north campus
+northwood
+northwood
+um paratransit
+bursley-baits
+oxford shuttle
+bursley-baits
+north-east shuttle to um hospital via va

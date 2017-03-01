@@ -1,6 +1,7 @@
 from bus_info import *
 from database import *
 from data import stop_aliases
+from difflib import get_close_matches
 
 bus_info = BusInfo()
 db = Database()
@@ -37,5 +38,5 @@ def clarifyStopName(user_phrase):
 		return name, stop_aliases[name]
 
 	# Raise an error if the user_phrase couldn't be clarified
-	raise InvalidStop(user_phrase)
+	raise InvalidUserAlias(user_phrase)
 	
