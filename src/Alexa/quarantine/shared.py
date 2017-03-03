@@ -2,9 +2,16 @@ from bus_info import *
 from database import *
 from data import stop_aliases
 from difflib import get_close_matches
+from flask import jsonify
 
 bus_info = BusInfo()
 db = Database()
+
+class RequestError(Exception):
+	def __init__(self, message, code):
+		self.code = code
+		self.json = jsonify({"errors": [{"message": message}]})
+		super(Exception, self).__init__(message)
 
 # Exception class used to indicate invalid stop names
 class InvalidUserAlias(Exception):
