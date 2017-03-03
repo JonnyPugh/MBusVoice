@@ -1,10 +1,4 @@
-from flask import jsonify
-
-class RequestError(Exception):
-	def __init__(self, message, code):
-		self.code = code
-		self.json = jsonify({"errors": [{"message": message}]})
-		super(Exception, self).__init__(message)
+from quarantine import *
 
 class BadRequest(RequestError):
 	def __init__(self, message):
