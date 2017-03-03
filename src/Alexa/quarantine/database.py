@@ -3,6 +3,8 @@ import json
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
+#add more custom exceptions
+#figure out why raising this exception doesn't work for the check in webapp/main.py
 class DatabaseFailure(Exception):
     def __init__(self):
         super(DatabaseFailure, self).__init__("Database Failure")
