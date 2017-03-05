@@ -14,7 +14,7 @@ class RequestError(Exception):
 		super(Exception, self).__init__(message)
 
 # Exception class used to indicate invalid stop names
-class InvalidUserAlias(Exception):
+class InvalidPhrase(Exception):
 	def __init__(self, stop_name):
 		super(Exception, self).__init__(stop_name+" is not a valid stop name")
 
@@ -48,5 +48,5 @@ def clarifyStopName(user_phrase, favorite_stops):
 		return name, stop_aliases[name]
 
 	# Raise an error if the user_phrase couldn't be clarified
-	raise InvalidUserAlias(user_phrase)
+	raise InvalidPhrase(user_phrase)
 	

@@ -41,7 +41,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 				return statement(text).simple_card(template, text)
 			end_stops = [stopID]
 			EndStop = {stopid: alias for alias, stopid in user_info["destinations"].items()}[stopID]
-	except shared.InvalidUserAlias as e:
+	except shared.InvalidPhrase as e:
 		return statement(e.message)
 
 	# If the origin and destination are the same, return an error message
@@ -112,7 +112,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 def getNextBuses(StopName):
 	try:
 		StopName, start_stops = shared.clarifyStopName(StopName, db.get_item(session.user.userId)["origins"])
-	except shared.InvalidUserAlias as e:
+	except shared.InvalidPhrase as e:
 		return statement(e.message)
 
 	# Determine the soonest eta to the specified stop
