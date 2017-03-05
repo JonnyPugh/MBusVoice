@@ -41,7 +41,7 @@ def clarifyStopName(user_phrase, favorite_stops):
 	close_matches = get_close_matches(user_phrase, bus_info.stops_by_name.keys())
 	if close_matches:
 		name = close_matches[0]
-		return name, [stops_by_name[name]]
+		return name, [bus_info.stops_by_name[name]]
 	close_matches = get_close_matches(user_phrase, stop_aliases.keys())
 	if close_matches:
 		name = close_matches[0]
