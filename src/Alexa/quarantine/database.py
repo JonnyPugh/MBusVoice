@@ -6,8 +6,8 @@ from botocore.exceptions import ClientError
 #add more custom exceptions
 #figure out why raising this exception doesn't work for the check in webapp/main.py
 class DatabaseFailure(Exception):
-    def __init__(self):
-        super(DatabaseFailure, self).__init__("Database Failure")
+    def __init__(self, message):
+        super(DatabaseFailure, self).__init__("Database Failure in function " + message)
 
 class Database(object):
 
@@ -18,7 +18,7 @@ class Database(object):
 		try:
 		    response = self.__table.get_item(Key={ 'AlexaID': str(alexaID)})
 		except:
-		    raise DatabaseFailure()
+		    raise DatabaseFailure("get_item")
 		    return None
 		else:
 		    item = response['Item']
@@ -48,7 +48,7 @@ class Database(object):
 			    }
 			)
 		except:
-			raise DatabaseFailure()
+			raise DatabaseFailure("update_item_field")
 
 	#origins, destinations must be JSON onject, and default_destination should be a number	    
 	def put_item(self, alexaID, origins, destinations, default):
@@ -62,7 +62,7 @@ class Database(object):
 			    }
 			)
 		except:
-			raise DatabaseFailure()
+			raise DatabaseFailure("put_item")
 
 	#if we only want to delete one part, for now we will have to delete the whole item and recreate it
 	def delete_item(self, alexaID):
@@ -73,4 +73,4 @@ class Database(object):
 		        }
 		    )
 		except:
-			raise DatabaseFailure()
+			raise DatabaseFailure("delete_item")
