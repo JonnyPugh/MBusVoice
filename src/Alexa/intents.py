@@ -5,9 +5,21 @@ from flask_ask import Ask, statement, session
 blueprint = Blueprint("MBus_blueprint", __name__, url_prefix="/")
 ask = Ask(blueprint=blueprint)
 
+# If the current user is not in the database, add them to the database 
+# Return the current user's data
+def getUserData():
+	userID = session.user.userId
+	try:
+		return db.get_item(userID)
+	except database.DatabaseFailure:
+		db.put_item(userID, {}, {}, -1)
+		return db.get_item(userID)
+
 # Introduce the skill and demonstrate how to use it
+# If the current user is not in the database, add them to the database
 @ask.launch
 def launch():
+	getUserData()
 	return statement("Hello, welcome to M-Bus Voice.")
 
 # Get bus information based on a variety of different parameters
@@ -20,7 +32,7 @@ def launch():
 	})
 def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	# Get user preferences from the database
-	user_info = db.get_item(session.user.userId)
+	user_info = getUserData()
 	template = "MissingFavorite"
 
 	try:
@@ -111,7 +123,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 @ask.intent("GetNextBusAtStop")
 def getNextBuses(StopName):
 	try:
-		StopName, start_stops = shared.clarifyStopName(StopName, db.get_item(session.user.userId)["origins"])
+		StopName, start_stops = shared.clarifyStopName(StopName, getUserData()["origins"])
 	except shared.InvalidPhrase as e:
 		return statement(e.message)
 
