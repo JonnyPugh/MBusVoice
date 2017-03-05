@@ -15,12 +15,16 @@ def getUserData():
 		db.put_item(userID, {}, {}, -1)
 		return db.get_item(userID)
 
+# Get the URL of the deployed web application
+def getUrl():
+	return "https://szxtj7qm84.execute-api.us-east-1.amazonaws.com/dev?alexaID="+session.user.userId
+
 # Introduce the skill and demonstrate how to use it
 # If the current user is not in the database, add them to the database
 @ask.launch
 def launch():
 	getUserData()
-	return statement("Hello, welcome to M-Bus Voice.")
+	return statement("Hello, welcome to Blue Bus.").simple_card("Welcome!", "Set up your preferences at: "+getUrl())
 
 # Get bus information based on a variety of different parameters
 @ask.intent("GetNextBuses", 
@@ -42,15 +46,13 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 		else:
 			start_stops = user_info["origins"].values()
 			if not start_stops:
-				text = render_template(template, stopType="starting", favoriteType="home")
-				return statement(text).simple_card(template, text)
+				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", "Set up your preferences at: "+getUrl())
 		if EndStop:
 			EndStop, end_stops = shared.clarifyStopName(EndStop, user_info["destinations"])
 		else:
 			stopID = user_info["default_destination"]
 			if stopID == -1:
-				text = render_template(template, stopType="ending", favoriteType="destination")
-				return statement(text).simple_card(template, text)
+				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", "Set up your preferences at: "+getUrl())
 			end_stops = [stopID]
 			EndStop = {stopid: alias for alias, stopid in user_info["destinations"].items()}[stopID]
 	except shared.InvalidPhrase as e:
@@ -78,7 +80,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 			route=RouteName if RouteName else "", 
 			origin=StartStop if StartStop else "your home stops", 
 			destination=EndStop)
-		return statement(text).simple_card(template, text)
+		return statement(text)
 
 	# Sort the etas by how soon their bus will arrive at their origin stop
 	etas = sorted(etas, key=lambda eta_info: eta_info[0].time)
@@ -117,7 +119,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 			"busInfo": message
 		})
 	text = render_template(template, **options)
-	return statement(text).simple_card(template, text)
+	return statement(text)
 
 # Get the next bus coming to a specified stop
 @ask.intent("GetNextBusAtStop")
@@ -139,7 +141,7 @@ def getNextBuses(StopName):
 	if not eta:
 		template = "NoBuses"
 		text = render_template(template, origin=StopName)
-		return statement(text).simple_card(template, text)
+		return statement(text)
 
 	# Form the response and return it to the user
 	template = "GetNextBusAtStop"
@@ -147,4 +149,4 @@ def getNextBuses(StopName):
 		origin=StopName if len(start_stops) == 1 else bus_info.stops[eta_stop].name,
 		route=bus_info.routes[eta.route].name,
 		minutes=eta.time)
-	return statement(text).simple_card(template, text)
+	return statement(text)
