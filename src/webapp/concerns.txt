@@ -15,5 +15,4 @@
  - when in delete form and enter pressed, reloads page
  - database failure if no alias entered for new stops
  	- add alias, assume to be stopname
-
-
+ - change Delete Destination on webapp to Delete Favorite

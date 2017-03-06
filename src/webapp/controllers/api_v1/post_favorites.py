@@ -13,11 +13,17 @@ def create_favorite():
 
 	try:
 		verify_proper_request(req_json)
+		stop_name = req_json['stop_name']
 		req_json['stop_name'] = req_json['stop_name'].lower()
+
 		# Check stopname is in the api -- need access to api object
 			# on error, return error
 		if not req_json['stop_name'] in bus_info.stops_by_name:
 			raise UnprocessableEntity("Given stop_name is not a valid stopname")
+
+		# If the stop alias is not defined, default it to the stop name
+		if not req_json['stop_alias']:
+			req_json['stop_alias'] = stop_name
 
 		# check if alias (if it exists) is distinct from system aliases/api stops -- need db access
 			# on error, return error
