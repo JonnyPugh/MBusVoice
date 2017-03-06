@@ -16,7 +16,7 @@ def change_primary():
 		if not req_json['stop_alias'] in user_record['destinations']:
 			raise BadRequest("Cannot change non existent destination to be primary")
 
-	except RequestError as e:
+	except (RequestError, database.DatabaseFailure) as e:
 		return e.json, e.code
 	
 	db.update_item_field(req_json['alexa_id'], 'default_destination', user_record['destinations'][req_json['stop_alias']])
@@ -36,7 +36,7 @@ def delete_favorite():
 			# throw error if not
 		favorite_type = determine_favorite_type(req_json['stop_alias'], user_record)
 
-	except RequestError as e:
+	except (RequestError, database.DatabaseFailure) as e:
 		return e.json, e.code
 
 	if user_record[favorite_type][req_json['stop_alias']] == user_record['default_destination']:
