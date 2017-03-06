@@ -40,8 +40,7 @@ def delete_favorite():
 		return e.json, e.code
 
 	if user_record[favorite_type][req_json['stop_alias']] == user_record['default_destination']:
-		# There appears to be a bug, becuse this causes a DatabaseError to be thrown
-		db.update_item_field(req_json['alexa_id'], 'default_destination', "")
+		db.update_item_field(req_json['alexa_id'], 'default_destination', -1)
 
 	# Remove the alias from the user_record
 	user_record[favorite_type].pop(req_json['stop_alias'])

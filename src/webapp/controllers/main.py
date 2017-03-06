@@ -14,7 +14,7 @@ def index():
 		#if not in db, do not show them main page
 		try:
 			record = db.get_item(alexaID)
-		except KeyError as e:
+		except database.DatabaseFailure as e:
 			abort(403)
 
 		session['alexaID'] = alexaID
