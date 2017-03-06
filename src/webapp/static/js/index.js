@@ -168,8 +168,6 @@ function populateRow(row, rowData) {
 }
 
 function disableInvalidSubmission(fieldId, buttonId) {
-	console.log(document.getElementById(fieldId).value)
-
 	var listOptions = document.getElementsByClassName('systemLevelStop');
 	systemLevelStops = [];
 	for (var i = 0; i < listOptions.length; i++) {

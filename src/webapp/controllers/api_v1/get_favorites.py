@@ -8,7 +8,7 @@ def get_favorite_list():
 
 	try:
 		record =  db.get_item(session['alexaID'])
-	except DatabaseFailure as e:
+	except database.DatabaseFailure as e:
 		jsonify({"errors": [{"message": "Failed to retrieve user info."}]}), 502
 
 	user_stops = get_list_with_stop_type(record['origins'], "Home")
