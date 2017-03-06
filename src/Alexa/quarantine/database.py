@@ -13,10 +13,16 @@ class Database(object):
 	def get_item(self, alexaID):
 		try:
 			item = self.__table.get_item(Key={"AlexaID": str(alexaID)})["Item"]
+
+			# Don't return the AlexaID since it has to be used to get the item
+			del item["AlexaID"]
+
+			# Cast all numbers from the database to ints since 
+			# they are returned as decimals
 			for key in item:
 				if key == "default_destination":
 					item[key] = int(item[key])
-				elif key in ["origins", "destinations"]:
+				else:
 					for stop_alias in item[key]:
 						item[key][stop_alias] = int(item[key][stop_alias])
 			return item

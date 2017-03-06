@@ -24,7 +24,7 @@ def getUrl():
 @ask.launch
 def launch():
 	getUserData()
-	return statement("Hello, welcome to Blue Bus.").simple_card("Welcome!", "Set up your preferences at: "+getUrl())
+	return statement(render_template("Open")).simple_card("Welcome!", "Set up your preferences at: "+getUrl())
 
 # Get bus information based on a variety of different parameters
 @ask.intent("GetNextBuses", 
