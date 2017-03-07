@@ -31,13 +31,15 @@ def create_favorite():
 
 		# clarifyStopName will throw an exception if the given alias
 		# does not conflict with existing aliases
-		aliases = user_record['origins']
-		aliases.update(user_record['destinations'])
-		shared.clarifyStopName(req_json['stop_alias'], aliases)
 
-		# If clarifyStopName did not throw an exception, throw one to indicate
-		# the given stop alias is too similar to an existing alias
-		raise UnprocessableEntity("This alias is too similar to another alias")
+		if req_json['stop_alias'].lower() != stop_name.lower():
+			aliases = user_record['origins']
+			aliases.update(user_record['destinations'])
+			shared.clarifyStopName(req_json['stop_alias'], aliases)
+
+			# If clarifyStopName did not throw an exception, throw one to indicate
+			# the given stop alias is too similar to an existing alias
+			raise UnprocessableEntity("This alias is too similar to another alias")
 
 	except RequestError as e:
 		return e.json, e.code
