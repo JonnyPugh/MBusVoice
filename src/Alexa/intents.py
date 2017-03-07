@@ -15,16 +15,17 @@ def getUserData():
 		db.put_item(userID, {}, {}, -1)
 		return db.get_item(userID)
 
-# Get the URL of the deployed web application
-def getUrl():
-	return "https://szxtj7qm84.execute-api.us-east-1.amazonaws.com/dev?alexaID="+session.user.userId
+# Get the message to put in the card that tells users 
+# the URL of the deployed web application
+def getPreferencesCard():
+	return "Set up your preferences at: https://szxtj7qm84.execute-api.us-east-1.amazonaws.com/dev?alexaID="+session.user.userId
 
 # Introduce the skill and demonstrate how to use it
 # If the current user is not in the database, add them to the database
 @ask.launch
 def launch():
 	getUserData()
-	return statement(render_template("Open")).simple_card("Welcome!", "Set up your preferences at: "+getUrl())
+	return statement(render_template("Open")).simple_card("Welcome!", getPreferencesCard())
 
 # Get bus information based on a variety of different parameters
 @ask.intent("GetNextBuses", 
@@ -46,13 +47,13 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 		else:
 			start_stops = user_info["origins"].values()
 			if not start_stops:
-				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", "Set up your preferences at: "+getUrl())
+				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard())
 		if EndStop:
 			EndStop, end_stops = shared.clarifyStopName(EndStop, user_info["destinations"])
 		else:
 			stopID = user_info["default_destination"]
 			if stopID == -1:
-				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", "Set up your preferences at: "+getUrl())
+				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard())
 			end_stops = [stopID]
 			EndStop = {stopid: alias for alias, stopid in user_info["destinations"].items()}[stopID]
 	except shared.InvalidPhrase as e:
@@ -98,7 +99,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 		if not StartStop:
 			StartStop = {stopid: alias for alias, stopid in user_info["origins"].items()}[stopID]	
 		options.update({
-			"origin": StartStop if len(start_stops) == 1 else bus_info.stops[stopID].name,
+			"origin": (StartStop if len(start_stops) == 1 else bus_info.stops[stopID].name).replace(" -", ""),
 			"route": bus_info.routes[eta.route].name,
 			"minutes": eta.time
 		})
@@ -108,7 +109,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 		count = 0
 		for eta_info in etas:
 			eta = eta_info[0]
-			message += "a "+bus_info.routes[eta.route].name+" bus at "+bus_info.stops[eta_info[1]].name+" in "+str(eta.time)+" "+("minute" if eta.time == 1 else "minutes")
+			message += "a "+bus_info.routes[eta.route].name+" bus at "+bus_info.stops[eta_info[1]].name.replace(" -", "")+" in "+str(eta.time)+" "+("minute" if eta.time == 1 else "minutes")
 			count += 1
 			if count == NumBuses:
 				break
@@ -146,7 +147,7 @@ def getNextBuses(StopName):
 	# Form the response and return it to the user
 	template = "GetNextBusAtStop"
 	text = render_template(template, 
-		origin=StopName if len(start_stops) == 1 else bus_info.stops[eta_stop].name,
+		origin=(StopName if len(start_stops) == 1 else bus_info.stops[eta_stop].name).replace(" -", ""),
 		route=bus_info.routes[eta.route].name,
 		minutes=eta.time)
 	return statement(text)
