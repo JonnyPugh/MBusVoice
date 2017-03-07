@@ -1,6 +1,7 @@
 from extensions import *
 from quarantine import *
 from flask import *
+from copy import deepcopy
 
 post_favorites = Blueprint('post_favorites', __name__, template_folder='templates')
 
@@ -33,7 +34,7 @@ def create_favorite():
 		# does not conflict with existing aliases
 
 		if req_json['stop_alias'].lower() != stop_name.lower():
-			aliases = user_record['origins']
+			aliases = deepcopy(user_record['origins'])
 			aliases.update(user_record['destinations'])
 			shared.clarifyStopName(req_json['stop_alias'], aliases)
 
