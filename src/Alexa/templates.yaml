@@ -1,7 +1,7 @@
 Open: Hello, welcome to Blue Bus. Blue Bus provides bus info for the University of Michigan bus system. Please see the card in your Alexa mobile app for a link to the website to set your preferences. Once your preferences are set, just ask for a bus to get bus info.
 GetNextBus: A {{route}} bus from {{origin}} to {{destination}} will be arriving in {{minutes}} {{"minute" if minutes == 1 else "minutes"}}.
 GetNextBuses: The next buses to {{destination}} are {{busInfo}}.
-MissingFavorite: You don't have a {{favoriteType}} stop set. Please state a {{stopType}} stop or set a favorite {{favoriteType}} stop using our website. Please see the card in your alexa mobile app for a link.
+MissingFavorite: You don't have a {{favoriteType}} stop set. Please state a {{stopType}} stop or set a favorite {{favoriteType}} stop on our website. Please see the card in your alexa mobile app for a link.
 NoEtas: No {{route}} buses are currently going from {{origin}} to {{destination}}.
 GetNextBusAtStop: A {{route}} bus will be arriving at {{origin}} in {{minutes}} {{"minute" if minutes == 1 else "minutes"}}.
 NoBuses: No buses are currently coming to {{origin}}.
