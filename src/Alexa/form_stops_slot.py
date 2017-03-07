@@ -1,5 +1,4 @@
-from quarantine import BusInfo
-from data import stop_aliases
+from quarantine import BusInfo, data
 
 # Form the slot for all bus stops and aliases
 # of those bus stops using API stop names
@@ -15,5 +14,5 @@ with open("interaction_model/stops_slot.txt", "w") as stops_slot_file:
 			seen_stops[stop_name] = True
 
 	# Write all system level aliases to the slot file
-	for alias in stop_aliases.keys():
+	for alias in data.stop_aliases.keys():
 		stops_slot_file.write(alias+"\n")
