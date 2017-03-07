@@ -98,7 +98,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 		if not StartStop:
 			StartStop = {stopid: alias for alias, stopid in user_info["origins"].items()}[stopID]	
 		options.update({
-			"origin": StartStop if len(start_stops) == 1 else bus_info.stops[stopID].name,
+			"origin": (StartStop if len(start_stops) == 1 else bus_info.stops[stopID].name).replace(" -", ""),
 			"route": bus_info.routes[eta.route].name,
 			"minutes": eta.time
 		})
@@ -108,7 +108,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 		count = 0
 		for eta_info in etas:
 			eta = eta_info[0]
-			message += "a "+bus_info.routes[eta.route].name+" bus at "+bus_info.stops[eta_info[1]].name+" in "+str(eta.time)+" "+("minute" if eta.time == 1 else "minutes")
+			message += "a "+bus_info.routes[eta.route].name+" bus at "+bus_info.stops[eta_info[1]].name.replace(" -", "")+" in "+str(eta.time)+" "+("minute" if eta.time == 1 else "minutes")
 			count += 1
 			if count == NumBuses:
 				break
@@ -146,7 +146,7 @@ def getNextBuses(StopName):
 	# Form the response and return it to the user
 	template = "GetNextBusAtStop"
 	text = render_template(template, 
-		origin=StopName if len(start_stops) == 1 else bus_info.stops[eta_stop].name,
+		origin=(StopName if len(start_stops) == 1 else bus_info.stops[eta_stop].name).replace(" -", ""),
 		route=bus_info.routes[eta.route].name,
 		minutes=eta.time)
 	return statement(text)
