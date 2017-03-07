@@ -41,7 +41,6 @@ function formPost(form, formData) {
 			renderUserFavorites();
 		},
 		error: function(data) {
-			console.log(data);
 			displayError(data);
 		}
 	});
