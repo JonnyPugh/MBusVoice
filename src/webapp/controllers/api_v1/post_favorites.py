@@ -1,6 +1,7 @@
 from extensions import *
 from quarantine import *
 from flask import *
+from copy import deepcopy
 
 post_favorites = Blueprint('post_favorites', __name__, template_folder='templates')
 
@@ -31,13 +32,15 @@ def create_favorite():
 
 		# clarifyStopName will throw an exception if the given alias
 		# does not conflict with existing aliases
-		aliases = user_record['origins']
-		aliases.update(user_record['destinations'])
-		shared.clarifyStopName(req_json['stop_alias'], aliases)
 
-		# If clarifyStopName did not throw an exception, throw one to indicate
-		# the given stop alias is too similar to an existing alias
-		raise UnprocessableEntity("This alias is too similar to another alias")
+		if req_json['stop_alias'].lower() != stop_name.lower():
+			aliases = deepcopy(user_record['origins'])
+			aliases.update(user_record['destinations'])
+			shared.clarifyStopName(req_json['stop_alias'], aliases)
+
+			# If clarifyStopName did not throw an exception, throw one to indicate
+			# the given stop alias is too similar to an existing alias
+			raise UnprocessableEntity("This alias is too similar to another alias")
 
 	except RequestError as e:
 		return e.json, e.code
@@ -74,12 +77,10 @@ def verify_proper_request(req_json):
 		raise BadRequest("Invalid command type")
 
 def verify_non_duplicate(req_json, user_record):
-	favorite_type = 'origins'
-	if req_json['command_type'] == DESTINATION:
-		favorite_type = 'destinations'
-
-	if bus_info.stops_by_name[req_json['stop_name']] in user_record[favorite_type].values():
-		raise UnprocessableEntity("You already an alias for this destination")
+	stop_id = bus_info.stops_by_name[req_json['stop_name']]
+	print stop_id
+	if stop_id in user_record['origins'].values() or stop_id in user_record['destinations'].values():
+		raise UnprocessableEntity("You already an alias for this stop")
 
 def response_json(req_json, remove):
 	for key in remove:
