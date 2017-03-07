@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="https://bootswatch.com/darkly/bootstrap.min.css">
+    <link rel="stylesheet" href="https://bootswatch.com/cerulean/bootstrap.min.css">
     <meta name="author" content="MBus Voice">
     <title>{% block title %}{% endblock %} - MBus Voice Webapp</title>
+    <link rel="shortcut icon" href={{url_for('static', filename='images/favicon.ico')}}>
 </head>
 <header>
     <h1>{% block heading %}{% endblock %}</h1>
@@ -15,4 +16,8 @@
 <footer style="text-align: center">
     Produced by MBus Voice
 </footer>
+<br></br>
+<center>
+<img src={{url_for('static', filename='images/Logo.png')}} style="width:225px;height:225px;">
+</center>c>
 </html>
