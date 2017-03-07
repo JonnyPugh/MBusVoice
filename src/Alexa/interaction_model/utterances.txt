@@ -1,60 +1,25 @@
 GetNextBuses for a bus
 GetNextBuses for the next bus
-GetNextBuses when is the next bus
-GetNextBuses when is the next bus coming
-GetNextBuses for a {RouteName} bus
-GetNextBuses for the next {RouteName} bus
-GetNextBuses when is the next {RouteName} bus
-GetNextBuses when is the next {RouteName} bus coming
 GetNextBuses for {NumBuses} buses
 GetNextBuses for the next {NumBuses} buses
-GetNextBuses when are the next {NumBuses} buses
-GetNextBuses when are the next {NumBuses} buses coming
-GetNextBuses for {NumBuses} {RouteName} buses
-GetNextBuses for the next {NumBuses} {RouteName} buses
-GetNextBuses when are the next {NumBuses} {RouteName} buses
-GetNextBuses when are the next {NumBuses} {RouteName} buses coming
-GetNextBuses for a bus coming to {StartStop}
-GetNextBuses for the next bus coming to {StartStop}
-GetNextBuses when is the next bus coming to {StartStop}
-GetNextBuses for a {RouteName} bus coming to {StartStop}
-GetNextBuses for the next {RouteName} bus coming to {StartStop}
-GetNextBuses when is the next {RouteName} bus coming to {StartStop}
-GetNextBuses for {NumBuses} buses coming to {StartStop}
-GetNextBuses for the next {NumBuses} buses coming to {StartStop}
-GetNextBuses when are the next {NumBuses} buses coming to {StartStop}
-GetNextBuses for {NumBuses} {RouteName} buses coming to {StartStop}
-GetNextBuses for the next {NumBuses} {RouteName} buses coming to {StartStop}
-GetNextBuses when are the next {NumBuses} {RouteName} buses coming to {StartStop}
 GetNextBuses for a bus to {EndStop}
 GetNextBuses for the next bus to {EndStop}
-GetNextBuses for the next bus going to {EndStop}
-GetNextBuses when is the next bus to {EndStop}
-GetNextBuses when is the next bus going to {EndStop}
-GetNextBuses for a {RouteName} bus to {EndStop}
-GetNextBuses for the next {RouteName} bus to {EndStop}
-GetNextBuses for the next {RouteName} bus going to {EndStop}
-GetNextBuses when is the next bus to {EndStop}
-GetNextBuses when is the next {RouteName} bus going to {EndStop}
-GetNextBuses for the next {NumBuses} buses to {EndStop}
-GetNextBuses for the next {NumBuses} buses going to {EndStop}
-GetNextBuses when are the next {NumBuses} buses to {EndStop}
-GetNextBuses when are the next {NumBuses} buses going to {EndStop}
-GetNextBuses for the next {NumBuses} {RouteName} buses to {EndStop}
-GetNextBuses for the next {NumBuses} {RouteName} buses going to {EndStop}
-GetNextBuses when are the next {NumBuses} {RouteName} buses to {EndStop}
-GetNextBuses when are the next {NumBuses} {RouteName} buses going to {EndStop}
 GetNextBuses for a bus from {StartStop} to {EndStop}
 GetNextBuses for the next bus from {StartStop} to {EndStop}
+GetNextBuses when is the next bus
+GetNextBuses when is the next {RouteName} bus
+GetNextBuses when are the next {NumBuses} buses
+GetNextBuses when are the next {NumBuses} {RouteName} buses
+GetNextBuses when is the next bus coming to {StartStop}
+GetNextBuses when is the next {RouteName} bus coming to {StartStop}
+GetNextBuses when are the next {NumBuses} buses coming to {StartStop}
+GetNextBuses when are the next {NumBuses} {RouteName} buses coming to {StartStop}
+GetNextBuses when is the next bus going to {EndStop}
+GetNextBuses when is the next {RouteName} bus going to {EndStop}
+GetNextBuses when are the next {NumBuses} buses going to {EndStop}
+GetNextBuses when are the next {NumBuses} {RouteName} buses going to {EndStop}
 GetNextBuses when is the next bus from {StartStop} to {EndStop}
-GetNextBuses for a {RouteName} bus from {StartStop} to {EndStop}
-GetNextBuses for the next {RouteName} bus from {StartStop} to {EndStop}
 GetNextBuses when is the next {RouteName} bus from {StartStop} to {EndStop}
-GetNextBuses for {NumBuses} buses from {StartStop} to {EndStop}
-GetNextBuses for the next {NumBuses} buses from {StartStop} to {EndStop}
 GetNextBuses when are the next {NumBuses} buses from {StartStop} to {EndStop}
-GetNextBuses for the next {NumBuses} {RouteName} buses from {StartStop} to {EndStop}
 GetNextBuses when are the next {NumBuses} {RouteName} buses from {StartStop} to {EndStop}
-GetNextBusAtStop for the next bus at {StopName}
 GetNextBusAtStop when is the next bus at {StopName}
-GetNextBusAtStop when is the next bus at {StopName} coming

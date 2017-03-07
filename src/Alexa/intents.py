@@ -111,7 +111,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 			eta = eta_info[0]
 			message += "a "+bus_info.routes[eta.route].name+" bus at "+bus_info.stops[eta_info[1]].name.replace(" -", "")+" in "+str(eta.time)+" "+("minute" if eta.time == 1 else "minutes")
 			count += 1
-			if count == NumBuses:
+			if count == NumBuses or count == len(etas):
 				break
 			message += ", "
 			if count == NumBuses - 1 or count == len(etas) - 1:
