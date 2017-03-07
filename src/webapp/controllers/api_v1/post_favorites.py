@@ -76,12 +76,10 @@ def verify_proper_request(req_json):
 		raise BadRequest("Invalid command type")
 
 def verify_non_duplicate(req_json, user_record):
-	favorite_type = 'origins'
-	if req_json['command_type'] == DESTINATION:
-		favorite_type = 'destinations'
-
-	if bus_info.stops_by_name[req_json['stop_name']] in user_record[favorite_type].values():
-		raise UnprocessableEntity("You already an alias for this destination")
+	stop_id = bus_info.stops_by_name[req_json['stop_name']]
+	print stop_id
+	if stop_id in user_record['origins'].values() or stop_id in user_record['destinations'].values():
+		raise UnprocessableEntity("You already an alias for this stop")
 
 def response_json(req_json, remove):
 	for key in remove:

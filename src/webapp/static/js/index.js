@@ -38,18 +38,20 @@ function formPost(form, formData) {
 		contentType: "application/json",
 		data: JSON.stringify(formData),
 		success: function(data) {
+			displayError("");
 			renderUserFavorites();
 		},
 		error: function(data) {
-			displayError(data);
+			displayError(JSON.parse(data.responseText).errors[0].message);
 		}
 	});
 } 
 
-function displayError(data){
-	document.getElementById('displayError').innerHTML=JSON.parse(data.responseText).errors[0].message;
+function displayError(message){
+	document.getElementById('displayError').innerHTML=message;
 }
 
+// Function added to submission button onclick to submit form values
 function postHome() {
 	var formId = "newHome";
 	var form = document.getElementById(formId);
@@ -63,6 +65,7 @@ function postHome() {
 	formPost(form, formData);
 }
 
+// Function added to submission button onclick to submit form values
 function postDestination() {
 	var formId = "newDestination";
 	var form = document.getElementById(formId);
@@ -77,6 +80,7 @@ function postDestination() {
 	formPost(form, formData);
 }
 
+// Function added to submission button onclick to submit form values
 function postChangePrimary() {
 	var formId = "changePrimary";
 	var form = document.getElementById(formId);
@@ -88,6 +92,7 @@ function postChangePrimary() {
 	formPost(form, formData);
 }
 
+// Function added to submission button onclick to submit form values
 function postDeleteFavorite() {
 	var formId = "deleteFavorite";
 	var form = document.getElementById(formId);
@@ -99,6 +104,7 @@ function postDeleteFavorite() {
 	formPost(form, formData);
 }
 
+// Clears datalists and user favorites table before repopulating them
 function renderUserFavorites() {
 
 	clearTable("userFavorites");
@@ -131,6 +137,7 @@ function renderUserFavorites() {
 	});
 }
 
+// Accepts the modified user record and determines the primary destination
 function findPrimaryAlias(data) {
 	for (var i = 0; i < data['user_stops'].length; i++) {
 		if (data['user_stops'][i]['stop_name'] === data['primary']) {
@@ -171,6 +178,7 @@ function populateRow(row, rowData) {
 	}
 }
 
+// Runs on every change of new origin or destination forms
 function disableInvalidSubmission(fieldId, buttonId) {
 	var listOptions = document.getElementsByClassName('systemLevelStop');
 	systemLevelStops = [];
