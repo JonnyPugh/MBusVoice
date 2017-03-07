@@ -79,7 +79,7 @@ def verify_non_duplicate(req_json, user_record):
 		favorite_type = 'destinations'
 
 	if bus_info.stops_by_name[req_json['stop_name']] in user_record[favorite_type].values():
-		raise UnprocessableEntity("You already have a stop with this alias")
+		raise UnprocessableEntity("You already an alias for this destination")
 
 def response_json(req_json, remove):
 	for key in remove:
