@@ -25,19 +25,24 @@ def create_favorite():
 		if not req_json['stop_alias']:
 			req_json['stop_alias'] = stop_name
 
-		# check if alias (if it exists) is distinct from system aliases/api stops -- need db access
-			# on error, return error
-
-		# verify new alias is not too similar to any other user aliases -- need db access
-			# if so, throw parameter_error
-
 		user_record = db.get_item(req_json['alexa_id'])
 
 		verify_non_duplicate(req_json, user_record)
 
+		# clarifyStopName will throw an exception if the given alias
+		# does not conflict with existing aliases
+		aliases = user_record['origins']
+		aliases.update(user_record['destinations'])
+		shared.clarifyStopName(req_json['stop_alias'], aliases)
+
+		# If clarifyStopName did not throw an exception, throw one to indicate
+		# the given stop alias is too similar to an existing alias
+		raise BadRequest("Given alias conflicts with an existing alias")
+
 	except RequestError as e:
 		return e.json, e.code
-
+	except InvalidPhrase as e:
+		pass
 
 	# Update the offline version of the user record
 	favorite_type = 'origins'
@@ -45,7 +50,6 @@ def create_favorite():
 		favorite_type = 'destinations'
 	user_record[favorite_type][req_json['stop_alias']] = bus_info.stops_by_name[req_json['stop_name']]
 
-	# Insert the update favorite dictionary into the database
 	db.update_item_field(req_json['alexa_id'], favorite_type, user_record[favorite_type])
 
 	if 'primary' in req_json and req_json['primary'] == True:
