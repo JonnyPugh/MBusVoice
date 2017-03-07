@@ -37,7 +37,7 @@ def create_favorite():
 
 		# If clarifyStopName did not throw an exception, throw one to indicate
 		# the given stop alias is too similar to an existing alias
-		raise BadRequest("Given alias conflicts with an existing alias")
+		raise UnprocessableEntity("This alias is too similar to another alias")
 
 	except RequestError as e:
 		return e.json, e.code
@@ -79,7 +79,7 @@ def verify_non_duplicate(req_json, user_record):
 		favorite_type = 'destinations'
 
 	if bus_info.stops_by_name[req_json['stop_name']] in user_record[favorite_type].values():
-		raise UnprocessableEntity("Insertion of this stop would cause duplication")
+		raise UnprocessableEntity("You already have a stop with this alias")
 
 def response_json(req_json, remove):
 	for key in remove:

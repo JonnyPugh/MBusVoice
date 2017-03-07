@@ -42,9 +42,14 @@ function formPost(form, formData) {
 		},
 		error: function(data) {
 			console.log(data);
+			displayError(data);
 		}
 	});
 } 
+
+function displayError(data){
+	document.getElementById('displayError').innerHTML=JSON.parse(data.responseText).errors[0].message;
+}
 
 function postHome() {
 	var formId = "newHome";
