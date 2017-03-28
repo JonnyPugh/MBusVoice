@@ -4,6 +4,7 @@ from data import stop_aliases
 from flask import Blueprint, render_template
 from flask_ask import Ask, statement, session
 from difflib import get_close_matches
+from hashlib import md5
 
 blueprint = Blueprint("MBus_blueprint", __name__, url_prefix="/")
 ask = Ask(blueprint=blueprint)
@@ -48,27 +49,31 @@ def clarifyStopName(user_phrase, favorite_stops):
 	# Raise an error if the user_phrase couldn't be clarified
 	raise InvalidPhrase(user_phrase)
 
+def __get_hash(self, alexaID):
+	return md5(str(alexaID)).hexdigest()
+
 # If the current user is not in the database, add them to the database 
 # Return the current user's data
 def getUserData():
-	userID = session.user.userId
+	ID = md5(str(session.user.userId)).hexdigest()
 	try:
-		return db.get_item(userID)
+		user_info = db.get_item(ID)
 	except DatabaseFailure:
-		db.put_item(userID, {}, {}, -1)
-		return db.get_item(userID)
+		db.put_item(ID)
+		user_info = db.get_item(ID)
+	return user_info, ID
 
 # Get the message to put in the card that tells users 
 # the URL of the deployed web application
-def getPreferencesCard():
-	return "Set up your preferences at: https://szxtj7qm84.execute-api.us-east-1.amazonaws.com/dev?alexaID="+session.user.userId
+def getPreferencesCard(ID):
+	return "Set up your preferences at: https://y7r89izao4.execute-api.us-east-1.amazonaws.com/web?ID="+ID
 
 # Introduce the skill and demonstrate how to use it
 # If the current user is not in the database, add them to the database
 @ask.launch
 def launch():
-	getUserData()
-	return statement(render_template("Open")).simple_card("Welcome!", getPreferencesCard())
+	user_info, ID = getUserData()
+	return statement(render_template("Open")).simple_card("Welcome!", getPreferencesCard(ID))
 
 # Get bus information based on a variety of different parameters
 @ask.intent("GetNextBuses", 
@@ -80,31 +85,32 @@ def launch():
 	})
 def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	# Get user preferences from the database
-	user_info = getUserData()
+	user_info, ID = getUserData()
+	nicknames = user_info["nicknames"]
+	home = user_info.get("home")
+	destination = user_info.get("destination")
 	template = "MissingFavorite"
 
 	try:
 		# Try to understand which stops the user is talking about
 		if StartStop:
-			StartStop, start_stops = sclarifyStopName(StartStop, user_info["origins"])
+			StartStop, start_stops = clarifyStopName(StartStop, nicknames.get(home, []))
 		else:
-			start_stops = user_info["origins"].values()
+			start_stops = nicknames.get(home, [])
 			if not start_stops:
-				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard())
+				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard(ID))
 		if EndStop:
-			EndStop, end_stops = clarifyStopName(EndStop, user_info["destinations"])
+			EndStop, end_stops = clarifyStopName(EndStop, nicknames.get(destination, []))
 		else:
-			stopID = user_info["default_destination"]
-			if stopID == -1:
-				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard())
-			end_stops = [stopID]
-			EndStop = {stopid: alias for alias, stopid in user_info["destinations"].items()}[stopID]
+			end_stops = nicknames.get(destination, [])
+			if not end_stops:
+				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard(ID))
 	except InvalidPhrase as e:
 		return statement(e.message)
 
 	# If the origin and destination are the same, return an error message
 	if set(start_stops) == set(end_stops):
-		return statement("The starting stop "+EndStop+" cannot be the same as the destination")
+		return statement("The starting stop cannot be the same as the destination")
 
 	# Determine all valid etas based on the start and end stops
 	etas = []
@@ -169,7 +175,8 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 @ask.intent("GetNextBusAtStop")
 def getNextBuses(StopName):
 	try:
-		StopName, start_stops = clarifyStopName(StopName, getUserData()["origins"])
+		user_info, ID = getUserData()
+		StopName, start_stops = clarifyStopName(StopName, user_info["nicknames"].get(user_info.get("home"), []))
 	except InvalidPhrase as e:
 		return statement(e.message)
 

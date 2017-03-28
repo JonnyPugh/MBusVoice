@@ -1,8 +1,5 @@
 from boto3 import resource
-from hashlib import md5
 
-#add more custom exceptions
-#figure out why raising this exception doesn't work for the check in webapp/main.py
 class DatabaseFailure(Exception):
 	def __init__(self, function):
 		super(Exception, self).__init__("Database Failure in function " + function)
@@ -11,12 +8,9 @@ class Database(object):
 	def __init__(self):
 		self.__table = resource("dynamodb", region_name="us-east-1").Table("UserPreferences")
 
-	def __get_hash(self, alexaID):
-		return md5(str(alexaID)).hexdigest()
-
-	def get_item(self, alexaID):
+	def get_item(self, ID):
 		try:
-			item = self.__table.get_item(Key={"ID": self.__get_hash(alexaID)})["Item"]
+			item = self.__table.get_item(Key={"ID": ID})["Item"]
 
 			# Don't return the ID since it has to be used to get the item
 			del item["ID"]
@@ -34,23 +28,21 @@ class Database(object):
 		except:
 			raise DatabaseFailure("get_item")
 
-	#for updating one value of a key
-	#key must be 'order', 'home', 'destination', 'nickanmes', or 'min_time'
-	#value must be a list for order, strings for home/destination, a dictionary for nicknames, or an int for min_time 
-	def update_item_field(self, alexaID, key, value):
+	# Update a value in the specified item
+	def update_item_field(self, ID, key, value):
 		try:
-			self.__table.update_item(Key={"ID": self.__get_hash(alexaID)},
+			self.__table.update_item(Key={"ID": ID},
 				UpdateExpression="set " + str(key) + " = :r",
 				ExpressionAttributeValues={":r": value}
 			)
 		except:
 			raise DatabaseFailure("update_item_field")
 
-	#order must be a list, nicknames must be a dictionary, and min_time must be a number		
-	def put_item(self, alexaID):
+	# Put an empty item into the database		
+	def put_item(self, ID):
 		try:
 			self.__table.put_item(
-				Item={"ID": self.__get_hash(alexaID),
+				Item={"ID": ID,
 					"order": [],
 					"nicknames": {},
 					"min_time": 0
@@ -59,9 +51,9 @@ class Database(object):
 		except:
 			raise DatabaseFailure("put_item")
 
-	#if we only want to delete one part, for now we will have to delete the whole item and recreate it
-	def delete_item(self, alexaID):
+	# Delete an item from the database
+	def delete_item(self, ID):
 		try:
-			self.__table.delete_item(Key={"ID": self.__get_hash(alexaID)})
+			self.__table.delete_item(Key={"ID": ID})
 		except:
 			raise DatabaseFailure("delete_item")

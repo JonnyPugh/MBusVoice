@@ -21,5 +21,4 @@ GetNextBuses when are the next {NumBuses} {RouteName} buses going to {EndStop}
 GetNextBuses when is the next bus from {StartStop} to {EndStop}
 GetNextBuses when is the next {RouteName} bus from {StartStop} to {EndStop}
 GetNextBuses when are the next {NumBuses} buses from {StartStop} to {EndStop}
-GetNextBuses when are the next {NumBuses} {RouteName} buses from {StartStop} to {EndStop}
 GetNextBusAtStop when is the next bus at {StopName}

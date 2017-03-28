@@ -4,8 +4,8 @@ table = resource("dynamodb", region_name="us-east-1").create_table(
     TableName="UserPreferences",
     KeySchema=[
         {
-            'AttributeName': "ID",
-            'KeyType': 'HASH'  #Partition key
+            "AttributeName": "ID",
+            "KeyType": "HASH"
         }
     ],
     AttributeDefinitions=[
