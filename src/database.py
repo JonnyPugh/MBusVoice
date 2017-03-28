@@ -46,16 +46,14 @@ class Database(object):
 		except:
 			raise DatabaseFailure("update_item_field")
 
-	#order must be a list, home/destination must be strings, nicknames must be a dictionary, and min_time must be a number		
-	def put_item(self, alexaID, order, home, destination, nicknames, min_time):
+	#order must be a list, nicknames must be a dictionary, and min_time must be a number		
+	def put_item(self, alexaID):
 		try:
 			self.__table.put_item(
 				Item={"ID": self.__get_hash(alexaID),
-					"order": order,
-					"home": home,
-					"destination": destination,
-					"nicknames": nicknames,
-					"min_time": min_time
+					"order": [],
+					"nicknames": {},
+					"min_time": 0
 				}
 			)
 		except:
