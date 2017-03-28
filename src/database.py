@@ -46,13 +46,15 @@ class Database(object):
 			raise DatabaseFailure("update_item_field")
 
 	#origins and destinations must be a dictionary, and default_destination should be a number		
-	def put_item(self, alexaID, origins, destinations, default):
+	def put_item(self, alexaID, order, home, destination, nicknames, min_time):
 		try:
 			self.__table.put_item(
 				Item={"ID": self.__get_hash(alexaID),
-					"origins": origins,
-					"destinations": destinations,
-					"default_destination": default
+					"order": order,
+					"home": home,
+					"destination": destination,
+					"nicknames": nicknames,
+					"min_time": min_time
 				}
 			)
 		except:
