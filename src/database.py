@@ -8,7 +8,7 @@ class DatabaseFailure(Exception):
 
 class Database(object):
 	def __init__(self):
-		self.__table = resource("dynamodb", region_name="us-east-1").Table("UserFavorites")
+		self.__table = resource("dynamodb", region_name="us-east-1").Table("UserPreferences")
 
 	def get_item(self, alexaID):
 		try:

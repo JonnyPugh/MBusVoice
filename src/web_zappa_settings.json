@@ -1,0 +1,6 @@
+{
+    "web": {
+        "app_function": "web.app", 
+        "s3_bucket": "zappa-o040h7jt1"
+    }
+}

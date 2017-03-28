@@ -1,0 +1,6 @@
+{
+    "alexa": {
+        "app_function": "alexa.app", 
+        "s3_bucket": "zappa-yae0pdzy5"
+    }
+}
