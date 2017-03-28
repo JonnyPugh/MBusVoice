@@ -1,4 +1,5 @@
 from boto3 import resource
+from hashlib import md5
 
 #add more custom exceptions
 #figure out why raising this exception doesn't work for the check in webapp/main.py
@@ -10,12 +11,15 @@ class Database(object):
 	def __init__(self):
 		self.__table = resource("dynamodb", region_name="us-east-1").Table("UserPreferences")
 
+	def __get_hash(self, alexaID):
+		return md5(str(alexaID)).hexdigest()
+
 	def get_item(self, alexaID):
 		try:
-			item = self.__table.get_item(Key={"AlexaID": str(alexaID)})["Item"]
+			item = self.__table.get_item(Key={"ID": self.__get_hash(alexaID)})["Item"]
 
-			# Don't return the AlexaID since it has to be used to get the item
-			del item["AlexaID"]
+			# Don't return the ID since it has to be used to get the item
+			del item["ID"]
 
 			# Cast all numbers from the database to ints since 
 			# they are returned as decimals
@@ -34,7 +38,7 @@ class Database(object):
 	#value must be a new dictionary for origins/destinations, or a new stopID for default_destination 
 	def update_item_field(self, alexaID, key, value):
 		try:
-			self.__table.update_item(Key={"AlexaID": str(alexaID)},
+			self.__table.update_item(Key={"ID": self.__get_hash(alexaID)},
 				UpdateExpression="set " + str(key) + " = :r",
 				ExpressionAttributeValues={":r": value}
 			)
@@ -45,7 +49,7 @@ class Database(object):
 	def put_item(self, alexaID, origins, destinations, default):
 		try:
 			self.__table.put_item(
-				Item={"AlexaID": str(alexaID),
+				Item={"ID": self.__get_hash(alexaID),
 					"origins": origins,
 					"destinations": destinations,
 					"default_destination": default
@@ -57,6 +61,6 @@ class Database(object):
 	#if we only want to delete one part, for now we will have to delete the whole item and recreate it
 	def delete_item(self, alexaID):
 		try:
-			self.__table.delete_item(Key={"AlexaID": str(alexaID)})
+			self.__table.delete_item(Key={"ID": self.__get_hash(alexaID)})
 		except:
 			raise DatabaseFailure("delete_item")

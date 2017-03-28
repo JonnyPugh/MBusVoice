@@ -1,5 +1,5 @@
+from database import *
 from bus_info import BusInfo
-from database import Database
 from data import stop_aliases
 from flask import Blueprint, render_template
 from flask_ask import Ask, statement, session
@@ -54,7 +54,7 @@ def getUserData():
 	userID = session.user.userId
 	try:
 		return db.get_item(userID)
-	except database.DatabaseFailure:
+	except DatabaseFailure:
 		db.put_item(userID, {}, {}, -1)
 		return db.get_item(userID)
 
