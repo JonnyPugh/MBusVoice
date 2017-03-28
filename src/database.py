@@ -29,7 +29,7 @@ class Database(object):
 				elif key == "nicknames":
 					for aliases in item[key]:
 						for i in range(len(item[key][aliases])):
-							item[key][stop_alias][i] = int(item[key][stop_alias][i])
+							item[key][aliases][i] = int(item[key][aliases][i])
 			return item
 		except:
 			raise DatabaseFailure("get_item")
