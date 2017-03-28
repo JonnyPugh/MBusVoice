@@ -21,21 +21,22 @@ class Database(object):
 			# Don't return the ID since it has to be used to get the item
 			del item["ID"]
 
-			# Cast all numbers from the database to ints since 
+			# Cast all numbers in min_time and nicknames from the database to ints since 
 			# they are returned as decimals
 			for key in item:
-				if key == "default_destination":
+				if key == "min_time":
 					item[key] = int(item[key])
-				else:
-					for stop_alias in item[key]:
-						item[key][stop_alias] = int(item[key][stop_alias])
+				elif key == "nicknames":
+					for aliases in item[key]:
+						for i in range(len(item[key][aliases])):
+							item[key][stop_alias][i] = int(item[key][stop_alias][i])
 			return item
 		except:
 			raise DatabaseFailure("get_item")
 
 	#for updating one value of a key
-	#key must be 'origins', 'destinations', or 'default_destination'
-	#value must be a new dictionary for origins/destinations, or a new stopID for default_destination 
+	#key must be 'order', 'home', 'destination', 'nickanmes', or 'min_time'
+	#value must be a list for order, strings for home/destination, a dictionary for nicknames, or an int for min_time 
 	def update_item_field(self, alexaID, key, value):
 		try:
 			self.__table.update_item(Key={"ID": self.__get_hash(alexaID)},
@@ -45,7 +46,7 @@ class Database(object):
 		except:
 			raise DatabaseFailure("update_item_field")
 
-	#origins and destinations must be a dictionary, and default_destination should be a number		
+	#order must be a list, home/destination must be strings, nicknames must be a dictionary, and min_time must be a number		
 	def put_item(self, alexaID, order, home, destination, nicknames, min_time):
 		try:
 			self.__table.put_item(
