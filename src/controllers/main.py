@@ -1,5 +1,6 @@
-from quarantine import *
 from flask import *
+from extensions import *
+from database import DatabaseFailure
 from stops import stops
 
 main = Blueprint('main', __name__, template_folder='templates')
@@ -14,7 +15,7 @@ def index():
 		#if not in db, do not show them main page
 		try:
 			record = db.get_item(alexaID)
-		except database.DatabaseFailure as e:
+		except DatabaseFailure as e:
 			abort(403)
 
 		session['alexaID'] = alexaID

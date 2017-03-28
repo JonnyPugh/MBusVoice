@@ -1,5 +1,4 @@
 from extensions import *
-from quarantine import *
 from flask import *
 from copy import deepcopy
 
@@ -36,11 +35,12 @@ def create_favorite():
 		if req_json['stop_alias'].lower() != stop_name.lower():
 			aliases = deepcopy(user_record['origins'])
 			aliases.update(user_record['destinations'])
-			shared.clarifyStopName(req_json['stop_alias'], aliases)
+			#shared.clarifyStopName(req_json['stop_alias'], aliases)
+			# FLAG: Change this error handling to fit new structure
 
 			# If clarifyStopName did not throw an exception, throw one to indicate
 			# the given stop alias is too similar to an existing alias
-			raise UnprocessableEntity("This alias is too similar to another alias")
+			#raise UnprocessableEntity("This alias is too similar to another alias")
 
 	except RequestError as e:
 		return e.json, e.code

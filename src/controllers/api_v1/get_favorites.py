@@ -1,4 +1,4 @@
-from quarantine import *
+from extensions import *
 from flask import *
 
 get_favorites = Blueprint('get_favorites', __name__, template_folder='templates')

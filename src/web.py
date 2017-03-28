@@ -1,6 +1,5 @@
 from flask import Flask, render_template
 import controllers
-import config 
 
 # Initialize Flask app with the template folder address
 app = Flask(__name__, template_folder='templates')
@@ -19,4 +18,4 @@ def access_forbidden(e):
 
 # Listen on external IPs using the configured port
 if __name__ == '__main__':
-    app.run(host=config.env['host'], port=config.env['port'], debug=True)
+    app.run(host="0.0.0.0", port=3000, debug=True)

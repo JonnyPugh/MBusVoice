@@ -4,7 +4,7 @@ from quarantine import BusInfo, data
 # of those bus stops using API stop names
 # and system level stop aliases
 info = BusInfo()
-with open("interaction_model/stops_slot.txt", "w") as stops_slot_file:
+with open("stops_slot.txt", "w") as stops_slot_file:
 	# Write all API stop names to the slot file
 	seen_stops = {}
 	for stopid, stop in info.stops.items():

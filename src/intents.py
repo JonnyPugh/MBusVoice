@@ -1,9 +1,52 @@
-from quarantine import *
+from bus_info import BusInfo
+from database import Database
+from data import stop_aliases
 from flask import Blueprint, render_template
 from flask_ask import Ask, statement, session
+from difflib import get_close_matches
 
 blueprint = Blueprint("MBus_blueprint", __name__, url_prefix="/")
 ask = Ask(blueprint=blueprint)
+
+bus_info = BusInfo()
+db = Database()
+
+# Exception class used to indicate invalid stop names
+class InvalidPhrase(Exception):
+	def __init__(self, stop_name):
+		super(Exception, self).__init__(stop_name+" is not a valid stop name")
+
+# Take the user's spoken stop name and figure out which stop 
+# id(s) they are referring to and return it/them as a list.
+def clarifyStopName(user_phrase, favorite_stops):
+	# Use system level aliases and the stops given by the API and 
+	# see if the user was referring to one of those stops
+	user_phrase = user_phrase.lower()
+	if user_phrase in bus_info.stops_by_name:
+		return user_phrase, [bus_info.stops_by_name[user_phrase]]
+	if user_phrase in stop_aliases:
+		return user_phrase, stop_aliases[user_phrase]
+
+	# If the specified stop name is similar to a user level alias,
+	# return the stop id associated with that alias
+	close_matches = get_close_matches(user_phrase, favorite_stops.keys())
+	if close_matches:
+		name = close_matches[0]
+		return name, [favorite_stops[name]]
+
+	# If the specified stop name is similar to a system level alias or 
+	# a stop name, return all stop ids associated with it
+	close_matches = get_close_matches(user_phrase, bus_info.stops_by_name.keys())
+	if close_matches:
+		name = close_matches[0]
+		return name, [bus_info.stops_by_name[name]]
+	close_matches = get_close_matches(user_phrase, stop_aliases.keys())
+	if close_matches:
+		name = close_matches[0]
+		return name, stop_aliases[name]
+
+	# Raise an error if the user_phrase couldn't be clarified
+	raise InvalidPhrase(user_phrase)
 
 # If the current user is not in the database, add them to the database 
 # Return the current user's data
@@ -43,20 +86,20 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	try:
 		# Try to understand which stops the user is talking about
 		if StartStop:
-			StartStop, start_stops = shared.clarifyStopName(StartStop, user_info["origins"])
+			StartStop, start_stops = sclarifyStopName(StartStop, user_info["origins"])
 		else:
 			start_stops = user_info["origins"].values()
 			if not start_stops:
 				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard())
 		if EndStop:
-			EndStop, end_stops = shared.clarifyStopName(EndStop, user_info["destinations"])
+			EndStop, end_stops = clarifyStopName(EndStop, user_info["destinations"])
 		else:
 			stopID = user_info["default_destination"]
 			if stopID == -1:
 				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard())
 			end_stops = [stopID]
 			EndStop = {stopid: alias for alias, stopid in user_info["destinations"].items()}[stopID]
-	except shared.InvalidPhrase as e:
+	except InvalidPhrase as e:
 		return statement(e.message)
 
 	# If the origin and destination are the same, return an error message
@@ -126,8 +169,8 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 @ask.intent("GetNextBusAtStop")
 def getNextBuses(StopName):
 	try:
-		StopName, start_stops = shared.clarifyStopName(StopName, getUserData()["origins"])
-	except shared.InvalidPhrase as e:
+		StopName, start_stops = clarifyStopName(StopName, getUserData()["origins"])
+	except InvalidPhrase as e:
 		return statement(e.message)
 
 	# Determine the soonest eta to the specified stop

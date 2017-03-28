@@ -1,5 +1,4 @@
 from extensions import *
-from quarantine import *
 from flask import *
 
 edit_favorites = Blueprint('edit_favorites', __name__, template_folder='templates')
