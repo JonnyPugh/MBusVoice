@@ -5,6 +5,7 @@ class BusInfo(object):
         self.__favorite_stops = favorite_stops
         self.__session = Session()
         self.__stops = None
+        self.__stops_by_name = None
         self.__buses = None
         self.__routes = None
         self.__etas = None
@@ -22,7 +23,9 @@ class BusInfo(object):
 
     @property
     def stops_by_name(self):
-        return {stop.name.lower(): stop_id for stop_id, stop in self.stops.items()}
+        if not self.__stops_by_name:
+            self.__stops_by_name = {stop.name.lower(): stop_id for stop_id, stop in self.stops.items()}
+        return self.__stops_by_name
 
     @property
     def buses(self):

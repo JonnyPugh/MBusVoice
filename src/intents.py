@@ -168,7 +168,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 def getNextBuses(StopName):
 	try:
 		user_info, ID = getUserData()
-		StopName, start_stops = clarifyStopName(StopName, user_info.get("home"), user_info["nicknames"])
+		StopName, start_stops = clarifyStopName(StopName, user_info.get("home", ""), user_info["nicknames"])
 	except InvalidPhrase as e:
 		return statement(e.message)
 
