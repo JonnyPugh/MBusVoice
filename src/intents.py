@@ -47,9 +47,6 @@ def clarifyStopName(user_phrase, user_stop, nicknames):
 	# Raise an error if the user_phrase couldn't be clarified
 	raise InvalidPhrase(user_phrase)
 
-def __get_hash(self, alexaID):
-	return md5(str(alexaID)).hexdigest()
-
 # If the current user is not in the database, add them to the database 
 # Return the current user's data
 def getUserData():
@@ -125,12 +122,10 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 
 	# If there are no valid etas, return an error message
 	if not etas:
-		template = "NoEtas"
-		text = render_template(template, 
+		return statement(render_template("NoEtas", 
 			route=RouteName if RouteName else "", 
 			origin=StartStop if StartStop else "your home stops", 
-			destination=EndStop)
-		return statement(text)
+			destination=EndStop))
 
 	# Sort the etas by how soon their bus will arrive at their origin stop
 	etas = sorted(etas, key=lambda eta_info: eta_info[0].time)
@@ -166,8 +161,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 		options.update({
 			"busInfo": message
 		})
-	text = render_template(template, **options)
-	return statement(text)
+	return statement(render_template(template, **options))
 
 # Get the next bus coming to a specified stop
 @ask.intent("GetNextBusAtStop")
@@ -188,14 +182,10 @@ def getNextBuses(StopName):
 
 	# If there are no etas, return an error message
 	if not eta:
-		template = "NoBuses"
-		text = render_template(template, origin=StopName)
-		return statement(text)
+		return statement(render_template("NoBuses", origin=StopName))
 
 	# Form the response and return it to the user
-	template = "GetNextBusAtStop"
-	text = render_template(template, 
+	return statement(render_template("GetNextBusAtStop", 
 		origin=(StopName if len(start_stops) == 1 else bus_info.stops[eta_stop].name).replace(" -", ""),
 		route=bus_info.routes[eta.route].name,
-		minutes=eta.time)
-	return statement(text)
+		minutes=eta.time))
