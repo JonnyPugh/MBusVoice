@@ -19,7 +19,12 @@ class InvalidPhrase(Exception):
 
 # Take the user's spoken stop name and figure out which stop 
 # id(s) they are referring to and return it/them as a list.
-def clarifyStopName(user_phrase, favorite_stops):
+def clarifyStopName(user_phrase, user_stop, nicknames):
+	# If the specified stop name is similar to a user level alias,
+	# return the stop ids associated with that alias
+	if get_close_matches(user_phrase, [user_stop]):
+		return user_stop, nicknames[user_stop]
+
 	# Use system level aliases and the stops given by the API and 
 	# see if the user was referring to one of those stops
 	user_phrase = user_phrase.lower()
@@ -27,13 +32,6 @@ def clarifyStopName(user_phrase, favorite_stops):
 		return user_phrase, [bus_info.stops_by_name[user_phrase]]
 	if user_phrase in stop_aliases:
 		return user_phrase, stop_aliases[user_phrase]
-
-	# If the specified stop name is similar to a user level alias,
-	# return the stop id associated with that alias
-	close_matches = get_close_matches(user_phrase, favorite_stops.keys())
-	if close_matches:
-		name = close_matches[0]
-		return name, [favorite_stops[name]]
 
 	# If the specified stop name is similar to a system level alias or 
 	# a stop name, return all stop ids associated with it
@@ -94,17 +92,19 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	try:
 		# Try to understand which stops the user is talking about
 		if StartStop:
-			StartStop, start_stops = clarifyStopName(StartStop, nicknames.get(home, []))
+			StartStop, start_stops = clarifyStopName(StartStop, home, nicknames)
 		else:
-			start_stops = nicknames.get(home, [])
+			start_stops = nicknames.get(home)
 			if not start_stops:
 				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard(ID))
+			StartStop = home
 		if EndStop:
-			EndStop, end_stops = clarifyStopName(EndStop, nicknames.get(destination, []))
+			EndStop, end_stops = clarifyStopName(EndStop, destination, nicknames)
 		else:
-			end_stops = nicknames.get(destination, [])
+			end_stops = nicknames.get(destination)
 			if not end_stops:
 				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard(ID))
+			EndStop = destination
 	except InvalidPhrase as e:
 		return statement(e.message)
 
@@ -144,9 +144,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 		template = "GetNextBus"
 		eta_info = etas[0]
 		eta = eta_info[0]
-		stopID = eta_info[1]
-		if not StartStop:
-			StartStop = {stopid: alias for alias, stopid in user_info["origins"].items()}[stopID]	
+		stopID = eta_info[1]	
 		options.update({
 			"origin": (StartStop if len(start_stops) == 1 else bus_info.stops[stopID].name).replace(" -", ""),
 			"route": bus_info.routes[eta.route].name,
@@ -176,7 +174,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 def getNextBuses(StopName):
 	try:
 		user_info, ID = getUserData()
-		StopName, start_stops = clarifyStopName(StopName, user_info["nicknames"].get(user_info.get("home"), []))
+		StopName, start_stops = clarifyStopName(StopName, user_info.get("home"), user_info["nicknames"])
 	except InvalidPhrase as e:
 		return statement(e.message)
 
