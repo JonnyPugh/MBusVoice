@@ -82,8 +82,8 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	# Get user preferences from the database
 	user_info, ID = getUserData()
 	nicknames = user_info["nicknames"]
-	home = user_info.get("home")
-	destination = user_info.get("destination")
+	home = user_info.get("home", "")
+	destination = user_info.get("destination", "")
 	template = "MissingFavorite"
 
 	try:
@@ -91,16 +91,16 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 		if StartStop:
 			StartStop, start_stops = clarifyStopName(StartStop, home, nicknames)
 		else:
-			start_stops = nicknames.get(home)
-			if not start_stops:
+			if home not in nicknames:
 				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard(ID))
+			start_stops[home]
 			StartStop = home
 		if EndStop:
 			EndStop, end_stops = clarifyStopName(EndStop, destination, nicknames)
 		else:
-			end_stops = nicknames.get(destination)
-			if not end_stops:
+			if destination not in nicknames:
 				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard(ID))
+			end_stops = nicknames[destination]
 			EndStop = destination
 	except InvalidPhrase as e:
 		return statement(e.message)
