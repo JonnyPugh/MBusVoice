@@ -10,7 +10,6 @@ blueprint = Blueprint("MBus_blueprint", __name__, url_prefix="/")
 ask = Ask(blueprint=blueprint)
 
 bus_info = BusInfo()
-db = Database()
 
 # Exception class used to indicate invalid stop names
 class InvalidPhrase(Exception):
@@ -22,7 +21,7 @@ class InvalidPhrase(Exception):
 def clarifyStopName(user_phrase, user_stop, nicknames):
 	# If the specified stop name is similar to a user level alias,
 	# return the stop ids associated with that alias
-	if get_close_matches(user_phrase, [user_stop]):
+	if get_close_matches(user_phrase, [user_stop] if user_stop != None else []):
 		return user_stop, nicknames[user_stop]
 
 	# Use system level aliases and the stops given by the API and 
@@ -52,11 +51,11 @@ def clarifyStopName(user_phrase, user_stop, nicknames):
 def getUserData():
 	ID = md5(str(session.user.userId)).hexdigest()
 	try:
-		user_info = db.get_item(ID)
+		record = Record(ID)
 	except DatabaseFailure:
-		db.put_item(ID)
-		user_info = db.get_item(ID)
-	return user_info, ID
+		Record.create(ID)
+		record = Record(ID)
+	return record, ID
 
 # Get the message to put in the card that tells users 
 # the URL of the deployed web application
@@ -67,7 +66,7 @@ def getPreferencesCard(ID):
 # If the current user is not in the database, add them to the database
 @ask.launch
 def launch():
-	user_info, ID = getUserData()
+	record, ID = getUserData()
 	return statement(render_template("Open")).simple_card("Welcome!", getPreferencesCard(ID))
 
 # Get bus information based on a variety of different parameters
@@ -80,10 +79,10 @@ def launch():
 	})
 def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	# Get user preferences from the database
-	user_info, ID = getUserData()
-	nicknames = user_info["nicknames"]
-	home = user_info.get("home", "")
-	destination = user_info.get("destination", "")
+	record, ID = getUserData()
+	nicknames = record.nicknames
+	home = record.home
+	destination = record.destination
 	template = "MissingFavorite"
 
 	try:
@@ -93,7 +92,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 		else:
 			if home not in nicknames:
 				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard(ID))
-			start_stops[home]
+			start_stops = nicknames[home]
 			StartStop = home
 		if EndStop:
 			EndStop, end_stops = clarifyStopName(EndStop, destination, nicknames)
@@ -167,8 +166,8 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 @ask.intent("GetNextBusAtStop")
 def getNextBuses(StopName):
 	try:
-		user_info, ID = getUserData()
-		StopName, start_stops = clarifyStopName(StopName, user_info.get("home", ""), user_info["nicknames"])
+		record, ID = getUserData()
+		StopName, start_stops = clarifyStopName(StopName, record.home, record.nicknames)
 	except InvalidPhrase as e:
 		return statement(e.message)
 

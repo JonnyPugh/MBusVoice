@@ -4,109 +4,136 @@ class DatabaseFailure(Exception):
 	def __init__(self, function):
 		super(Exception, self).__init__("Database Failure in function " + function)
 
-class Database(object):
-	def __init__(self):
-		self.__table = resource("dynamodb", region_name="us-east-1").Table("UserPreferences")
-
-	def get_item(self, ID):
-		try:
-			item = self.__table.get_item(Key={"ID": ID})["Item"]
-
-			# Don't return the ID since it has to be used to get the item
-			del item["ID"]
-
-			# Cast all numbers in min_time and nicknames from the database to ints since 
-			# they are returned as decimals
-			for key in item:
-				if key == "min_time":
-					item[key] = int(item[key])
-				elif key == "nicknames":
-					for aliases in item[key]:
-						for i in range(len(item[key][aliases])):
-							item[key][aliases][i] = int(item[key][aliases][i])
-			return item
-		except:
-			raise DatabaseFailure("get_item")
-
-	# Update a value in the specified item
-	def update_item_field(self, ID, key, value):
-		try:
-			self.__table.update_item(Key={"ID": ID},
-				UpdateExpression="set " + str(key) + " = :r",
-				ExpressionAttributeValues={":r": value}
-			)
-		except:
-			raise DatabaseFailure("update_item_field")
-
-	# Put an empty item into the database		
-	def put_item(self, ID):
-		try:
-			self.__table.put_item(
-				Item={"ID": ID,
-					"order": [],
-					"nicknames": {},
-					"min_time": 0
-				}
-			)
-		except:
-			raise DatabaseFailure("put_item")
-
-	# Delete an item from the database
-	def delete_item(self, ID):
-		try:
-			self.__table.delete_item(Key={"ID": ID})
-		except:
-			raise DatabaseFailure("delete_item")
-
-# Interface:
-# Edit home (check that it isn't a duplicate of another nickname) - set_home
-# Edit destination (check that it isn't a duplicate of another nickname) - set_destination
-# Swap destination with existing nickname - swap_destination(nickname)
-# Change nicknames
-#	Put a nickname (check that nickname isn't duplicate of another one)
-#	Change a nickname (check that the new nickname isn't in the nicknames and original exists)
-#	Delete entire nickname - delete_nickname(nickname)
-# Change min_time (check that 0 <= value <= 30) - set_time(time)
-class Item(object):
-	# Table used by all Item objects
+# Records are used to cache user preferences from the database and
+# write back those preferences if they are modified
+class Record(object):
+	# Table used by all Records
 	__table = resource("dynamodb", region_name="us-east-1").Table("UserPreferences")
 
-	def __init__(self, ID, write=True):
+	# Put an empty record for the spcified user in the database
+	@staticmethod
+	def create(ID):
 		try:
-			# Cast min_time and all numbers in nicknames to 
-			# ints since they are returned as decimals
-			item = Item.__table.get_item(Key={"ID": ID})["Item"]
-			for key in item:
-				if key == "min_time":
-					item[key] = int(item[key])
-				elif key == "nicknames":
-					for nickname in item[key]:
-						for i in xrange(len(item[key][nickname])):
-							item[key][nickname][i] = int(item[key][nickname][i])
+			Record.__table.put_item(Item={"ID": ID})
+		except:
+			raise DatabaseFailure("create")
 
-			self.ID = ID
-			self.home = item.get("home")
-			self.destination = item.get("destination")
-			self.nicknames = item.get("nicknames", {})
-			self.order = item.get("order", [])
-			self.min_time = item.get("min_time", 0)
-			self.__write = write
+	# Get the preferences of the specified user from the database
+	def __init__(self, ID):
+		try:
+			# Cache the user's preferences
+			self.__write = False
+			item = Record.__table.get_item(Key={"ID": ID})["Item"]
+			self.__ID = ID
+			self.__home = item.get("home")
+			self.__destination = item.get("destination")
+			self.__order = item.get("order", [])
+
+			# Cast min_time and all stop ids in nicknames to 
+			# ints since they are returned as decimals
+			self.__min_time = int(item.get("min_time", 0))
+			self.__nicknames = item.get("nicknames", {})
+			for nickname in self.__nicknames:
+				for i in xrange(len(self.__nicknames[nickname])):
+					self.__nicknames[nickname][i] = int(self.__nicknames[nickname][i])
 		except Exception as e:
 			raise DatabaseFailure("__init__")
 
+	# Write the preferences of the user to the 
+	# database if they were modified
 	def __del__(self):
 		if self.__write:
 			try:
 				item = {
-					"ID": self.ID, 
-					"nicknames": self.nicknames, 
-					"order": self.order, 
-					"min_time":self.min_time
+					"ID": self.__ID, 
+					"nicknames": self.__nicknames, 
+					"order": self.__order, 
+					"min_time":self.__min_time
 				}
-				if self.home:
-					item["home"] = self.home
-				if self.destination:
-					item["destination"] = self.destination
-				Item.__table.put_item(Item=item)
-			except Exception as e:
+				if self.__home:
+					item["home"] = self.__home
+				if self.__destination:
+					item["destination"] = self.__destination
+				Record.__table.put_item(Item=item)
+			except:
 				raise DatabaseFailure("__del__")
+
+	# Define getters for all user preferences and a
+	# setter for min_time
+	@property
+	def home(self):
+		return self.__home
+	@property
+	def destination(self):
+		return self.__destination
+	@property
+	def nicknames(self):
+		return self.__nicknames
+	@property
+	def order(self):
+		return self.__order
+	@property
+	def min_time(self):
+		return self.__min_time
+	@min_time.setter
+	def min_time(self, min_time):
+		if min_time < 0 or min_time > 30:
+			raise DatabaseFailure("set_time")
+		self.__min_time = min_time
+		self.__write = True
+
+	# Swap the current destination group with the specified group
+	# Raise an exception if the specified group does not exist
+	def swap_destination(self, nickname):
+		index = 0
+		while self.__order[index] != nickname:
+			index += 1
+			if index == len(self.__order):
+				raise DatabaseFailure("swap_destination")
+		if self.__destination:	
+			self.__order[index] = self.__destination
+		self.__destination = nickname
+		self.__write = True
+
+	# Give the specified nickname the specified stops
+	# This is used for both creating new groups and modifying 
+	# existing groups
+	def put_nickname(self, nickname, stops, home=None):
+		if home:
+			self.__home = nickname
+		elif home == False:
+			self.__destination = nickname
+		elif nickname not in self.__nicknames:
+			self.__order.append(nickname)
+		self.__nicknames[nickname] = stops
+		self.__write = True
+
+	# Change the specified nickname to the new specified nickname
+	# Raise an exception if the old nickname doesn't exist or if
+	# the new nickname already exists
+	def change_nickname(self, old_nickname, new_nickname):
+		if old_nickname not in self.__nicknames or new_nickname in self.__nicknames:
+			raise DatabaseFailure("change_nickname")
+		if old_nickname == self.__home:
+			self.__home = new_nickname
+		elif old_nickname == self.__destination:
+			self.__destination = new_nickname
+		else:
+			self.__order[self.__order.index(old_nickname)] = new_nickname
+		self.__nicknames[new_nickname] = self.__nicknames[old_nickname]
+		del self.__nicknames[old_nickname]
+		self.__write = True
+		
+	# Delete the specified nickname
+	# Raise an exception if the nickname does not exist
+	def delete_nickname(self, nickname):
+		if nickname not in self.__nicknames:
+			raise DatabaseFailure("delete_nickname")
+		if nickname == self.__home:
+			self.__home = None
+		elif nickname == self.__destination:
+			self.__destination = None
+		else:
+			self.__order.remove(nickname)
+		del self.__nicknames[nickname]
+		self.__write = True
