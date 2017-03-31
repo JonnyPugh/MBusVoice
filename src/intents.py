@@ -10,9 +10,9 @@ blueprint = Blueprint("BlueBus_blueprint", __name__, url_prefix="/")
 ask = Ask(blueprint=blueprint)
 
 # Exception class used to indicate invalid stop names
-class InvalidPhrase(Exception):
+class __InvalidPhrase(Exception):
 	def __init__(self, stop_name):
-		super(Exception, self).__init__(stop_name+" is not a valid stop name")
+		super(__InvalidPhrase, self).__init__(stop_name+" is not a valid stop name")
 
 # Take the user's spoken stop name and figure out which stop 
 # id(s) they are referring to and return it/them as a list.
@@ -42,7 +42,7 @@ def clarifyStopName(user_phrase, user_stop, nicknames, bus_info):
 		return name, stop_aliases[name]
 
 	# Raise an error if the user_phrase couldn't be clarified
-	raise InvalidPhrase(user_phrase)
+	raise __InvalidPhrase(user_phrase)
 
 # If the current user is not in the database, add them to the database 
 # Return the current user's data
@@ -50,7 +50,7 @@ def getUserData():
 	ID = md5(str(session.user.userId)).hexdigest()
 	try:
 		record = Record(ID)
-	except DatabaseFailure:
+	except DatabaseError:
 		Record.create(ID)
 		record = Record(ID)
 	return record, ID
@@ -100,7 +100,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard(ID))
 			end_stops = nicknames[destination]
 			EndStop = destination
-	except InvalidPhrase as e:
+	except __InvalidPhrase as e:
 		return statement(e.message)
 
 	# If the origin and destination are the same, return an error message
@@ -168,7 +168,7 @@ def getNextBuses(StopName):
 	try:
 		record, ID = getUserData()
 		StopName, start_stops = clarifyStopName(StopName, record.home, record.nicknames, bus_info)
-	except InvalidPhrase as e:
+	except __InvalidPhrase as e:
 		return statement(e.message)
 
 	# Determine the soonest eta to the specified stop

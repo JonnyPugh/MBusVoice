@@ -49,7 +49,7 @@ class BusInfo(object):
         eta_json = self.__get_request_json("eta", {"stop": stop})
         if "error" in eta_json:
             # If the stop number is invalid, the JSON will contain "error"
-            raise self.__InvalidStop(stop)
+            raise __InvalidStop(stop)
         
         return sorted([self.__Eta(eta) for eta in eta_json["etas"][str(stop)]["etas"]], key=lambda eta: eta.time)
 
@@ -83,6 +83,6 @@ class BusInfo(object):
             self.route = eta_json["route"]
             self.time = eta_json["avg"]
 
-    class __InvalidStop(Exception):
-        def __init__(self, stop):
-            super(InvalidStop, self).__init__("There is no stop with the ID "+str(stop))
+class __InvalidStop(Exception):
+    def __init__(self, stop):
+        super(__InvalidStop, self).__init__("There is no stop with the ID "+str(stop))
