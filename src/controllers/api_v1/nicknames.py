@@ -3,11 +3,10 @@ from flask import Blueprint, request, jsonify
 
 nicknames_endpoint = Blueprint('nicknames_endpoint', __name__)
 
-@nicknames_endpoint.route('/api/v1/nicknames', methods=["GET", "PUT", "DELETE"])
-def nicknames():
+@nicknames_endpoint.route('/api/v1/nicknames/<ID>', methods=["GET", "PUT", "DELETE"])
+def nicknames(ID):
 	req_json = request.get_json()
 
-	ID = req_json["ID"]
 	nickname = req_json["nickname"]
 	group_type = req_json["type"]
 	try:
@@ -23,11 +22,10 @@ def nicknames():
 		return
 	return jsonify({"nicknames": record.nicknames, "ID": ID})
 
-@nicknames_endpoint.route('/api/v1/change_nicknames', methods=["PUT"])
-def change_nicknames():
+@nicknames_endpoint.route('/api/v1/change_nicknames/<ID>', methods=["PUT"])
+def change_nicknames(ID):
 	req_json = request.get_json()
 
-	ID = req_json["ID"]
 	try:
 		record = Record(ID)
 		record.change_nickname(req_json["old_nickname"], req_json["new_nickname"])
