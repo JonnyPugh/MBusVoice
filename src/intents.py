@@ -6,10 +6,8 @@ from flask_ask import Ask, statement, session
 from difflib import get_close_matches
 from hashlib import md5
 
-blueprint = Blueprint("MBus_blueprint", __name__, url_prefix="/")
+blueprint = Blueprint("BlueBus_blueprint", __name__, url_prefix="/")
 ask = Ask(blueprint=blueprint)
-
-bus_info = BusInfo()
 
 # Exception class used to indicate invalid stop names
 class InvalidPhrase(Exception):
@@ -18,7 +16,7 @@ class InvalidPhrase(Exception):
 
 # Take the user's spoken stop name and figure out which stop 
 # id(s) they are referring to and return it/them as a list.
-def clarifyStopName(user_phrase, user_stop, nicknames):
+def clarifyStopName(user_phrase, user_stop, nicknames, bus_info):
 	# If the specified stop name is similar to a user level alias,
 	# return the stop ids associated with that alias
 	if get_close_matches(user_phrase, [user_stop] if user_stop != None else []):
@@ -84,18 +82,19 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	home = record.home
 	destination = record.destination
 	template = "MissingFavorite"
+	bus_info = BusInfo()
 
 	try:
 		# Try to understand which stops the user is talking about
 		if StartStop:
-			StartStop, start_stops = clarifyStopName(StartStop, home, nicknames)
+			StartStop, start_stops = clarifyStopName(StartStop, home, nicknames, bus_info)
 		else:
 			if home not in nicknames:
 				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard(ID))
 			start_stops = nicknames[home]
 			StartStop = home
 		if EndStop:
-			EndStop, end_stops = clarifyStopName(EndStop, destination, nicknames)
+			EndStop, end_stops = clarifyStopName(EndStop, destination, nicknames, bus_info)
 		else:
 			if destination not in nicknames:
 				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard(ID))
@@ -165,9 +164,10 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 # Get the next bus coming to a specified stop
 @ask.intent("GetNextBusAtStop")
 def getNextBuses(StopName):
+	bus_info = BusInfo()
 	try:
 		record, ID = getUserData()
-		StopName, start_stops = clarifyStopName(StopName, record.home, record.nicknames)
+		StopName, start_stops = clarifyStopName(StopName, record.home, record.nicknames, bus_info)
 	except InvalidPhrase as e:
 		return statement(e.message)
 
