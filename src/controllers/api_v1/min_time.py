@@ -1,4 +1,4 @@
-from extensions import *
+from database import *
 from flask import Blueprint, request, jsonify
 
 min_time_endpoint = Blueprint('min_time_endpoint', __name__)

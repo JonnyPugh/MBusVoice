@@ -1,7 +1,5 @@
-from flask import *
-from extensions import *
-from database import DatabaseFailure
-from stops import stops
+from database import *
+from flask import abort, Blueprint, session, redirect, request
 
 main = Blueprint('main', __name__, template_folder='templates')
 
@@ -9,22 +7,21 @@ main = Blueprint('main', __name__, template_folder='templates')
 def index():
 	# Add the alexaID to the session if present, if not give error
 
-	alexaID = request.args.get('alexaID')
-	if alexaID:
+	ID = request.args.get('ID')
+	if ID:
 		#check if the alexaID is in the db, should be added when card is first sent
 		#if not in db, do not show them main page
 		try:
-			record = db.get_item(alexaID)
+			record = Record(ID)
 		except DatabaseFailure as e:
 			abort(403)
 
-		session['alexaID'] = alexaID
+		session['ID'] = ID
 		return redirect(url_for('main.index'))
-	if not alexaID and not 'alexaID' in session:
+	if not ID and not "ID" in session:
 		abort(403)
 
 	options = {
-		'alexaID': session['alexaID'],
-		'stop_names': stops,
+		'ID': session['ID'],
 	}
 	return render_template("index.html", **options)

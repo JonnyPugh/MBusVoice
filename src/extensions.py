@@ -1,7 +1,4 @@
-from bus_info import BusInfo
 from flask import jsonify
-
-bus_info = BusInfo()
 
 class RequestError(Exception):
 	def __init__(self, message, code):

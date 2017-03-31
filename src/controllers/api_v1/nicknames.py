@@ -1,4 +1,4 @@
-from extensions import *
+from database import *
 from flask import Blueprint, request, jsonify
 
 nicknames_endpoint = Blueprint('nicknames_endpoint', __name__)

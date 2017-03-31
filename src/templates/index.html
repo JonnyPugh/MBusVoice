@@ -31,7 +31,7 @@
 	 		<input class="form-control" name="stopName" id="homeStopName" list="systemStops">
 		 	<label class="control-label" for="focusedInput">Home Alias</label>
 	 		<input class="form-control" name="stopAlias" type="text">
-	 		<input type="hidden" name="alexaId" value={{alexaID}} class="disabled">
+	 		<input type="hidden" name="alexaId" value={{ID}} class="disabled">
 		</form>
 		<input type="button" value="Submit" id="homeSubmit" class="btn btn-default">
 		<form destination="{{ url_for('post_favorites.create_favorite') }}" id="newDestination">
@@ -39,28 +39,23 @@
 	 		<input class="form-control" name="stopName" id="destinationStopName" list="systemStops">
 		 	<label class="control-label" for="focusedInput">Destination Alias</label>
 	 		<input class="form-control" name="stopAlias" type="text">
-	  		<input type="hidden" name="alexaID" value={{alexaID}}>
+	  		<input type="hidden" name="alexaID" value={{ID}}>
 	 		<input type="checkbox" name="primary" value="primary" class="checkbox">Make primary destination?<br>
 		</form>
 		<input type="button" value="Submit" id="destinationSubmit" class="btn btn-default">
-		<datalist id="systemStops">
-			{% for stopname in stop_names %}
-				<option value="{{stopname}}" class="systemLevelStop">{{stopname}}</option>
-			{% endfor %}
-		</datalist>
 		</div>
 	</div>
 	<div class="panel panel-default panel-body container">
 	<form destination="{{ url_for('edit_favorites.change_primary') }}" id=changePrimary>
 	 	<label class="control-label" for="focusedInput">Current Primary Destination (Alias)</label>
  		<input class="form-control" id=primaryAlias type="text" list="userDestinations">
- 		<input type="hidden" name="alexaID" value={{alexaID}}>
+ 		<input type="hidden" name="alexaID" value={{ID}}>
 	</form>
 	<input type="button" value="Submit" id="submitChangePrimary" class="btn btn-default">
 	<form destination="{{ url_for('edit_favorites.delete_favorite') }}" id=deleteFavorite>
 	 	<label class="control-label" for="focusedInput">Delete Stop (Alias)</label>
  		<input class="form-control" id=deleteFavorite type="text" list="userStops">
- 		<input type="hidden" name="alexaID" value={{alexaID}}>
+ 		<input type="hidden" name="alexaID" value={{ID}}>
 	</form>
 	<input type="button" value="Submit" id="submitDeleteFavorite" class="btn btn-default">
 	<datalist id="userDestinations">

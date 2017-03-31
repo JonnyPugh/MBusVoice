@@ -1,4 +1,4 @@
-from extensions import *
+from database import *
 from flask import Blueprint, request, jsonify
 
 order_endpoint = Blueprint('order_endpoint', __name__)
