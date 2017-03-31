@@ -8,7 +8,7 @@ def destination(ID):
 	try:
 		record = Record(ID)
 	except DatabaseFailure as e:
-		return
+		return jsonify({"error": "temp error message"})
 	return jsonify({"destination": record.destination, "ID": ID})
 
 @destination_endpoint.route('/api/v1/swap_destination/<ID>', methods=["PUT"])
@@ -18,5 +18,5 @@ def swap_destination(ID):
 		record = Record(ID)
 		record.swap_destination(req_json["nickname"])
 	except DatabaseFailure as e:
-		return
+		return jsonify({"error": "temp error message"})
 	return jsonify({"destination": record.destination, "ID": ID})

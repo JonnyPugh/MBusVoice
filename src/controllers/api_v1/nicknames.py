@@ -5,21 +5,20 @@ nicknames_endpoint = Blueprint('nicknames_endpoint', __name__)
 
 @nicknames_endpoint.route('/api/v1/nicknames/<ID>', methods=["GET", "PUT", "DELETE"])
 def nicknames(ID):
-	req_json = request.get_json()
-
-	nickname = req_json["nickname"]
-	group_type = req_json["type"]
 	try:
 		record = Record(ID)
-		if method == "PUT":
-			if group_type != "":
-				record.put_nickname(req_json["nickname"], req_json["stops"], group_type == "home")
+		req_json = request.get_json()
+		nickname = req_json["nickname"]
+
+		if request.method == "PUT":
+			if req_json["type"] != "":
+				record.put_nickname(nickname, req_json["stops"], req_json["type"] == "home")
 			else:
-				record.put_nickname(req_json["nickname"], req_json["stops"])
+				record.put_nickname(nickname, req_json["stops"])
 		if method == "DELETE":
-			record.delete_nickname(req_json["nickname"])
+			record.delete_nickname(nickname)
 	except DatabaseFailure as e:
-		return
+		return jsonify({"error": "temp error message"})
 	return jsonify({"nicknames": record.nicknames, "ID": ID})
 
 @nicknames_endpoint.route('/api/v1/change_nicknames/<ID>', methods=["PUT"])
@@ -30,5 +29,5 @@ def change_nicknames(ID):
 		record = Record(ID)
 		record.change_nickname(req_json["old_nickname"], req_json["new_nickname"])
 	except DatabaseFailure as e:
-		return
+		return jsonify({"error": "temp error message"})
 	return jsonify({"nicknames": record.nicknames, "ID": ID})
