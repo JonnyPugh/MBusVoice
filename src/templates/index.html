@@ -1,17 +1,22 @@
 {% extends "base.html" %}
-{% block title %}Blue Bus Setup{% endblock %}
-{% block content %}
+{% block title %}Preferences{% endblock %}
+{% block scripts %}
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
-	<script src={{url_for('static', filename='js/index.js')}} ></script>
-	<div class="panel panel-default panel-body container" style="text-align:center">
-	  <h1>Welcome to Blue Bus Setup</h1>
-	  <p>Use this website to fill in your favorite home and destination stops. Use the map or look at <a href="https://pts.umich.edu/transit/routes.php" target="_blank">the official bus schedule</a> to locate your favorite home and destination stops.</p>
-	</div>
+	<script src={{url_for("static", filename="js/index.js")}}></script>
+{% endblock %}
+{% block heading %}
+	<h1>Welcome to Blue Bus Setup</h1>
+	<p>
+		Use this website to set up your preferences. Use the map or look at <a href="https://pts.umich.edu/transit/routes.php" target="_blank">the official bus schedule</a> to locate bus stops.
+	</p>
+{% endblock %}
+{% block content %}
 	<iframe src="https://mbus.doublemap.com/map/" height="650" width="1000" scrolling="no" style="display: block; margin-left: auto; margin-right: auto;"></iframe>
 	<br></br>
+<!--
 	<div class="panel panel-default panel-body container">
 	<h2>Current User Stops</h2>
-	<table class="table table-striped table-hover " id="userFavorites" destination="{{ url_for('get_favorites.get_favorite_list') }}">
+	<table class="table table-striped table-hover " id="userFavorites" destination="">
 		<thead>
 			<tr>
 				<th>Stop Alias</th>
@@ -26,7 +31,7 @@
 	<div class="panel panel-default panel-body container">
 		<h2 id="displayError"></h2>
 		<div class="form-group">
-		<form destination="{{ url_for('post_favorites.create_favorite') }}" id="newHome">
+		<form destination="" id="newHome">
 		 	<label class="control-label" for="focusedInput">Home Stop</label>
 	 		<input class="form-control" name="stopName" id="homeStopName" list="systemStops">
 		 	<label class="control-label" for="focusedInput">Home Alias</label>
@@ -34,7 +39,7 @@
 	 		<input type="hidden" name="alexaId" value={{ID}} class="disabled">
 		</form>
 		<input type="button" value="Submit" id="homeSubmit" class="btn btn-default">
-		<form destination="{{ url_for('post_favorites.create_favorite') }}" id="newDestination">
+		<form destination="" id="newDestination">
 		 	<label class="control-label" for="focusedInput">Destination Stop</label>
 	 		<input class="form-control" name="stopName" id="destinationStopName" list="systemStops">
 		 	<label class="control-label" for="focusedInput">Destination Alias</label>
@@ -46,13 +51,13 @@
 		</div>
 	</div>
 	<div class="panel panel-default panel-body container">
-	<form destination="{{ url_for('edit_favorites.change_primary') }}" id=changePrimary>
+	<form destination="" id=changePrimary>
 	 	<label class="control-label" for="focusedInput">Current Primary Destination (Alias)</label>
  		<input class="form-control" id=primaryAlias type="text" list="userDestinations">
  		<input type="hidden" name="alexaID" value={{ID}}>
 	</form>
 	<input type="button" value="Submit" id="submitChangePrimary" class="btn btn-default">
-	<form destination="{{ url_for('edit_favorites.delete_favorite') }}" id=deleteFavorite>
+	<form destination="" id=deleteFavorite>
 	 	<label class="control-label" for="focusedInput">Delete Stop (Alias)</label>
  		<input class="form-control" id=deleteFavorite type="text" list="userStops">
  		<input type="hidden" name="alexaID" value={{ID}}>
@@ -63,4 +68,5 @@
 	<datalist id="userStops">
 	</datalist>
 	</div>
+-->
 {% endblock %}

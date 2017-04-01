@@ -1,6 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Blue Bus Unauthorized{% endblock %}
+{% block title %}Unauthorized{% endblock %}
+{% block heading %}
+	<center>
+		<h1 class="text-warning">
+			This website is for users of the Blue Bus Alexa Skill. Please use the link in your Alexa mobile app to access your preferences.
+		</h1>
+	</center>
+{% endblock %}
 {% block content %}
-<h1 class="text-warning">This page is for users of the Blue Bus Application. Please use the link in the Alexa app to visit this page.</h1>
-<p>Blue Bus is an Alexa Skill for the University of Michigan Blue Bus system.</p>
+	<center>
+		<p>
+			Blue Bus is an Alexa Skill for the University of Michigan bus system.
+		</p>
+	</center>
 {% endblock %}
