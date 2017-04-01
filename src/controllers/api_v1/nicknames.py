@@ -3,15 +3,23 @@ from flask import Blueprint, request, jsonify
 
 nicknames_blueprint = Blueprint("nicknames_blueprint", __name__)
 
-@nicknames_blueprint.route("/api/v1/<ID>/<nickname>", methods=["GET", "PUT", "DELETE"])
+@nicknames_blueprint.route("/api/v1/<ID>/nicknames", methods=["GET"])
+def get_nicknames(ID):
+	# Get the user's groups
+	try:
+		return jsonify({"nicknames": Record(ID).nicknames})
+	except DatabaseError as e:
+		return jsonify(e.json), e.code
+
+@nicknames_blueprint.route("/api/v1/<ID>/<nickname>", methods=["PUT", "DELETE"])
 def nicknames(ID, nickname):
 	# If the request is a PUT request, write the specified
 	# stops to the specified nickname and change the nickname
 	# if a new_nickname is specified
 	# If the request is a DELETE request, delete the specified group
-	# Get the specified group
 	try:
 		record = Record(ID)
+		record.verify_nickname(nickname)
 		if request.method == "PUT":
 			req_json = request.get_json()
 			if "new_nickname" in req_json:
@@ -22,8 +30,8 @@ def nicknames(ID, nickname):
 				if "type" in req_json and req_json["type"] in ["home", "destination"]:
 					home = req_json["type"] == "home"
 				record.put_nickname(nickname, req_json["stops"], home)
-		elif request.method == "DELETE":
+		else:
 			record.delete_nickname(nickname)
-		return jsonify({"nicknames": record.nicknames})
+		return jsonify({nickname: record.nicknames[nickname]})
 	except DatabaseError as e:
 		return jsonify(e.json), e.code

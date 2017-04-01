@@ -92,13 +92,15 @@ class Record(object):
 		self.__write = True
 
 	# Swap the current destination group with the specified group
-	# Raise an exception if the specified group does not exist
+	# Raise an exception if the specified group does not exist or
+	# if the specified group is the home or destination group
 	def swap_destination(self, nickname):
+		self.verify_nickname(nickname)
+		if nickname in [self.__home, self.__destination]:
+			raise _InvalidSwap
 		index = 0
 		while self.__order[index] != nickname:
 			index += 1
-			if index == len(self.__order):
-				raise _InvalidNickname(nickname)
 		if self.__destination:	
 			self.__order[index] = self.__destination
 		self.__destination = nickname
@@ -126,8 +128,7 @@ class Record(object):
 	# Raise an exception if the current nickname doesn't exist or if
 	# the new nickname already exists
 	def change_nickname(self, current_nickname, new_nickname):
-		if current_nickname not in self.__nicknames:
-			raise _InvalidNickname(current_nickname)
+		self.verify_nickname(current_nickname)
 		if new_nickname in self.__nicknames:
 			raise _DuplicateNickname(new_nickname)
 		if current_nickname == self.__home:
@@ -143,8 +144,7 @@ class Record(object):
 	# Delete the specified nickname
 	# Raise an exception if the nickname does not exist
 	def delete_nickname(self, nickname):
-		if nickname not in self.__nicknames:
-			raise _InvalidNickname(nickname)
+		self.verify_nickname(nickname)
 		if nickname == self.__home:
 			self.__home = None
 		elif nickname == self.__destination:
@@ -153,6 +153,12 @@ class Record(object):
 			self.__order.remove(nickname)
 		del self.__nicknames[nickname]
 		self.__write = True
+
+	# Verify that the specified nickname is valid
+	# Raise an exception if the nickname does not exist
+	def verify_nickname(self, nickname):
+		if nickname not in self.__nicknames:
+			raise _InvalidNickname(nickname)
 
 # Internal Exception types used by Records
 # Only DatabaseErrors should be used outside this file
@@ -168,13 +174,17 @@ class _InvalidInput(DatabaseError):
 	def __init__(self, message):
 		super(_InvalidInput, self).__init__(message, 400)
 
-class _InvalidTime(_InvalidInput):
-	def __init__(self):
-		super(_InvalidTime, self).__init__("The time must be an integer between 0 and 30")
-
 class _InvalidNickname(_InvalidInput):
 	def __init__(self, nickname):
 		super(_InvalidNickname, self).__init__("The nickname '" + nickname + "' does not exist")
+
+class _InvalidSwap(_InvalidInput):
+	def __init__(self):
+		super(_InvalidSwap, self).__init__("Home and destination groups cannot swap with the destination group")
+
+class _InvalidTime(_InvalidInput):
+	def __init__(self):
+		super(_InvalidTime, self).__init__("The time must be an integer between 0 and 30")
 
 class _DuplicateNickname(_InvalidInput):
 	def __init__(self, nickname):

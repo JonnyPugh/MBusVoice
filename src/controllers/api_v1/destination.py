@@ -12,8 +12,8 @@ def destination(ID):
 		record = Record(ID)
 		if request.method == "PUT":
 			req_json = request.get_json()
-			if "nickname" in req_json:
-				record.swap_destination(req_json["nickname"])
+			if "swap" in req_json:
+				record.swap_destination(req_json["swap"])
 		return jsonify({"destination": record.destination})
 	except DatabaseError as e:
 		return jsonify(e.json), e.code		
