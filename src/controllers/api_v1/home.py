@@ -1,12 +1,12 @@
 from database import *
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 
-home_endpoint = Blueprint('home_endpoint', __name__)
+home_blueprint = Blueprint("home_blueprint", __name__)
 
-@home_endpoint.route('/api/v1/home/<ID>', methods=["GET"])
+@home_blueprint.route("/api/v1/<ID>/home", methods=["GET"])
 def home(ID):
+	# Get the user's home nickname
 	try:
-		record = Record(ID)
-	except DatabaseFailure as e:
-		return jsonify({"error": "Everything exploded"})
-	return jsonify({"home": record.home, "ID": ID})
+		return jsonify({"home": Record(ID).home})
+	except DatabaseError as e:
+		return jsonify(e.json), e.code

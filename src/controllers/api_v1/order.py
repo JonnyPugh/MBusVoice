@@ -1,13 +1,12 @@
 from database import *
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 
-order_endpoint = Blueprint('order_endpoint', __name__)
+order_blueprint = Blueprint("order_blueprint", __name__)
 
-@order_endpoint.route('/api/v1/order/<ID>', methods=["GET"])
+@order_blueprint.route("/api/v1/<ID>/order", methods=["GET"])
 def order(ID):
+	# Get the user's order
 	try:
-		record = Record(ID)
-	except DatabaseFailure as e:
-		return jsonify({"error": "temp error message"})
-	return jsonify({"order": record.order, "ID": ID})
-
+		return jsonify({"order": Record(ID).order})
+	except DatabaseError as e:
+		return jsonify(e.json), e.code

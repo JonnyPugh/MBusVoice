@@ -1,12 +1,13 @@
-from extensions import RequestError
 from boto3 import resource
 from botocore.exceptions import ClientError
 
 # Indicate that there was an error trying to modify the database
 # Use a user level error message and an HTTP error code
-class DatabaseError(RequestError):
+class DatabaseError(Exception):
 	def __init__(self, message, code):
-		super(DatabaseError, self).__init__(message, code)
+		self.code = code
+		self.json = {"error":  message}
+		super(DatabaseError, self).__init__(message)
 
 # Records are used to cache user preferences from the database and
 # write back those preferences if they are modified
@@ -20,7 +21,7 @@ class Record(object):
 		try:
 			Record.__table.put_item(Item={"ID": ID})
 		except ClientError:
-			raise __DynamoError
+			raise _DynamoError
 
 	# Get the preferences of the specified user from the database
 	def __init__(self, ID):
@@ -28,8 +29,10 @@ class Record(object):
 		try:
 			# Get the user's preferences
 			item = Record.__table.get_item(Key={"ID": ID})["Item"]
-		except ClientError:
-			raise __DynamoError
+		except KeyError:
+			raise _NoUser
+		except ClientError as e:
+			raise _DynamoError
 
 		# Cache the user's preferences
 		self.__ID = ID
@@ -62,7 +65,7 @@ class Record(object):
 			try:
 				Record.__table.put_item(Item=item)
 			except ClientError:
-				raise __DynamoError
+				raise _DynamoError
 
 	# Define getters for all user preferences and a
 	# setter for min_time
@@ -83,8 +86,8 @@ class Record(object):
 		return self.__min_time
 	@min_time.setter
 	def min_time(self, min_time):
-		if min_time % 1 or min_time < 0 or min_time > 30:
-			raise __InvalidTime
+		if not isinstance(min_time, (int, long)) or min_time < 0 or min_time > 30:
+			raise _InvalidTime
 		self.__min_time = min_time
 		self.__write = True
 
@@ -95,7 +98,7 @@ class Record(object):
 		while self.__order[index] != nickname:
 			index += 1
 			if index == len(self.__order):
-				raise __InvalidNickname(nickname)
+				raise _InvalidNickname(nickname)
 		if self.__destination:	
 			self.__order[index] = self.__destination
 		self.__destination = nickname
@@ -120,28 +123,28 @@ class Record(object):
 		self.__write = True
 
 	# Change the specified nickname to the new specified nickname
-	# Raise an exception if the old nickname doesn't exist or if
+	# Raise an exception if the current nickname doesn't exist or if
 	# the new nickname already exists
-	def change_nickname(self, old_nickname, new_nickname):
-		if old_nickname not in self.__nicknames:
-			raise __InvalidNickname(old_nickname)
+	def change_nickname(self, current_nickname, new_nickname):
+		if current_nickname not in self.__nicknames:
+			raise _InvalidNickname(current_nickname)
 		if new_nickname in self.__nicknames:
-			raise __DuplicateNickname(new_nickname)
-		if old_nickname == self.__home:
+			raise _DuplicateNickname(new_nickname)
+		if current_nickname == self.__home:
 			self.__home = new_nickname
-		elif old_nickname == self.__destination:
+		elif current_nickname == self.__destination:
 			self.__destination = new_nickname
 		else:
-			self.__order[self.__order.index(old_nickname)] = new_nickname
-		self.__nicknames[new_nickname] = self.__nicknames[old_nickname]
-		del self.__nicknames[old_nickname]
+			self.__order[self.__order.index(current_nickname)] = new_nickname
+		self.__nicknames[new_nickname] = self.__nicknames[current_nickname]
+		del self.__nicknames[current_nickname]
 		self.__write = True
 		
 	# Delete the specified nickname
 	# Raise an exception if the nickname does not exist
 	def delete_nickname(self, nickname):
 		if nickname not in self.__nicknames:
-			raise __InvalidNickname(nickname)
+			raise _InvalidNickname(nickname)
 		if nickname == self.__home:
 			self.__home = None
 		elif nickname == self.__destination:
@@ -153,22 +156,26 @@ class Record(object):
 
 # Internal Exception types used by Records
 # Only DatabaseErrors should be used outside this file
-class __DynamoError(DatabaseError):
+class _NoUser(DatabaseError):
 	def __init__(self):
-		super(__DynamoError, self).__init__("There was a problem communicating with the database", 502)
+		super(_NoUser, self).__init__("The user does not exist in the database", 401)
 
-class __InvalidInput(DatabaseError):
+class _DynamoError(DatabaseError):
+	def __init__(self):
+		super(_DynamoError, self).__init__("There was a problem communicating with the database", 502)
+
+class _InvalidInput(DatabaseError):
 	def __init__(self, message):
-		super(__InvalidInput, self).__init__(message, 400)
+		super(_InvalidInput, self).__init__(message, 400)
 
-class __InvalidTime(__InvalidInput):
+class _InvalidTime(_InvalidInput):
 	def __init__(self):
-		super(__InvalidTime, self).__init__("The time must be between 0 and 30 minutes and can't have a decimal")
+		super(_InvalidTime, self).__init__("The time must be an integer between 0 and 30")
 
-class __InvalidNickname(__InvalidInput):
+class _InvalidNickname(_InvalidInput):
 	def __init__(self, nickname):
-		super(__InvalidNickname, self).__init__("The nickname '" + nickname + "' does not exist")
+		super(_InvalidNickname, self).__init__("The nickname '" + nickname + "' does not exist")
 
-class __DuplicateNickname(__InvalidInput):
+class _DuplicateNickname(_InvalidInput):
 	def __init__(self, nickname):
-		super(__DuplicateNickname, self).__init__("The nickname '" + nickname + "' already exists")
+		super(_DuplicateNickname, self).__init__("The nickname '" + nickname + "' already exists")

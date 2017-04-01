@@ -1,27 +1,23 @@
 from database import *
 from flask import *
 
-main = Blueprint('main', __name__, template_folder='templates')
+main = Blueprint("main", __name__, template_folder="templates")
 
-@main.route('/')
+@main.route("/")
 def index():
-	# Add the alexaID to the session if present, if not give error
-
-	ID = request.args.get('ID')
+	# Add the ID to the session if specified as an argument
+	# If there's an ID in the session, render the main page
+	# If there's no ID in the session and no ID is specified
+	# as an argument, return an unauthorized error
+	ID = request.args.get("ID")
 	if ID:
-		#check if the alexaID is in the db, should be added when card is first sent
-		#if not in db, do not show them main page
+		# Verify that the specified ID is in the database
 		try:
 			record = Record(ID)
-		except DatabaseFailure as e:
-			abort(403)
-
-		session['ID'] = ID
-		return redirect(url_for('main.index'))
-	if not ID and not "ID" in session:
-		abort(403)
-
-	options = {
-		'ID': session['ID'],
-	}
-	return render_template("index.html", **options)
+		except DatabaseError:
+			abort(401)
+		session["ID"] = ID
+		return redirect(url_for("main.index"))
+	elif not "ID" in session:
+		abort(401)
+	return render_template("index.html", ID=session["ID"])
