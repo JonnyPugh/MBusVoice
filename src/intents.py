@@ -53,19 +53,19 @@ def getUserData():
 	except DatabaseError:
 		Record.create(ID)
 		record = Record(ID)
-	return record, ID
+	return record
 
 # Get the message to put in the card that tells users 
 # the URL of the deployed web application
-def getPreferencesCard(ID):
-	return "Set up your preferences at: https://y7r89izao4.execute-api.us-east-1.amazonaws.com/web?ID="+ID
+def getPreferencesCard(url):
+	return "Set up your preferences at: " + url
 
 # Introduce the skill and demonstrate how to use it
 # If the current user is not in the database, add them to the database
 @ask.launch
 def launch():
-	record, ID = getUserData()
-	return statement(render_template("Open")).simple_card("Welcome!", getPreferencesCard(ID))
+	record = getUserData()
+	return statement(render_template("Open")).simple_card("Welcome!", getPreferencesCard(record.url))
 
 # Get bus information based on a variety of different parameters
 @ask.intent("GetNextBuses", 
@@ -77,7 +77,7 @@ def launch():
 	})
 def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	# Get user preferences from the database
-	record, ID = getUserData()
+	record = getUserData()
 	nicknames = record.nicknames
 	home = record.home
 	destination = record.destination
@@ -90,14 +90,14 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 			StartStop, start_stops = clarifyStopName(StartStop, home, nicknames, bus_info)
 		else:
 			if home not in nicknames:
-				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard(ID))
+				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard(record.url))
 			start_stops = nicknames[home]
 			StartStop = home
 		if EndStop:
 			EndStop, end_stops = clarifyStopName(EndStop, destination, nicknames, bus_info)
 		else:
 			if destination not in nicknames:
-				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard(ID))
+				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard(record.url))
 			end_stops = nicknames[destination]
 			EndStop = destination
 	except __InvalidPhrase as e:
@@ -166,7 +166,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 def getNextBuses(StopName):
 	bus_info = BusInfo()
 	try:
-		record, ID = getUserData()
+		record = getUserData()
 		StopName, start_stops = clarifyStopName(StopName, record.home, record.nicknames, bus_info)
 	except __InvalidPhrase as e:
 		return statement(e.message)

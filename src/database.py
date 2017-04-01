@@ -1,3 +1,5 @@
+from config import bitly_token
+from requests import get
 from boto3 import resource
 from botocore.exceptions import ClientError
 
@@ -19,7 +21,14 @@ class Record(object):
 	@staticmethod
 	def create(ID):
 		try:
-			Record.__table.put_item(Item={"ID": ID})
+			r = get("https://api-ssl.bitly.com/v3/shorten", 
+				params={
+					"access_token": bitly_token, 
+					"longUrl": "https://y7r89izao4.execute-api.us-east-1.amazonaws.com/web?ID="+ID
+				}
+			)
+			r.raise_for_status()
+			Record.__table.put_item(Item={"ID": ID, "url": r.json()["data"]["url"]})
 		except ClientError:
 			raise _DynamoError
 
@@ -39,6 +48,7 @@ class Record(object):
 		self.__home = item.get("home")
 		self.__destination = item.get("destination")
 		self.__order = item.get("order", [])
+		self.__url = item["url"]
 
 		# Cast min_time and all stop ids in nicknames to 
 		# ints since they are returned as decimals
@@ -56,7 +66,8 @@ class Record(object):
 				"ID": self.__ID, 
 				"nicknames": self.__nicknames, 
 				"order": self.__order, 
-				"min_time":self.__min_time
+				"min_time":self.__min_time,
+				"url": self.__url
 			}
 			if self.__home:
 				item["home"] = self.__home
@@ -90,6 +101,9 @@ class Record(object):
 			raise _InvalidTime
 		self.__min_time = min_time
 		self.__write = True
+	@property
+	def url(self):
+		return self.__url
 
 	# Swap the current destination group with the specified group
 	# Raise an exception if the specified group does not exist or
