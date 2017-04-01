@@ -19,7 +19,6 @@ def nicknames(ID, nickname):
 	# If the request is a DELETE request, delete the specified group
 	try:
 		record = Record(ID)
-		record.verify_nickname(nickname)
 		if request.method == "PUT":
 			req_json = request.get_json()
 			if "new_nickname" in req_json:
@@ -30,8 +29,10 @@ def nicknames(ID, nickname):
 				if "type" in req_json and req_json["type"] in ["home", "destination"]:
 					home = req_json["type"] == "home"
 				record.put_nickname(nickname, req_json["stops"], home)
+			if nickname in record.nicknames:
+				return jsonify({nickname: record.nicknames[nickname]})
 		else:
 			record.delete_nickname(nickname)
-		return jsonify({nickname: record.nicknames[nickname]})
+		return jsonify({})
 	except DatabaseError as e:
 		return jsonify(e.json), e.code

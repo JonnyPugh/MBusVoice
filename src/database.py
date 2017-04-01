@@ -95,7 +95,7 @@ class Record(object):
 	# Raise an exception if the specified group does not exist or
 	# if the specified group is the home or destination group
 	def swap_destination(self, nickname):
-		self.verify_nickname(nickname)
+		self.__verify_nickname(nickname)
 		if nickname in [self.__home, self.__destination]:
 			raise _InvalidSwap
 		index = 0
@@ -128,7 +128,7 @@ class Record(object):
 	# Raise an exception if the current nickname doesn't exist or if
 	# the new nickname already exists
 	def change_nickname(self, current_nickname, new_nickname):
-		self.verify_nickname(current_nickname)
+		self.__verify_nickname(current_nickname)
 		if new_nickname in self.__nicknames:
 			raise _DuplicateNickname(new_nickname)
 		if current_nickname == self.__home:
@@ -144,7 +144,7 @@ class Record(object):
 	# Delete the specified nickname
 	# Raise an exception if the nickname does not exist
 	def delete_nickname(self, nickname):
-		self.verify_nickname(nickname)
+		self.__verify_nickname(nickname)
 		if nickname == self.__home:
 			self.__home = None
 		elif nickname == self.__destination:
@@ -156,7 +156,7 @@ class Record(object):
 
 	# Verify that the specified nickname is valid
 	# Raise an exception if the nickname does not exist
-	def verify_nickname(self, nickname):
+	def __verify_nickname(self, nickname):
 		if nickname not in self.__nicknames:
 			raise _InvalidNickname(nickname)
 
