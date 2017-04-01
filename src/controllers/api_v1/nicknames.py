@@ -33,6 +33,6 @@ def nicknames(ID, nickname):
 				return jsonify({nickname: record.nicknames[nickname]})
 		else:
 			record.delete_nickname(nickname)
-		return jsonify({})
+		return jsonify({"nickname": nickname})
 	except DatabaseError as e:
 		return jsonify(e.json), e.code
