@@ -17,7 +17,7 @@ class Record(object):
 	# Table used by all Records
 	__table = resource("dynamodb", region_name="us-east-1").Table("UserPreferences")
 
-	# Put an empty record for the spcified user in the database
+	# Put an empty record for the specified user in the database
 	@staticmethod
 	def create(ID):
 		try:
