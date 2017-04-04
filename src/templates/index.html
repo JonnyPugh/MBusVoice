@@ -2,7 +2,6 @@
 {% block title %}Preferences{% endblock %}
 {% block scripts %}
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
-	<script src={{url_for("static", filename="js/index.js")}}></script>
 {% endblock %}
 {% block heading %}
 	<h1>Welcome to Blue Bus Setup</h1>
@@ -12,7 +11,7 @@
 {% endblock %}
 {% block content %}
 	<center>
-		<iframe src="https://mbus.doublemap.com/map" height="650" width="80%" scrolling="no"></iframe>
+		<iframe src="https://mbus.doublemap.com/map/" height="650" width="80%" scrolling="no"></iframe>
 	</center>
 	<br></br>
 <!--
