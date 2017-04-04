@@ -122,6 +122,8 @@ class Record(object):
 	# home or destination group but it will not be a problem if it is set
 	# when the home or destination group already exists
 	def put_group(self, nickname, stops, home=None):
+		if not nickname.isalnum():
+			raise _InvalidNickname(nickname)
 		if home:
 			self.__home = nickname
 		elif home == False:
@@ -135,6 +137,8 @@ class Record(object):
 	# Raise an exception if the current nickname doesn't exist or if
 	# the new nickname already exists
 	def change_nickname(self, current_nickname, new_nickname):
+		if not new_nickname.isalnum():
+			raise _InvalidNickname(new_nickname)
 		self.__verify_nickname(current_nickname)
 		if new_nickname in self.__groups:
 			raise _DuplicateNickname(new_nickname)
@@ -165,7 +169,7 @@ class Record(object):
 	# Raise an exception if the nickname does not exist
 	def __verify_nickname(self, nickname):
 		if nickname not in self.__groups:
-			raise _InvalidNickname(nickname)
+			raise _NicknameDoesNotExist(nickname)
 
 # Internal Exception types used by Records
 class _NoUser(RequestError):
@@ -182,7 +186,11 @@ class _InvalidInput(RequestError):
 
 class _InvalidNickname(_InvalidInput):
 	def __init__(self, nickname):
-		super(_InvalidNickname, self).__init__("The nickname '" + nickname + "' does not exist")
+		super(_InvalidNickname, self).__init__("Nicknames must only contain alphanumeric characters")
+
+class _NicknameDoesNotExist(_InvalidInput):
+	def __init__(self, nickname):
+		super(_NicknameDoesNotExist, self).__init__("The nickname '" + nickname + "' does not exist")
 
 class _InvalidSwap(_InvalidInput):
 	def __init__(self):
