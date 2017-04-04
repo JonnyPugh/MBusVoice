@@ -1,4 +1,6 @@
-from database import *
+from database import Record
+from request_error import RequestError
+from verify_json import verify
 from flask import Blueprint, request, jsonify
 
 destination_blueprint = Blueprint("destination_blueprint", __name__)
@@ -12,8 +14,8 @@ def destination(ID):
 		record = Record(ID)
 		if request.method == "PUT":
 			req_json = request.get_json()
-			if "swap" in req_json:
-				record.swap_destination(req_json["swap"])
+			verify(req_json, "swap", basestring)
+			record.swap_destination(req_json["swap"])
 		return jsonify({"destination": record.destination})
-	except DatabaseError as e:
+	except RequestError as e:
 		return jsonify(e.json), e.code		

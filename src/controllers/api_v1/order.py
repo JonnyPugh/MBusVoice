@@ -1,4 +1,5 @@
-from database import *
+from database import Record
+from request_error import RequestError
 from flask import Blueprint, jsonify
 
 order_blueprint = Blueprint("order_blueprint", __name__)
@@ -8,5 +9,5 @@ def order(ID):
 	# Get the user's order
 	try:
 		return jsonify({"order": Record(ID).order})
-	except DatabaseError as e:
+	except RequestError as e:
 		return jsonify(e.json), e.code

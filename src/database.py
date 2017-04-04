@@ -1,15 +1,8 @@
 from config import bitly_token
+from request_error import RequestError
 from requests import get
 from boto3 import resource
 from botocore.exceptions import ClientError
-
-# Indicate that there was an error trying to modify the database
-# Use a user level error message and an HTTP error code
-class DatabaseError(Exception):
-	def __init__(self, message, code):
-		self.code = code
-		self.json = {"error":  message}
-		super(DatabaseError, self).__init__(message)
 
 # Records are used to cache user preferences from the database and
 # write back those preferences if they are modified
@@ -50,13 +43,13 @@ class Record(object):
 		self.__order = item.get("order", [])
 		self.__url = item["url"]
 
-		# Cast min_time and all stop ids in nicknames to 
+		# Cast time and all stop ids in groups to 
 		# ints since they are returned as decimals
-		self.__min_time = int(item.get("min_time", 0))
-		self.__nicknames = item.get("nicknames", {})
-		for nickname in self.__nicknames:
-			for i in xrange(len(self.__nicknames[nickname])):
-				self.__nicknames[nickname][i] = int(self.__nicknames[nickname][i])
+		self.__time = int(item.get("time", 0))
+		self.__groups = item.get("groups", {})
+		for nickname in self.__groups:
+			for i in xrange(len(self.__groups[nickname])):
+				self.__groups[nickname][i] = int(self.__groups[nickname][i])
 
 	# Write the preferences of the user to the 
 	# database if they were modified
@@ -64,9 +57,9 @@ class Record(object):
 		if self.__write:
 			item = {
 				"ID": self.__ID, 
-				"nicknames": self.__nicknames, 
+				"groups": self.__groups, 
 				"order": self.__order, 
-				"min_time":self.__min_time,
+				"time":self.__time,
 				"url": self.__url
 			}
 			if self.__home:
@@ -79,7 +72,7 @@ class Record(object):
 				raise _DynamoError
 
 	# Define getters for all user preferences and a
-	# setter for min_time
+	# setter for time
 	@property
 	def home(self):
 		return self.__home
@@ -87,19 +80,19 @@ class Record(object):
 	def destination(self):
 		return self.__destination
 	@property
-	def nicknames(self):
-		return self.__nicknames
+	def groups(self):
+		return self.__groups
 	@property
 	def order(self):
 		return self.__order
 	@property
-	def min_time(self):
-		return self.__min_time
-	@min_time.setter
-	def min_time(self, min_time):
-		if not isinstance(min_time, (int, long)) or min_time < 0 or min_time > 30:
+	def time(self):
+		return self.__time
+	@time.setter
+	def time(self, time):
+		if time < 0 or time > 30:
 			raise _InvalidTime
-		self.__min_time = min_time
+		self.__time = time
 		self.__write = True
 	@property
 	def url(self):
@@ -120,7 +113,7 @@ class Record(object):
 		self.__destination = nickname
 		self.__write = True
 
-	# Give the specified nickname the specified stops
+	# Give the specified group the specified stops
 	# This is used for both creating new groups and modifying existing groups
 	# If the nickname is for the home, the home flag should be True
 	# If the nickname is for the destination, the home flag should be False
@@ -128,14 +121,14 @@ class Record(object):
 	# Setting the home flag is only necessary when initially creating a
 	# home or destination group but it will not be a problem if it is set
 	# when the home or destination group already exists
-	def put_nickname(self, nickname, stops, home=None):
+	def put_group(self, nickname, stops, home=None):
 		if home:
 			self.__home = nickname
 		elif home == False:
 			self.__destination = nickname
-		elif nickname not in self.__nicknames:
+		elif nickname not in self.__groups:
 			self.__order.append(nickname)
-		self.__nicknames[nickname] = stops
+		self.__groups[nickname] = stops
 		self.__write = True
 
 	# Change the specified nickname to the new specified nickname
@@ -143,7 +136,7 @@ class Record(object):
 	# the new nickname already exists
 	def change_nickname(self, current_nickname, new_nickname):
 		self.__verify_nickname(current_nickname)
-		if new_nickname in self.__nicknames:
+		if new_nickname in self.__groups:
 			raise _DuplicateNickname(new_nickname)
 		if current_nickname == self.__home:
 			self.__home = new_nickname
@@ -151,13 +144,13 @@ class Record(object):
 			self.__destination = new_nickname
 		else:
 			self.__order[self.__order.index(current_nickname)] = new_nickname
-		self.__nicknames[new_nickname] = self.__nicknames[current_nickname]
-		del self.__nicknames[current_nickname]
+		self.__groups[new_nickname] = self.__groups[current_nickname]
+		del self.__groups[current_nickname]
 		self.__write = True
 		
-	# Delete the specified nickname
+	# Delete the specified group
 	# Raise an exception if the nickname does not exist
-	def delete_nickname(self, nickname):
+	def delete_group(self, nickname):
 		self.__verify_nickname(nickname)
 		if nickname == self.__home:
 			self.__home = None
@@ -165,26 +158,25 @@ class Record(object):
 			self.__destination = None
 		else:
 			self.__order.remove(nickname)
-		del self.__nicknames[nickname]
+		del self.__groups[nickname]
 		self.__write = True
 
 	# Verify that the specified nickname is valid
 	# Raise an exception if the nickname does not exist
 	def __verify_nickname(self, nickname):
-		if nickname not in self.__nicknames:
+		if nickname not in self.__groups:
 			raise _InvalidNickname(nickname)
 
 # Internal Exception types used by Records
-# Only DatabaseErrors should be used outside this file
-class _NoUser(DatabaseError):
+class _NoUser(RequestError):
 	def __init__(self):
 		super(_NoUser, self).__init__("The user does not exist in the database", 401)
 
-class _DynamoError(DatabaseError):
+class _DynamoError(RequestError):
 	def __init__(self):
 		super(_DynamoError, self).__init__("There was a problem communicating with the database", 502)
 
-class _InvalidInput(DatabaseError):
+class _InvalidInput(RequestError):
 	def __init__(self, message):
 		super(_InvalidInput, self).__init__(message, 400)
 
@@ -198,7 +190,7 @@ class _InvalidSwap(_InvalidInput):
 
 class _InvalidTime(_InvalidInput):
 	def __init__(self):
-		super(_InvalidTime, self).__init__("The time must be an integer between 0 and 30")
+		super(_InvalidTime, self).__init__("The time must be between 0 and 30")
 
 class _DuplicateNickname(_InvalidInput):
 	def __init__(self, nickname):

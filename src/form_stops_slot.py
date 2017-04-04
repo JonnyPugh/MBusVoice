@@ -1,4 +1,5 @@
-from quarantine import BusInfo, data
+from bus_info import BusInfo
+import data
 
 # Form the slot for all bus stops and aliases
 # of those bus stops using API stop names

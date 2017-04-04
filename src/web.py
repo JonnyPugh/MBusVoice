@@ -10,7 +10,7 @@ app.register_blueprint(controllers.main)
 # Register API controllers
 app.register_blueprint(controllers.api_v1.home_blueprint)
 app.register_blueprint(controllers.api_v1.destination_blueprint)
-app.register_blueprint(controllers.api_v1.nicknames_blueprint)
+app.register_blueprint(controllers.api_v1.groups_blueprint)
 app.register_blueprint(controllers.api_v1.order_blueprint)
 app.register_blueprint(controllers.api_v1.time_blueprint)
 app.register_blueprint(controllers.api_v1.stops_blueprint)

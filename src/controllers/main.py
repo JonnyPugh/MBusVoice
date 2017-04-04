@@ -1,4 +1,5 @@
-from database import *
+from database import Record
+from request_error import RequestError
 from flask import *
 
 main = Blueprint("main", __name__, template_folder="templates")
@@ -14,7 +15,7 @@ def index():
 		# Verify that the specified ID is in the database
 		try:
 			record = Record(ID)
-		except DatabaseError:
+		except RequestError:
 			abort(401)
 		session["ID"] = ID
 		return redirect(url_for("main.index"))

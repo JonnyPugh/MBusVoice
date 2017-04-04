@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from quarantine import BusInfo
+from bus_info import BusInfo
 from time import ctime, sleep
 import os
 
