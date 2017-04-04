@@ -77,6 +77,11 @@ def launch():
 		"NumBuses": 1
 	})
 def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
+	# Verify that NumBuses is greater than 0
+	NumBuses = int(NumBuses)
+	if NumBuses <= 0:
+		return statement("The number of buses must be at least 1")
+
 	# Get user preferences from the database
 	record = getUserData()
 	groups = record.groups
@@ -113,10 +118,11 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	for start_stop in start_stops:
 		for stop_eta in bus_info.get_eta(start_stop):
 			route = bus_info.routes[stop_eta.route]
-			if not (RouteName and not get_close_matches(RouteName, [route.name])) and set(route.stops).intersection(set(end_stops)):
-				# If the route of the eta is the not the specified 
-				# route or if the route doesn't contain one of the 
-				# destination stops, don't use it as a possible eta
+			if stop_eta.time >= record.time and not (RouteName and not get_close_matches(RouteName, [route.name])) and set(route.stops).intersection(set(end_stops)):
+				# If the route of the eta is not the specified route, 
+				# if the route doesn't contain one of the destination stops, 
+				# or if the eta's time is less than the user's minimum time, 
+				# don't use it as a possible eta
 				etas.append((stop_eta, start_stop))
 
 	# If there are no valid etas, return an error message
@@ -133,7 +139,6 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	options = {
 		"destination": EndStop
 	}
-	NumBuses = int(NumBuses)
 	if NumBuses == 1:
 		template = "GetNextBus"
 		eta_info = etas[0]
