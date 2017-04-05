@@ -106,16 +106,58 @@ function enableEditMode() {
 		var field = document.createElement("input");
 		field.className = obj.className + " form-control input-lg";
 		field.value = obj.innerHTML;
+
+		var deleteButton = document.createElement("button");
+		deleteButton.className = "btn btn-default input-lg";
+
+		var span = document.createElement("span");
+		span.className = "input-group-btn";
+
 		if (obj.classList.contains("warning")) {
 			field.value = "";
 			field.classList.remove("warning");
 		}
+		if (obj.classList.contains("nickname")) {
+			var addStopButton = document.createElement("button");
+			addStopButton.className = "btn btn-default input-lg";
+			addStopButton.innerHTML = "Add Stop";
+			addStopButton.onclick = function() {addStopField(obj.parentNode())};
+			span.appendChild(addStopButton);
+			deleteButton.innerHTML = "Remove Group";
+			deleteButton.onclick = function() {removeGroup(field.value)};
+		}
+		if (obj.classList.contains("stop")) {
+			deleteButton.innerHTML = "Delete";
+			deleteButton.onclick = function() {removeStop(obj.innerHTML)};
+		}
+
+		span.appendChild(deleteButton);
+
+		var div = document.createElement("div");
+		div.className = "input-group";
+
+		div.appendChild(field);
+		div.appendChild(span);
 		var parent = obj.parentNode;
-		parent.replaceChild(field, obj);
+		parent.replaceChild(div, obj);
 	})
 /*
 	Add editable tables for the home, destination, and other sections
 */
+}
+
+function removeGroup(nickname) {
+	console.log(nickname);
+}
+function removeStop(stopName) {
+	console.log(stopName);
+}
+/*
+	Add a new empty stop to a group
+	Append the new row to the span provided
+*/
+function addStopField(spanElement) {
+	console.log(spanElement)
 }
 
 /*
