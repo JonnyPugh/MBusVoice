@@ -54,20 +54,23 @@ Render the group with the specified nickname in the specified div
 */
 function renderGroup(nickname, divId) {
 	var div = document.createElement("div");
+	var span = document.createElement("span");
+	div.className = "list-group";
 	if (nickname) {
-		div.className = "list-group";
-		addToList(div, nickname, true);
+		addToList(span, nickname, true);
 		for (var i = 0; i < cachedRecord["groups"][nickname].length; i++) {
-			addToList(div, stopIdToName[cachedRecord["groups"][nickname][i]], false);
+			addToList(span, stopIdToName[cachedRecord["groups"][nickname][i]], false);
 		}
 	}
 	else {
-		div.className = "panel panel-warning";
-		panelTitle = document.createElement("h3");
-		panelTitle.className = "panel-heading panel-title group nickname";
-		panelTitle.innerHTML = "Click the edit button to set up your " + divId + " group";
-		div.appendChild(panelTitle);
+		addToList(span, "Click the edit button to set up your " + divId + " group", true);
+		var listElement = span.firstChild;
+		listElement.classList.add("warning");
+		// Manualy change color because list-elements do not support color changes using bootswatch
+		listElement.style.backgroundColor = "#ff6600";
+		listElement.style.borderColor = "#ff6600";
 	}
+	div.appendChild(span);
 	document.getElementById(divId).appendChild(div);
 }
 
@@ -85,7 +88,8 @@ function addToList(div, content, isActive) {
 Enable edit mode
 */
 function enableEditMode() {
-	$(".preferences").empty();
+	$("#buttons").empty();
+	$("#time").empty();
 	renderButton("Submit", handleSubmit);
 	renderButton("Cancel", renderUserPreferences);
 
@@ -98,6 +102,17 @@ function enableEditMode() {
 	time.id = "timeInput";
 	document.getElementById("time").appendChild(time);
 
+	$(".group").each(function(i, obj) {
+		var field = document.createElement("input");
+		field.className = obj.className + " form-control input-lg";
+		field.value = obj.innerHTML;
+		if (obj.classList.contains("warning")) {
+			field.value = "";
+			field.classList.remove("warning");
+		}
+		var parent = obj.parentNode;
+		parent.replaceChild(field, obj);
+	})
 /*
 	Add editable tables for the home, destination, and other sections
 */
