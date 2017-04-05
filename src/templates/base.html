@@ -11,7 +11,14 @@
 </head>
 <header>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
-		{% block navbar %}{% endblock %}
+		<div class="container-fluid">
+			{% block navbar %}{% endblock %}
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="https://pts.umich.edu/transit/routes.php" target="_blank">Find a Stop</a></li>
+				<li><a href="https://google.com" target="_blank">Alexa</a></li>
+				<li><a href="https://github.com/JonnyPugh/MBusVoice" target="_blank">Github</a></li>
+			</ul>
+		</div>
 	</nav>
 	<br></br>
 	<center class="panel panel-default panel-body container">
@@ -23,9 +30,10 @@
 </body>
 <footer>
 	<center>
-		Produced by MBus Voice
-		<br></br>
-		<img src={{url_for("static", filename="images/logo.png")}}>
+		<h4>Produced by MBus Voice</h4>
+		<a href="http://soloway.pbworks.com/w/page/114836017/MBus%20Voice" target="_blank">
+			<img src={{url_for("static", filename="images/logo.png")}}>
+		</a>
 	</center>
 </footer>
 </html>
