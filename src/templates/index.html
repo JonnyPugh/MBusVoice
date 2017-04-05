@@ -2,6 +2,11 @@
 {% block title %}Preferences{% endblock %}
 {% block scripts %}
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
+	<script>
+		var apiUrl = "{{url_for('main.index')}}" + "api/v1/";
+		var userId = "{{ID}}";
+	</script>
+	<script src={{url_for('static', filename='js/index.js')}}></script>
 {% endblock %}
 {% block navbar %}
 	<ul class="nav navbar-nav navbar-left">
@@ -20,21 +25,23 @@
 	</center>
 	<br></br>
 	<div class="panel panel-default panel-body container">
-		<a href="#" class="btn btn-primary btn-lg">Edit Preferences</a>
+		<div id="buttons" class="preferences"></div>
 		<div class="well well-lg">
 			<h3>How long does it take you to get to the bus stop?</h3>
 			<h4 id="time"></h4>
 		</div>
-		<div class="well well-lg" id="home">
+		<div class="well well-lg">
 			<h3>Where do you get on the bus?</h3>
+			<div id="home" class="preferences"></div>
 		</div>
-		<div class="well well-lg" id="destination">
+		<div class="well well-lg">
 			<h3>Where do you get off the bus?</h3>
+			<div id="destination" class="preferences"></div>
 		</div>
-		<div class="well well-lg" id="groups">
+		<div class="well well-lg">
 			<h3>What do you call bus stops?</h3>
+			<div id="groups" class="preferences"></div>
 		</div>
 	</div>
-	<datalist id="systemStops">
-	</datalist>
+	<datalist id="systemStops"></datalist>
 {% endblock %}
