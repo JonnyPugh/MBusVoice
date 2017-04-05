@@ -38,7 +38,7 @@ Render the user preferences in cachedRecord
 */
 function renderUserPreferences() {
 	$(".preferences").empty();
-	renderButton("Edit Preferences", enableEditMode);
+	renderButton("Edit Preferences", enableEditMode, document.getElementById("buttons"));
 	var time = document.createElement("h4");
 	time.innerHTML = cachedRecord["time"] + " minutes";
 	document.getElementById("time").appendChild(time);
@@ -90,8 +90,8 @@ Enable edit mode
 function enableEditMode() {
 	$("#buttons").empty();
 	$("#time").empty();
-	renderButton("Submit", handleSubmit);
-	renderButton("Cancel", renderUserPreferences);
+	renderButton("Submit", handleSubmit, document.getElementById("buttons"));
+	renderButton("Cancel", renderUserPreferences, document.getElementById("buttons"));
 
 	time = document.createElement("input");
 	time.type = "number";
@@ -107,34 +107,23 @@ function enableEditMode() {
 		field.className = obj.className + " form-control input-lg";
 		field.value = obj.innerHTML;
 
-		var deleteButton = document.createElement("button");
-		deleteButton.className = "btn btn-default input-lg";
-
 		var span = document.createElement("span");
 		span.className = "input-group-btn";
 
-		if (obj.classList.contains("warning")) {
-			field.value = "";
-			field.classList.remove("warning");
-		}
-		if (obj.classList.contains("nickname")) {
-			var addStopButton = document.createElement("button");
-			addStopButton.className = "btn btn-default input-lg";
-			addStopButton.innerHTML = "Add Stop";
-			addStopButton.onclick = function() {addStopField(obj.parentNode())};
-			span.appendChild(addStopButton);
-			deleteButton.innerHTML = "Remove Group";
-			deleteButton.onclick = function() {removeGroup(field.value)};
-		}
-		if (obj.classList.contains("stop")) {
-			deleteButton.innerHTML = "Delete";
-			deleteButton.onclick = function() {removeStop(obj.innerHTML)};
-		}
-
-		span.appendChild(deleteButton);
-
 		var div = document.createElement("div");
 		div.className = "input-group";
+
+		if (obj.classList.contains("nickname")) {
+			if (obj.classList.contains("warning")) {
+				field.value = "";
+				field.classList.remove("warning");
+			}
+			renderButton("Add Stop", createNewRowFunction(obj.parentNode), span);
+			renderButton("Remove Group", removeGroup(obj.parentNode), span);
+		}
+		else {
+			renderButton("Delete", removeStop(div), span);
+		}
 
 		div.appendChild(field);
 		div.appendChild(span);
@@ -146,11 +135,22 @@ function enableEditMode() {
 */
 }
 
-function removeGroup(nickname) {
-	console.log(nickname);
+function createNewRowFunction(groupList) {
+	return function() {
+		console.log(groupList);
+	}
 }
-function removeStop(stopName) {
-	console.log(stopName);
+
+function removeGroup(groupList) {
+	return function(){
+		console.log(groupList);
+
+	}
+}
+function removeStop(stop) {
+	return function(){
+		console.log(stop);
+	}
 }
 /*
 	Add a new empty stop to a group
@@ -163,12 +163,12 @@ function addStopField(spanElement) {
 /*
 Render a button with the specified text and callback function
 */
-function renderButton(displayText, callback) {
+function renderButton(displayText, callback, parent) {
 	var button = document.createElement("a");
 	button.innerHTML = displayText;
 	button.className = "btn btn-primary btn-lg";
 	button.onclick = callback;
-	document.getElementById("buttons").appendChild(button);
+	parent.appendChild(button);
 }
 
 /*
