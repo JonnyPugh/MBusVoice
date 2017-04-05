@@ -145,6 +145,10 @@ class _InvalidInput(RequestError):
 	def __init__(self, message):
 		super(_InvalidInput, self).__init__(message, 400)
 
+class _InvalidTime(_InvalidInput):
+	def __init__(self):
+		super(_InvalidTime, self).__init__("The time must be between 0 and 30")
+
 class _InvalidNickname(_InvalidInput):
 	def __init__(self, nickname):
 		super(_InvalidNickname, self).__init__("Nicknames must only contain alphanumeric characters")
@@ -152,7 +156,3 @@ class _InvalidNickname(_InvalidInput):
 class _NicknameDoesNotExist(_InvalidInput):
 	def __init__(self, nickname):
 		super(_NicknameDoesNotExist, self).__init__("The nickname '" + nickname + "' does not exist")
-
-class _InvalidTime(_InvalidInput):
-	def __init__(self):
-		super(_InvalidTime, self).__init__("The time must be between 0 and 30")
