@@ -64,7 +64,7 @@ function renderGroup(nickname, divId) {
 	else {
 		div.className = "panel panel-warning";
 		panelTitle = document.createElement("h3");
-		panelTitle.className = "panel-heading panel-title";
+		panelTitle.className = "panel-heading panel-title group nickname";
 		panelTitle.innerHTML = "Click the edit button to set up your " + divId + " group";
 		div.appendChild(panelTitle);
 	}
@@ -77,7 +77,7 @@ Add an element to the specified list with the specified content
 function addToList(div, content, isActive) {
 	var listElement = document.createElement("a");
 	listElement.innerHTML = content;
-	listElement.className = "list-group-item" + (isActive ? " active" : "");
+	listElement.className = "list-group-item group" + (isActive ? " active nickname" : " stop");
 	div.appendChild(listElement);
 }
 
