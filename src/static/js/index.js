@@ -54,19 +54,19 @@ Render the group with the specified nickname in the specified div
 */
 function renderGroup(nickname, divId) {
 	var div = document.createElement("div");
-	if (nickname == null) {
-		div.className = "panel panel-warning";
-		panelTitle = document.createElement("h3");
-		panelTitle.className = "panel-heading panel-title";
-		panelTitle.innerHTML = "Click the edit button to set up your " + divId + " group";
-		div.appendChild(panelTitle);
-	}
-	else {
+	if (nickname) {
 		div.className = "list-group";
 		addToList(div, nickname, true);
 		for (var i = 0; i < cachedRecord["groups"][nickname].length; i++) {
 			addToList(div, stopIdToName[cachedRecord["groups"][nickname][i]], false);
 		}
+	}
+	else {
+		div.className = "panel panel-warning";
+		panelTitle = document.createElement("h3");
+		panelTitle.className = "panel-heading panel-title";
+		panelTitle.innerHTML = "Click the edit button to set up your " + divId + " group";
+		div.appendChild(panelTitle);
 	}
 	document.getElementById(divId).appendChild(div);
 }
