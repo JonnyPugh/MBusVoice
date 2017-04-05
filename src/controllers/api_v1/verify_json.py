@@ -10,14 +10,6 @@ def verify(json, key, t, values=None):
 	if values and json[key] not in values:
 		raise _JSONValueError(values)
 
-# Verify that at least one of the specified keys is in the JSON
-def verify_at_least_one(json, keys):
-	error = True
-	for key in keys:
-		error = error and key not in json
-	if error:
-		raise _JSONKeyError("/".join(keys))
-
 # Internal errors used by the verification functions
 class _JSONError(RequestError):
 	def __init__(self, expected, value):

@@ -98,21 +98,6 @@ class Record(object):
 	def url(self):
 		return self.__url
 
-	# Swap the current destination group with the specified group
-	# Raise an exception if the specified group does not exist or
-	# if the specified group is the home or destination group
-	def swap_destination(self, nickname):
-		self.__verify_nickname(nickname)
-		if nickname in [self.__home, self.__destination]:
-			raise _InvalidSwap
-		index = 0
-		while self.__order[index] != nickname:
-			index += 1
-		if self.__destination:	
-			self.__order[index] = self.__destination
-		self.__destination = nickname
-		self.__write = True
-
 	# Give the specified group the specified stops
 	# This is used for both creating new groups and modifying existing groups
 	# If the nickname is for the home, the home flag should be True
@@ -132,30 +117,12 @@ class Record(object):
 			self.__order.append(nickname)
 		self.__groups[nickname] = stops
 		self.__write = True
-
-	# Change the specified nickname to the new specified nickname
-	# Raise an exception if the current nickname doesn't exist or if
-	# the new nickname already exists
-	def change_nickname(self, current_nickname, new_nickname):
-		if not new_nickname.isalnum():
-			raise _InvalidNickname(new_nickname)
-		self.__verify_nickname(current_nickname)
-		if new_nickname in self.__groups:
-			raise _DuplicateNickname(new_nickname)
-		if current_nickname == self.__home:
-			self.__home = new_nickname
-		elif current_nickname == self.__destination:
-			self.__destination = new_nickname
-		else:
-			self.__order[self.__order.index(current_nickname)] = new_nickname
-		self.__groups[new_nickname] = self.__groups[current_nickname]
-		del self.__groups[current_nickname]
-		self.__write = True
 		
 	# Delete the specified group
 	# Raise an exception if the nickname does not exist
 	def delete_group(self, nickname):
-		self.__verify_nickname(nickname)
+		if nickname not in self.__groups:
+			raise _NicknameDoesNotExist(nickname)
 		if nickname == self.__home:
 			self.__home = None
 		elif nickname == self.__destination:
@@ -163,13 +130,7 @@ class Record(object):
 		else:
 			self.__order.remove(nickname)
 		del self.__groups[nickname]
-		self.__write = True
-
-	# Verify that the specified nickname is valid
-	# Raise an exception if the nickname does not exist
-	def __verify_nickname(self, nickname):
-		if nickname not in self.__groups:
-			raise _NicknameDoesNotExist(nickname)
+		self.__write = True		
 
 # Internal Exception types used by Records
 class _NoUser(RequestError):
@@ -192,14 +153,6 @@ class _NicknameDoesNotExist(_InvalidInput):
 	def __init__(self, nickname):
 		super(_NicknameDoesNotExist, self).__init__("The nickname '" + nickname + "' does not exist")
 
-class _InvalidSwap(_InvalidInput):
-	def __init__(self):
-		super(_InvalidSwap, self).__init__("Home and destination groups cannot swap with the destination group")
-
 class _InvalidTime(_InvalidInput):
 	def __init__(self):
 		super(_InvalidTime, self).__init__("The time must be between 0 and 30")
-
-class _DuplicateNickname(_InvalidInput):
-	def __init__(self, nickname):
-		super(_DuplicateNickname, self).__init__("The nickname '" + nickname + "' already exists")
