@@ -1,10 +1,9 @@
 var cachedRecord = {};
 var stopIdToName;
 var nameToStopId = {};
-var numAjax = 6;
 
 document.addEventListener('DOMContentLoaded', function () {
-
+	// Get bus stops and the user's preferences from the API
 	$.get(apiUrl + "stops", function(data) {
 		stopIdToName = data;
 		for (var key in data) {
@@ -27,39 +26,22 @@ document.addEventListener('DOMContentLoaded', function () {
 		cachedRecord["order"] = data["order"];
 	});
 
+	// When the user's preferences are loaded, render them
 	$(document).ajaxStop(function() {
 		$(this).unbind("ajaxStop");
 		renderUserPreferences();
 	});
-	// Add ajax call wrappers to onclick events for submit buttons
-	// document.getElementById('homeSubmit').onclick = function() { postHome(); };
-	// document.getElementById('destinationSubmit').onclick = function() { postDestination(); };
-	// document.getElementById('submitChangePrimary').onclick = function() { postChangePrimary(); };
-	// document.getElementById('submitDeleteFavorite').onclick = function() { postDeleteFavorite(); };
-
-	// // Disable submit buttons for new home and destination stops
-	// document.getElementById('homeSubmit').setAttribute('disabled', 'disabled')
-	// document.getElementById('destinationSubmit').setAttribute('disabled', 'disabled')
-
-	// populateSystemStops()
-
-	// // Add event handlers to submit buttons to monitor for valid stop name
-	// $('#homeStopName').bind('keyup input', function() {
-	// 	disableInvalidSubmission('homeStopName', 'homeSubmit'); 
-	// });
-	// $('#destinationStopName').bind('keyup input', function() {
-	// 	disableInvalidSubmission('destinationStopName', 'destinationSubmit'); 
-	// });
-
 });
 
+/*
+Render the user preferences in cachedRecord
+*/
 function renderUserPreferences() {
 	$(".preferences").empty();
-
 	renderButton("Edit Preferences", enableEditMode);
-
-	document.getElementById("time").innerHTML = cachedRecord["time"] + " minutes";
-
+	var time = document.createElement("h4");
+	time.innerHTML = cachedRecord["time"] + " minutes";
+	document.getElementById("time").appendChild(time);
 	renderGroup(cachedRecord["home"], "home");
 	renderGroup(cachedRecord["destination"], "destination");
 	for (var i = 0; i < cachedRecord["order"].length; i++) {
@@ -67,113 +49,117 @@ function renderUserPreferences() {
 	}
 }
 
-function renderButton(displayText, func) {
-	var button = document.createElement("a");
-	button.innerHTML = displayText;
-	button.className = "btn btn-primary btn-lg";
-	button.onclick = func;
-	document.getElementById("buttons").appendChild(button);
-}
-
+/*
+Render the group with the specified nickname in the specified div
+*/
 function renderGroup(nickname, divId) {
-	// Render nickname, or indicate unpopulated group
 	var div = document.createElement("div");
-	div.className = "list-group";
-
 	if (nickname == null) {
-		nickname = "This group has not been set";
-		return
+		div.className = "panel panel-warning";
+		panelTitle = document.createElement("h3");
+		panelTitle.className = "panel-heading panel-title";
+		panelTitle.innerHTML = "Click the edit button to set up your " + divId + " group";
+		div.appendChild(panelTitle);
 	}
-	// Do not show the user a populated nickname and instead show an error if nickname is null
-	var nicknameElement = document.createElement("a");
-	nicknameElement.innerHTML = nickname;
-	nicknameElement.className = "list-group-item active";
-	div.appendChild(nicknameElement);
-	for (var i = 0; i < cachedRecord["groups"][nickname].length; i++) {
-		var listElement = document.createElement("a");
-		listElement.innerHTML = stopIdToName[cachedRecord["groups"][nickname][i]];
-		listElement.className = "list-group-item"
-		div.appendChild(listElement)
+	else {
+		div.className = "list-group";
+		addToList(div, nickname, true);
+		for (var i = 0; i < cachedRecord["groups"][nickname].length; i++) {
+			addToList(div, stopIdToName[cachedRecord["groups"][nickname][i]], false);
+		}
 	}
-
 	document.getElementById(divId).appendChild(div);
 }
 
+/*
+Add an element to the specified list with the specified content
+*/
+function addToList(div, content, isActive) {
+	var listElement = document.createElement("a");
+	listElement.innerHTML = content;
+	listElement.className = "list-group-item" + (isActive ? " active" : "");
+	div.appendChild(listElement);
+}
+
+/*
+Enable edit mode
+*/
 function enableEditMode() {
+	$(".preferences").empty();
+	renderButton("Submit", handleSubmit);
+	renderButton("Cancel", renderUserPreferences);
 
+	time = document.createElement("input");
+	time.type = "number";
+	time.min = 0;
+	time.max = 30;
+	time.className = "form-control input-lg";
+	time.value = cachedRecord["time"];
+	time.id = "timeInput";
+	document.getElementById("time").appendChild(time);
+
+/*
+	Add editable tables for the home, destination, and other sections
+*/
 }
 
-function formPost(form, formData) {
-	$.ajax({
-		url: form.getAttribute('destination'),
-		type: "POST",
-		contentType: "application/json",
-		data: JSON.stringify(formData),
-		success: function(data) {
-			displayError("");
-			renderUserFavorites();
-		},
-		error: function(data) {
-			displayError(JSON.parse(data.responseText).errors[0].message);
-		}
-	});
-} 
-
-function displayError(message){
-	document.getElementById('displayError').innerHTML=message;
+/*
+Render a button with the specified text and callback function
+*/
+function renderButton(displayText, callback) {
+	var button = document.createElement("a");
+	button.innerHTML = displayText;
+	button.className = "btn btn-primary btn-lg";
+	button.onclick = callback;
+	document.getElementById("buttons").appendChild(button);
 }
 
-// Function added to submission button onclick to submit form values
-function postHome() {
-	var formId = "newHome";
-	var form = document.getElementById(formId);
-	var formData = {
-		'command_type': formId,
-		'stop_name': form.elements[0].value,
-		'stop_alias': form.elements[1].value,
-		'alexa_id': form.elements[2].value
-	};
+/*
+Handle a user submitting their changes
+*/
+function handleSubmit() {
+	var updating = false;
+	var timeInput = document.getElementById("timeInput");
+	if (timeInput.value && timeInput.value != cachedRecord["time"]) {
+		updating = true;
+		$.ajax({
+			url: apiUrl + userId + "/time",
+			type: "PUT",
+			contentType: "application/json",
+			data: JSON.stringify({"time": parseInt(timeInput.value)}),
+			success: function(data) {
+				cachedRecord["time"] = data["time"];
+			},
+			error: function(data) {
+				/* HANDLE THE ERROR */
+			}
+		});
+	}
 
-	formPost(form, formData);
-}
+/*
+	# Pseudocode for logic
+	# Scrape UI for updated dictionary and the order of groups
+	order, updated = scrape()
 
-// Function added to submission button onclick to submit form values
-function postDestination() {
-	var formId = "newDestination";
-	var form = document.getElementById(formId);
-	var formData = {
-		'command_type': formId,
-		'stop_name': form.elements[0].value,
-		'stop_alias': form.elements[1].value,
-		'alexa_id': form.elements[2].value,
-		'primary': form.elements[3].checked
-	};
+	For nickname in cached:
+		If nickname not in updated:
+			api.delete(nickname)
 
-	formPost(form, formData);
-}
+	For nickname in order:
+		If nickname not in cached or cached[nickname] != updated[nickname]:
+			api.put(nickname, updated[nickname])
 
-// Function added to submission button onclick to submit form values
-function postChangePrimary() {
-	var formId = "changePrimary";
-	var form = document.getElementById(formId);
-	var formData = {
-		'stop_alias': form.elements[0].value,
-		'alexa_id': form.elements[1].value
-	};
-
-	formPost(form, formData);
-}
-
-// Function added to submission button onclick to submit form values
-function postDeleteFavorite() {
-	var formId = "deleteFavorite";
-	var form = document.getElementById(formId);
-	var formData = {
-		'stop_alias': form.elements[0].value,
-		'alexa_id': form.elements[1].value
-	};
-
-	formPost(form, formData);
+	cached = updated
+*/
+	if (updating) {
+		// When the user's preferences are finished updating, render them
+		$(document).ajaxStop(function() {
+			$(this).unbind("ajaxStop");
+			renderUserPreferences();
+		});
+	} else {
+		renderUserPreferences();
+	}
 }
 
 // Clears datalists and user favorites table before repopulating them
@@ -207,16 +193,6 @@ function renderUserFavorites() {
 		// Set default value for primary form
 		document.getElementById('primaryAlias').value = findPrimaryAlias(data);
 	});
-}
-
-// Accepts the modified user record and determines the primary destination
-function findPrimaryAlias(data) {
-	for (var i = 0; i < data['user_stops'].length; i++) {
-		if (data['user_stops'][i]['stop_name'] === data['primary']) {
-			return data['user_stops'][i]['alias'];
-		}
-	}
-	return "";
 }
 
 function clearTable(tableName) {
