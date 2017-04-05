@@ -107,7 +107,7 @@ class Record(object):
 	# home or destination group but it will not be a problem if it is set
 	# when the home or destination group already exists
 	def put_group(self, nickname, stops, home=None):
-		if not nickname.isalnum():
+		if not nickname.replace(" ", "").isalnum():
 			raise _InvalidNickname(nickname)
 		if home:
 			self.__home = nickname
@@ -151,7 +151,7 @@ class _InvalidTime(_InvalidInput):
 
 class _InvalidNickname(_InvalidInput):
 	def __init__(self, nickname):
-		super(_InvalidNickname, self).__init__("Nicknames must only contain alphanumeric characters")
+		super(_InvalidNickname, self).__init__("Nicknames must only contain alphanumeric characters and spaces")
 
 class _NicknameDoesNotExist(_InvalidInput):
 	def __init__(self, nickname):
