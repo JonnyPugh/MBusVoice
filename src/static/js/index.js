@@ -244,7 +244,13 @@ function createNewEditableNickname(parentNode) {
 
 function appendStop(parentDivId) {
 	return function() {
-		alert(parentDivId);
+		var span = document.getElementById(parentDivId).childNodes[0];
+
+		if (span.childNodes.length === 2) {
+			var target = span.childNodes[1];
+			span.replaceChild(generateStopInputGroup(target.childNodes[0].value, true), target);
+		}
+		span.appendChild(generateStopInputGroup("", span.childNodes.length !== 1));
 	}
 }
 
