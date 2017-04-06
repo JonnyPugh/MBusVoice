@@ -38,7 +38,7 @@ Render the user preferences in cachedRecord
 */
 function renderUserPreferences() {
 	$(".preferences").empty();
-	renderButton("Edit Preferences", enableEditMode, document.getElementById("buttons"));
+	renderButton("Edit Preferences", enableEditMode, document.getElementById("buttons"), true);
 	var time = document.createElement("h4");
 	time.innerHTML = cachedRecord["time"] + " minutes";
 	document.getElementById("time").appendChild(time);
@@ -53,9 +53,9 @@ function renderUserPreferences() {
 Render the group with the specified nickname in the specified div
 */
 function renderGroup(nickname, divId) {
-	var div = document.createElement("div");
+	var div = document.getElementById(divId);
 	var span = document.createElement("span");
-	div.className = "list-group";
+	div.className += " list-group";
 	if (nickname) {
 		addToList(span, nickname, true);
 		for (var i = 0; i < cachedRecord["groups"][nickname].length; i++) {
@@ -71,7 +71,6 @@ function renderGroup(nickname, divId) {
 		listElement.style.borderColor = "#ff6600";
 	}
 	div.appendChild(span);
-	document.getElementById(divId).appendChild(div);
 }
 
 /*
@@ -80,7 +79,7 @@ Add an element to the specified list with the specified content
 function addToList(div, content, isActive) {
 	var listElement = document.createElement("a");
 	listElement.innerHTML = content;
-	listElement.className = "list-group-item group" + (isActive ? " active nickname" : " stop");
+	listElement.className = "list-group-item " + (isActive ? "active nickname" : "stop");
 	div.appendChild(listElement);
 }
 
@@ -90,8 +89,8 @@ Enable edit mode
 function enableEditMode() {
 	$("#buttons").empty();
 	$("#time").empty();
-	renderButton("Submit", handleSubmit, document.getElementById("buttons"));
-	renderButton("Cancel", renderUserPreferences, document.getElementById("buttons"));
+	renderButton("Submit", handleSubmit, document.getElementById("buttons"), true);
+	renderButton("Cancel", renderUserPreferences, document.getElementById("buttons"), true);
 
 	time = document.createElement("input");
 	time.type = "number";
@@ -102,71 +101,100 @@ function enableEditMode() {
 	time.id = "timeInput";
 	document.getElementById("time").appendChild(time);
 
-	$(".group").each(function(i, obj) {
-		var field = document.createElement("input");
-		field.className = obj.className + " form-control input-lg";
-		field.value = obj.innerHTML;
+	// Begin making home editable
+	var homeDiv = document.getElementById("home");
+	var homeNicknameElement = homeDiv.getElementsByClassName("nickname")[0];
 
+	var div = document.createElement("div");
+	div.className = "input-group";
+
+	var text = homeNicknameElement.innerHTML;
+	if (homeNicknameElement.classList.contains("warning")) {
+		text = "";
+	}
+
+	var span = document.createElement("span");
+	span.className = "input-group-btn";
+
+	var field = document.createElement("input");
+	field.value = text;
+
+	field.className = "list-group-item form-control input group active nickname";
+	renderButton("Clear", clearGroup(div), span, false);
+
+	var parentSpan = homeNicknameElement.parentNode;
+	div.appendChild(field);
+	div.appendChild(span);
+
+	parentSpan.replaceChild(div, homeNicknameElement);
+
+	var homeStopElements = homeDiv.getElementsByClassName("stop");
+
+	for (var i = 0; i < homeStopElements.length; i++) {
 		var span = document.createElement("span");
 		span.className = "input-group-btn";
 
-		var div = document.createElement("div");
-		div.className = "input-group";
+		var field = document.createElement("input");
+		field.value = homeStopElements[i].innerHTML;
+		field.className = "list-group-item form-control input group stop";
 
-		if (obj.classList.contains("nickname")) {
-			if (obj.classList.contains("warning")) {
-				field.value = "";
-				field.classList.remove("warning");
-			}
-			renderButton("Add Stop", createNewRowFunction(obj.parentNode), span);
-			renderButton("Remove Group", removeGroup(obj.parentNode), span);
-		}
-		else {
-			renderButton("Delete", removeStop(div), span);
+		if (homeStopElements.length > 1) {
+			renderButton("Delete", removeStop(homeDiv), span, false);
 		}
 
-		div.appendChild(field);
-		div.appendChild(span);
-		var parent = obj.parentNode;
-		parent.replaceChild(div, obj);
-	})
-/*
-	Add editable tables for the home, destination, and other sections
-*/
+		homeDiv.appendChild(field);
+		homeDiv.appendChild(span);
+	}
+
+	renderImageButton(imageUrl + "plus.png", appendStop("home"), homeDiv);
 }
 
-function createNewRowFunction(groupList) {
+function appendStop(parentDivId) {
 	return function() {
-		console.log(groupList);
+		alert(parentDivId);
 	}
 }
 
-function removeGroup(groupList) {
+function removeGroup(nickname) {
 	return function(){
-		console.log(groupList);
+
+		// remove element with this id
+		console.log(nickname);
 
 	}
 }
+
+function clearGroup(nickname) {
+	return function() {
+		console.log(nickname)
+	}
+}
+
 function removeStop(stop) {
 	return function(){
-		console.log(stop);
+		stop.remove()
 	}
 }
+
 /*
-	Add a new empty stop to a group
-	Append the new row to the span provided
+Render a button with the image and callback function
 */
-function addStopField(spanElement) {
-	console.log(spanElement)
+function renderImageButton(image, callback, parent) {
+	var button = document.createElement("img");
+	button.style.display = "block";
+	button.style.margin = "0 auto";
+	button.src = image;
+	button.onclick = callback;
+	parent.appendChild(button);
 }
 
 /*
 Render a button with the specified text and callback function
 */
-function renderButton(displayText, callback, parent) {
+function renderButton(displayText, callback, parent, large) {
 	var button = document.createElement("a");
 	button.innerHTML = displayText;
-	button.className = "btn btn-primary btn-lg";
+	button.className = "btn btn-primary" + (large ? " btn-lg" : "");
 	button.onclick = callback;
 	parent.appendChild(button);
 }
@@ -219,68 +247,10 @@ function handleSubmit() {
 	}
 }
 
-// Clears datalists and user favorites table before repopulating them
-function renderUserFavorites() {
-
-	clearTable("userFavorites");
-	clearDatalist("userDestinations");
-	clearDatalist("userStops");
-
-	var favoriteTable = document.getElementById('userFavorites');
-	$.get(favoriteTable.getAttribute('destination'), function(data) {
-		
-		// Render the user favorites table and the datalist of edit and delete
-		var userStopsFull = data['user_stops'];
-		for (var stop in userStopsFull) {
-			var newRow = favoriteTable.getElementsByTagName('tbody')[0].insertRow();
-			populateRow(newRow, userStopsFull[stop]);
-
-			// Highlight the current primary row
-			if (userStopsFull[stop]['alias'] === findPrimaryAlias(data)) {
-				newRow.className = "success";
-			}
-
-			// Populate the datalists for primary editing and deletion forms
-			appendListElement("userStops", userStopsFull[stop]['alias']);
-			if (userStopsFull[stop]['favorite_type'] == "Destination") {
-				appendListElement("userDestinations", userStopsFull[stop]['alias']);
-			}
-		}
-
-		// Set default value for primary form
-		document.getElementById('primaryAlias').value = findPrimaryAlias(data);
-	});
-}
-
-function clearTable(tableName) {
-	var table = document.getElementById(tableName);
-	if (table.rows.length > 1) {
-		var newBody = document.createElement('tbody');
-		table.replaceChild(newBody, table.getElementsByTagName('tbody')[0]);
-	}
-}
-
-function clearDatalist(listName) {
-	var listChildren = document.getElementById(listName).children;
-	if (listChildren.length > 0) {
-		document.getElementById(listName).removeChild(listChildren[0]);
-		clearDatalist(listName);
-	}
-}
-
 function appendListElement(listName, textValue) {
 	var option = document.createElement('option');
 	option.value = textValue;
 	document.getElementById(listName).appendChild(option);
-}
-
-function populateRow(row, rowData) {
-	tableOrder = ['alias', 'stop_name', 'favorite_type']
-	for (var i = 0; i < tableOrder.length; i++){
-		var newCell = row.insertCell(-1);
-		var newText = document.createTextNode(rowData[tableOrder[i]]);
-		newCell.appendChild(newText);
-	}
 }
 
 // Runs on every change of new origin or destination forms

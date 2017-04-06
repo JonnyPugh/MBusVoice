@@ -5,6 +5,7 @@
 	<script>
 		var apiUrl = "{{url_for('main.index')}}" + "api/v1/";
 		var userId = "{{ID}}";
+		var imageUrl = "{{url_for('static', filename='images/')}}";
 	</script>
 	<script src={{url_for('static', filename='js/index.js')}}></script>
 {% endblock %}
