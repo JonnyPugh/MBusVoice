@@ -48,6 +48,7 @@ function renderUserPreferences() {
 	for (var i = 0; i < cachedRecord["order"].length; i++) {
 		var div = document.createElement("div");
 		div.id = cachedRecord["order"][i];
+		div.classList.add("list-group");
 		document.getElementById("groups-div").appendChild(div);
 		renderGroup(cachedRecord["order"][i], cachedRecord["order"][i]);
 	}
@@ -225,18 +226,19 @@ function generateInputDiv(text, isNickname) {
 function createNewEditableNickname(parentNode) {
 	var counter = 0;
 	return function() {
-		var inputGroupDiv = createInputGroupDiv()
 
-		var outerSpan = document.createElement("span");
-		outerSpan.appendChild(inputGroupDiv);
+		var div = document.createElement("div");
+		div.id = "newnickname-" + counter++;
+		div.classList.add("list-group");
 
-		var outerDiv = document.createElement("div");
-		outerDiv.classList.add("list-group");
-		outerDiv.id = "newnickname-" + counter++;
+		var span = document.createElement("span");
+		div.appendChild(span);
 
-		outerDiv.appendChild(outerSpan);
-		renderImageButton(imageUrl + "plus.png", appendStop(parentNode.id), outerDiv);
-		parentNode.appendChild(outerDiv);
+		parentNode.appendChild(div);
+
+		span.appendChild(generateNicknameInputGroup("", "Delete", deleteGroup(div)));
+
+		renderImageButton(imageUrl + "plus.png", appendStop(div.id), div);
 	}
 }
 
