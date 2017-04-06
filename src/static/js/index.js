@@ -41,13 +41,13 @@ function renderUserPreferences() {
 	renderButton("Edit Preferences", enableEditMode, document.getElementById("buttons"));
 	var time = document.createElement("h4");
 	time.innerHTML = cachedRecord["time"] + " minutes";
-	document.getElementById("time").appendChild(time);
-	renderGroup(cachedRecord["home"], "home");
-	renderGroup(cachedRecord["destination"], "destination");
+	document.getElementById("time-div").appendChild(time);
+	renderGroup(cachedRecord["home"], "home-div");
+	renderGroup(cachedRecord["destination"], "destination-div");
 	for (var i = 0; i < cachedRecord["order"].length; i++) {
 		var div = document.createElement("div");
 		div.id = cachedRecord["order"][i];
-		document.getElementById("groups").appendChild(div);
+		document.getElementById("groups-div").appendChild(div);
 		renderGroup(cachedRecord["order"][i], cachedRecord["order"][i]);
 	}
 }
@@ -111,10 +111,10 @@ function enableEditMode() {
 	time.classList.add("form-control", "input-lg");
 	time.value = cachedRecord["time"];
 	time.id = "timeInput";
-	document.getElementById("time").appendChild(time);
+	document.getElementById("time-div").appendChild(time);
 
-	renderEditableGroup("home");
-	renderEditableGroup("destination");
+	renderEditableGroup("home-div");
+	renderEditableGroup("destination-div");
 	for (var i = 0; i < cachedRecord["order"].length; i++) {
 		renderEditableGroup(cachedRecord["order"][i]);
 	}
@@ -134,13 +134,18 @@ function renderEditableGroup(groupDivId) {
 
 	var span = document.createElement("span");
 	span.classList.add("input-group-btn");
-	renderButton("Clear", clearGroup(inputDiv), span);
+	if (groupDivId === "home-div" || groupDivId === "destination-div") {
+		renderButton("Clear", clearGroup(inputDiv), span);
+	}
+	else {
+		renderButton("Delete", deleteGroup(groupDiv), span);
+	}
 	inputDiv.appendChild(span);
 		
 	nicknameElement.parentNode.replaceChild(inputDiv, nicknameElement);
 
 	var stopElements = $.extend(true, [], groupDiv.getElementsByClassName("stop"));
-	if (stopElements.length == 1) {
+	if (stopElements.length === 1) {
 		var field = document.createElement("input");
 		field.value = stopElements[0].innerHTML;
 		field.classList.add("form-group", "form-control", "input-lg");
@@ -159,8 +164,7 @@ function renderEditableGroup(groupDivId) {
 
 			var span = document.createElement("span");
 			span.classList.add("input-group-btn");
-			renderButton("Delete", removeStop(groupDiv), span);
-			//renderImageButton(imageUrl + "minus.png", removeStop(div), span);
+			renderImageButton(imageUrl + "x.png", deleteStop(div), span);
 			div.appendChild(span);
 
 			stopElements[i].remove();
@@ -177,24 +181,21 @@ function appendStop(parentDivId) {
 	}
 }
 
-function removeGroup(nickname) {
-	return function(){
-
-		// remove element with this id
-		console.log(nickname);
-
-	}
-}
-
-function clearGroup(nickname) {
-	return function() {
-		console.log(nickname);
-	}
-}
-
-function removeStop(stopElement) {
+function deleteStop(stopElement) {
 	return function() {
 		stopElement.remove();
+	}
+}
+
+function deleteGroup(groupElement) {
+	return function() {
+		groupElement.remove();
+	}
+}
+
+function clearGroup(groupElement) {
+	return function() {
+		console.log(groupElement);
 	}
 }
 
