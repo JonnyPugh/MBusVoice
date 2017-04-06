@@ -125,6 +125,15 @@ function enableEditMode() {
 	var groupsDiv = document.getElementById("groups-div");
 	var newButton = renderButton("New", createNewEditableNickname(groupsDiv), groupsWellDiv);
 	newButton.id = "new-group-button";
+
+	var datalist = document.getElementById("systemStops");
+	if (datalist.childNodes.length === 0){
+		for (var stop in nameToStopId) {
+			var option = document.createElement('option');
+			option.value = stop;
+			document.getElementById("systemStops").appendChild(option);
+		}
+	}
 }
 
 function renderEditableGroup(groupDivId) {
@@ -159,7 +168,7 @@ function renderEditableGroup(groupDivId) {
 			inputGroupElement.parentNode.appendChild(div);
 		}
 	}
-
+	
 	renderImageButton(imageUrl + "plus.png", appendStop(groupDivId), groupDiv);
 }
 
@@ -198,6 +207,8 @@ function generateStopInputGroup(text, hasButton) {
 		inputField.classList.add("form-group", "stop");
 		inputField.classList.remove("list-group-item");
 	}
+	inputDiv.getElementsByTagName("input")[0].setAttribute("list", "systemStops");
+	console.log(inputDiv.getElementsByTagName("input")[0].list);
 	return inputDiv;
 }
 
@@ -427,12 +438,6 @@ function scrapeGroupData(groupDivId, updated, order) {
 		}
 	}
 	return null;
-}
-
-function appendListElement(listName, textValue) {
-	var option = document.createElement('option');
-	option.value = textValue;
-	document.getElementById(listName).appendChild(option);
 }
 
 // Runs on every change of new origin or destination forms
