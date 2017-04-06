@@ -38,14 +38,17 @@ Render the user preferences in cachedRecord
 */
 function renderUserPreferences() {
 	$(".preferences").empty();
-	renderButton("Edit Preferences", enableEditMode, document.getElementById("buttons"), true);
+	renderButton("Edit Preferences", enableEditMode, document.getElementById("buttons"));
 	var time = document.createElement("h4");
 	time.innerHTML = cachedRecord["time"] + " minutes";
 	document.getElementById("time").appendChild(time);
 	renderGroup(cachedRecord["home"], "home");
 	renderGroup(cachedRecord["destination"], "destination");
 	for (var i = 0; i < cachedRecord["order"].length; i++) {
-		renderGroup(cachedRecord["order"][i], "groups");
+		var div = document.createElement("div");
+		div.id = cachedRecord["order"][i];
+		document.getElementById("groups").appendChild(div);
+		renderGroup(cachedRecord["order"][i], cachedRecord["order"][i]);
 	}
 }
 
@@ -55,8 +58,7 @@ Render the group with the specified nickname in the specified div
 function renderGroup(nickname, divId) {
 	var div = document.getElementById(divId);
 	var span = document.createElement("span");
-
-	div.className += " list-group";
+	div.classList.add("list-group");
 	if (nickname) {
 		addToList(span, nickname, true);
 		for (var i = 0; i < cachedRecord["groups"][nickname].length; i++) {
@@ -67,7 +69,9 @@ function renderGroup(nickname, divId) {
 		addToList(span, "Click the edit button to set up your " + divId + " group", true);
 		var listElement = span.firstChild;
 		listElement.classList.add("warning");
-		// Manualy change color because list-elements do not support color changes using bootswatch
+
+		// Manually change color because list-elements do 
+		// not support color changes using bootswatch
 		listElement.style.backgroundColor = "#ff6600";
 		listElement.style.borderColor = "#ff6600";
 	}
@@ -79,9 +83,15 @@ Add an element to the specified list with the specified content
 */
 function addToList(div, content, isActive) {
 	var listElement = document.createElement("a");
-	listElement.style.fontSize = "x-large"
 	listElement.innerHTML = content;
-	listElement.className = "list-group-item " + (isActive ? "active nickname" : "stop");
+	listElement.style.fontSize = "large";
+	listElement.classList.add("list-group-item");
+	if (isActive) {
+		listElement.classList.add("active");
+	}
+	else {
+		listElement.classList.add("stop");
+	}
 	div.appendChild(listElement);
 }
 
@@ -90,65 +100,75 @@ Enable edit mode
 */
 function enableEditMode() {
 	$("#buttons").empty();
-	// $("#time").empty();
-	renderButton("Submit", handleSubmit, document.getElementById("buttons"), true);
-	renderButton("Cancel", renderUserPreferences, document.getElementById("buttons"), true);
+	$("#time").empty();
+	renderButton("Submit", handleSubmit, document.getElementById("buttons"));
+	renderButton("Cancel", renderUserPreferences, document.getElementById("buttons"));
 
-	// time = document.createElement("input");
-	// time.type = "number";
-	// time.min = 0;
-	// time.max = 30;
-	// time.className = "form-control input-lg";
-	// time.value = cachedRecord["time"];
-	// time.id = "timeInput";
-	// document.getElementById("time").appendChild(time);
+	time = document.createElement("input");
+	time.type = "number";
+	time.min = 0;
+	time.max = 30;
+	time.classList.add("form-control", "input-lg");
+	time.value = cachedRecord["time"];
+	time.id = "timeInput";
+	document.getElementById("time").appendChild(time);
 
-	// Begin making home editable
-	var homeDiv = document.getElementById("home");
-	var homeNicknameElement = homeDiv.getElementsByClassName("nickname")[0];
-
-	var div = document.createElement("div");
-	div.className = "input-group";
-
-	var text = homeNicknameElement.innerHTML;
-	if (homeNicknameElement.classList.contains("warning")) {
-		text = "";
+	renderEditableGroup("home");
+	renderEditableGroup("destination");
+	for (var i = 0; i < cachedRecord["order"].length; i++) {
+		renderEditableGroup(cachedRecord["order"][i]);
 	}
+}
 
-	var span = document.createElement("span");
-	span.className = "input-group-btn";
+function renderEditableGroup(groupDivId) {
+	var groupDiv = document.getElementById(groupDivId);
+	var nicknameElement = groupDiv.getElementsByClassName("active")[0];
 
 	var field = document.createElement("input");
-	field.value = text;
+	field.value = nicknameElement.classList.contains("warning") ? "" : nicknameElement.innerHTML;
+	field.classList.add("list-group-item", "form-control", "input-lg", "active");
 
-	field.className = "list-group-item input-lg form-control input group active nickname";
-	renderButton("Clear", clearGroup(div), span, true);
+	var inputDiv = document.createElement("div");
+	inputDiv.classList.add("input-group");
+	inputDiv.appendChild(field);
 
-	var parentSpan = homeNicknameElement.parentNode;
-	div.appendChild(field);
-	div.appendChild(span);
+	var span = document.createElement("span");
+	span.classList.add("input-group-btn");
+	renderButton("Clear", clearGroup(inputDiv), span);
+	inputDiv.appendChild(span);
+		
+	nicknameElement.parentNode.replaceChild(inputDiv, nicknameElement);
 
-	parentSpan.replaceChild(div, homeNicknameElement);
-
-	var homeStopElements = homeDiv.getElementsByClassName("stop");
-
-	for (var i = 0; i < homeStopElements.length; i++) {
-		var span = document.createElement("span");
-		span.className = "input-group-btn";
-
+	var stopElements = $.extend(true, [], groupDiv.getElementsByClassName("stop"));
+	if (stopElements.length == 1) {
 		var field = document.createElement("input");
-		field.value = homeStopElements[i].innerHTML;
-		field.className = "list-group-item form-control input group stop";
+		field.value = stopElements[0].innerHTML;
+		field.classList.add("form-group", "form-control", "input-lg");
+		stopElements[0].remove();
+		inputDiv.parentNode.appendChild(field);
+	}
+	else {
+		for (var i = 0; i < stopElements.length; i++) {
+			var div = document.createElement("div");
+			div.classList.add("input-group");
 
-		if (homeStopElements.length > 1) {
-			renderButton("Delete", removeStop(homeDiv), span, false);
+			var field = document.createElement("input");
+			field.value = stopElements[i].innerHTML;
+			field.classList.add("list-group-item", "form-control", "input-lg", "stop");
+			div.appendChild(field);
+
+			var span = document.createElement("span");
+			span.classList.add("input-group-btn");
+			renderButton("Delete", removeStop(groupDiv), span);
+			//renderImageButton(imageUrl + "minus.png", removeStop(div), span);
+			div.appendChild(span);
+
+			stopElements[i].remove();
+			inputDiv.parentNode.appendChild(div);
 		}
-
-		homeDiv.appendChild(field);
-		homeDiv.appendChild(span);
 	}
 
-	renderImageButton(imageUrl + "plus.png", appendStop("home"), homeDiv);
+	renderImageButton(imageUrl + "plus.png", appendStop(groupDivId), groupDiv);
 }
 
 function appendStop(parentDivId) {
@@ -168,13 +188,13 @@ function removeGroup(nickname) {
 
 function clearGroup(nickname) {
 	return function() {
-		console.log(nickname)
+		console.log(nickname);
 	}
 }
 
-function removeStop(stop) {
-	return function(){
-		stop.remove()
+function removeStop(stopElement) {
+	return function() {
+		stopElement.remove();
 	}
 }
 
@@ -193,10 +213,10 @@ function renderImageButton(image, callback, parent) {
 /*
 Render a button with the specified text and callback function
 */
-function renderButton(displayText, callback, parent, large) {
+function renderButton(displayText, callback, parent) {
 	var button = document.createElement("a");
 	button.innerHTML = displayText;
-	button.className = "btn btn-primary" + (large ? " btn-lg" : "");
+	button.classList.add("btn", "btn-primary", "btn-lg");
 	button.onclick = callback;
 	parent.appendChild(button);
 }
