@@ -100,7 +100,7 @@ Enable edit mode
 */
 function enableEditMode() {
 	$("#buttons").empty();
-	$("#time").empty();
+	$("#time-div").empty();
 	renderButton("Submit", handleSubmit, document.getElementById("buttons"));
 	renderButton("Cancel", renderUserPreferences, document.getElementById("buttons"));
 
@@ -125,7 +125,7 @@ function renderEditableGroup(groupDivId) {
 	var nicknameElement = groupDiv.getElementsByClassName("active")[0];
 
 	var field = document.createElement("input");
-	field.value = nicknameElement.classList.contains("warning") ? "" : nicknameElement.innerHTML;
+	field.value = nicknameElement.classList.contains("warning") ? "" : nicknameElement.textContent;
 	field.classList.add("list-group-item", "form-control", "input-lg", "active");
 
 	var inputDiv = document.createElement("div");
@@ -147,8 +147,8 @@ function renderEditableGroup(groupDivId) {
 	var stopElements = $.extend(true, [], groupDiv.getElementsByClassName("stop"));
 	if (stopElements.length === 1) {
 		var field = document.createElement("input");
-		field.value = stopElements[0].innerHTML;
-		field.classList.add("form-group", "form-control", "input-lg");
+		field.value = stopElements[0].textContent;
+		field.classList.add("form-group", "form-control", "input-lg", "stop");
 		stopElements[0].remove();
 		inputDiv.parentNode.appendChild(field);
 	}
@@ -158,7 +158,7 @@ function renderEditableGroup(groupDivId) {
 			div.classList.add("input-group");
 
 			var field = document.createElement("input");
-			field.value = stopElements[i].innerHTML;
+			field.value = stopElements[i].textContent;
 			field.classList.add("list-group-item", "form-control", "input-lg", "stop");
 			div.appendChild(field);
 
@@ -244,30 +244,107 @@ function handleSubmit() {
 		});
 	}
 
-/*
-	# Pseudocode for logic
-	# Scrape UI for updated dictionary and the order of groups
-	order, updated = scrape()
+	// Scrape the current state of the UI for the 
+	// updated preferences and order of groups
+	updated = {};
+	homeDestinationOrder = [];
+	var newHome = scrapeGroupData("home-div", updated, homeDestinationOrder);
+	var newDestination = scrapeGroupData("destination-div", updated, homeDestinationOrder);
+	var groups = document.getElementById("groups-div").getElementsByClassName("list-group");
+	updatedOrder = [];
+	for (var i = 0; i < groups.length; i++) {
+		scrapeGroupData(groups[i].id, updated, updatedOrder);
+	}
 
-	For nickname in cached:
-		If nickname not in updated:
-			api.delete(nickname)
+	// Delete all groups in cachedRecord and not in updated
+	for (cachedNickname in cachedRecord["groups"]) {
+		if (!(cachedNickname in updated)) {
+			// Delete the cachedNickname from the database using the API
+			updating = true;
+			$.ajax({
+				url: apiUrl + userId + "/groups/" + cachedNickname,
+				type: "DELETE",
+				success: function(data) {
+					console.log("Deleted " + data["nickname"]);
+				},
+				error: function(data) {
+					/* HANDLE THE ERROR */
+					console.log("Failed delete");
+				}
+			});
+		}
+	}
 
-	For nickname in order:
-		If nickname not in cached or cached[nickname] != updated[nickname]:
-			api.put(nickname, updated[nickname])
+	// Update all groups that are either in updated and not in cachedRecord
+	// or have different stops in updated and cachedRecord
+	combinedOrder = homeDestinationOrder.concat(updatedOrder);
+	for (var index = 0; index < combinedOrder.length; index++) {
+		updatedNickname = combinedOrder[index];
+		var updatedStops = updated[updatedNickname];
+		var putStops = !(updatedNickname in cachedRecord["groups"])
+		if (!putStops) {
+			var cachedStops = cachedRecord["groups"][updatedNickname];
+			var equal = cachedStops.length === updatedStops.length;
+			for (var i = 0; i < cachedStops.length && equal; i++) {
+				equal = cachedStops[i] === updatedStops[i];
+			}
+			putStops = !equal;
+		}
+		if (putStops) {
+			// Put the updated group into the database using the API
+			updating = true;
+			var type = updatedNickname === newHome ? "home" : 
+				updatedNickname === newDestination ? "destination" : 
+				"other"
+			$.ajax({
+				url: apiUrl + userId + "/groups/" + updatedNickname,
+				type: "PUT",
+				contentType: "application/json",
+				data: JSON.stringify({"stops": updatedStops, "type": type}),
+				success: function(data) {
+					for (nickname in data) {
+						console.log("Put " + nickname);
+					}
+				},
+				error: function(data) {
+					/* HANDLE THE ERROR */
+					console.log("Failed put");
+				}
+			});
+		}
+	}
 
-	cached = updated
-*/
 	if (updating) {
 		// When the user's preferences are finished updating, render them
 		$(document).ajaxStop(function() {
 			$(this).unbind("ajaxStop");
+			cachedRecord["home"] = newHome;
+			cachedRecord["destination"] = newDestination;
+			cachedRecord["groups"] = updated;
+			cachedRecord["order"] = updatedOrder;
 			renderUserPreferences();
 		});
 	} else {
 		renderUserPreferences();
 	}
+}
+
+function scrapeGroupData(groupDivId, updated, order) {
+	var groupDiv = document.getElementById(groupDivId);
+	var nickname = groupDiv.getElementsByClassName("active")[0].value;
+	if (nickname) {
+		var stopElements = groupDiv.getElementsByClassName("stop");
+		var stopIds = [];
+		for (var i = 0; i < stopElements.length; i++) {
+			stopIds.push(parseInt(nameToStopId[stopElements[i].value]));
+		}
+		if (stopIds) {
+			updated[nickname] = stopIds;
+			order.push(nickname);
+			return nickname;
+		}
+	}
+	return null;
 }
 
 function appendListElement(listName, textValue) {
