@@ -250,14 +250,18 @@ function appendStop(parentDivId) {
 
 function deleteStop(stopElement) {
 	return function() {
-		console.log(stopElement);
+		var span = stopElement.parentNode;
 		stopElement.remove();
+
+		if (span.childNodes.length == 2) {
+			var target = span.childNodes[1];
+			span.replaceChild(generateStopInputGroup(target.childNodes[0].value, false), target);
+		}
 	}
 }
 
 function deleteGroup(groupElement) {
 	return function() {
-		console.log(groupElement);
 		groupElement.remove();
 	}
 }
