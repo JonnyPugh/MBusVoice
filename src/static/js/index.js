@@ -332,7 +332,7 @@ function handleSubmit() {
 	var groups = document.getElementById("groups-div").getElementsByClassName("list-group");
 	updatedOrder = [];
 	for (var i = 0; i < groups.length; i++) {
-		scrapeGroupData(groups[i], updated, updatedOrder);
+		scrapeGroupData(groups[i].id, updated, updatedOrder);
 	}
 
 	// Delete all groups in cachedRecord and not in updated
