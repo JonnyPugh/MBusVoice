@@ -38,6 +38,7 @@ Render the user preferences in cachedRecord
 */
 function renderUserPreferences() {
 	$(".preferences").empty();
+	$("#new-group-button").remove();
 	renderButton("Edit Preferences", enableEditMode, document.getElementById("buttons"));
 	var time = document.createElement("h4");
 	time.innerHTML = cachedRecord["time"] + " minutes";
@@ -66,7 +67,7 @@ function renderGroup(nickname, divId) {
 		}
 	}
 	else {
-		addToList(span, "Click the edit button to set up your " + divId + " group", true);
+		addToList(span, "Click the edit button to set up your " + divId.split('-')[0] + " group", true);
 		var listElement = span.firstChild;
 		listElement.classList.add("warning");
 
@@ -101,6 +102,7 @@ Enable edit mode
 function enableEditMode() {
 	$("#buttons").empty();
 	$("#time-div").empty();
+
 	renderButton("Submit", handleSubmit, document.getElementById("buttons"));
 	renderButton("Cancel", renderUserPreferences, document.getElementById("buttons"));
 
@@ -118,6 +120,11 @@ function enableEditMode() {
 	for (var i = 0; i < cachedRecord["order"].length; i++) {
 		renderEditableGroup(cachedRecord["order"][i]);
 	}
+
+	var groupsWellDiv = document.getElementsByClassName("well-lg")[3];
+	var groupsDiv = document.getElementById("groups-div");
+	var newButton = renderButton("New", createNewEditableNickname(groupsDiv), groupsWellDiv);
+	newButton.id = "new-group-button";
 }
 
 function renderEditableGroup(groupDivId) {
@@ -175,6 +182,39 @@ function renderEditableGroup(groupDivId) {
 	renderImageButton(imageUrl + "plus.png", appendStop(groupDivId), groupDiv);
 }
 
+/*
+	Create new nickname in the other section
+*/
+function createNewEditableNickname(parentNode) {
+	var counter = 0;
+	return function() {
+		var field = document.createElement("input");
+		field.value = "";
+		field.classList.add("list-group-item", "form-control", "input-lg", "active");
+
+		var inputGroupDiv = document.createElement("div");
+		inputGroupDiv.classList.add("input-group");
+		inputGroupDiv.appendChild(field);
+
+		var span = document.createElement("span");
+		span.classList.add("input-group-btn");
+		renderButton("Delete", deleteGroup(parentNode), span);
+
+		inputGroupDiv.appendChild(span);
+
+		var outerSpan = document.createElement("span");
+		outerSpan.appendChild(inputGroupDiv);
+
+		var outerDiv = document.createElement("div");
+		outerDiv.classList.add("list-group");
+		outerDiv.id = "newnickname-" + counter++;
+
+		outerDiv.appendChild(outerSpan);
+		renderImageButton(imageUrl + "plus.png", appendStop(parentNode.id), outerDiv);
+		parentNode.appendChild(outerDiv);
+	}
+}
+
 function appendStop(parentDivId) {
 	return function() {
 		alert(parentDivId);
@@ -220,6 +260,7 @@ function renderButton(displayText, callback, parent) {
 	button.classList.add("btn", "btn-primary", "btn-lg");
 	button.onclick = callback;
 	parent.appendChild(button);
+	return button;
 }
 
 /*
