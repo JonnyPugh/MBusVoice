@@ -55,6 +55,7 @@ Render the group with the specified nickname in the specified div
 function renderGroup(nickname, divId) {
 	var div = document.getElementById(divId);
 	var span = document.createElement("span");
+
 	div.className += " list-group";
 	if (nickname) {
 		addToList(span, nickname, true);
@@ -78,6 +79,7 @@ Add an element to the specified list with the specified content
 */
 function addToList(div, content, isActive) {
 	var listElement = document.createElement("a");
+	listElement.style.fontSize = "x-large"
 	listElement.innerHTML = content;
 	listElement.className = "list-group-item " + (isActive ? "active nickname" : "stop");
 	div.appendChild(listElement);
@@ -88,18 +90,18 @@ Enable edit mode
 */
 function enableEditMode() {
 	$("#buttons").empty();
-	$("#time").empty();
+	// $("#time").empty();
 	renderButton("Submit", handleSubmit, document.getElementById("buttons"), true);
 	renderButton("Cancel", renderUserPreferences, document.getElementById("buttons"), true);
 
-	time = document.createElement("input");
-	time.type = "number";
-	time.min = 0;
-	time.max = 30;
-	time.className = "form-control input-lg";
-	time.value = cachedRecord["time"];
-	time.id = "timeInput";
-	document.getElementById("time").appendChild(time);
+	// time = document.createElement("input");
+	// time.type = "number";
+	// time.min = 0;
+	// time.max = 30;
+	// time.className = "form-control input-lg";
+	// time.value = cachedRecord["time"];
+	// time.id = "timeInput";
+	// document.getElementById("time").appendChild(time);
 
 	// Begin making home editable
 	var homeDiv = document.getElementById("home");
@@ -119,8 +121,8 @@ function enableEditMode() {
 	var field = document.createElement("input");
 	field.value = text;
 
-	field.className = "list-group-item form-control input group active nickname";
-	renderButton("Clear", clearGroup(div), span, false);
+	field.className = "list-group-item input-lg form-control input group active nickname";
+	renderButton("Clear", clearGroup(div), span, true);
 
 	var parentSpan = homeNicknameElement.parentNode;
 	div.appendChild(field);
