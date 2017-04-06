@@ -39,7 +39,7 @@ Render the user preferences in cachedRecord
 function renderUserPreferences() {
 	$(".preferences").empty();
 	$("#new-group-button").remove();
-	renderButton("Edit Preferences", enableEditMode, document.getElementById("buttons"));
+	renderButton("Edit Preferences", enableEditMode, document.getElementById("buttons-div"));
 	var time = document.createElement("h4");
 	time.innerHTML = cachedRecord["time"] + " minutes";
 	document.getElementById("time-div").appendChild(time);
@@ -67,8 +67,9 @@ function renderGroup(nickname, divId) {
 		}
 	}
 	else {
-		addToList(span, "Click the edit button to set up your " + divId.split('-')[0] + " group", true);
-		var listElement = span.firstChild;
+		var listElement = addToList(span, 
+			"Click the edit button to set up your " + divId.split("-")[0] + " group", 
+			true);
 		listElement.classList.add("warning");
 
 		// Manually change color because list-elements do 
@@ -86,34 +87,30 @@ function addToList(div, content, isActive) {
 	var listElement = document.createElement("a");
 	listElement.innerHTML = content;
 	listElement.style.fontSize = "large";
-	listElement.classList.add("list-group-item");
-	if (isActive) {
-		listElement.classList.add("active");
-	}
-	else {
-		listElement.classList.add("stop");
-	}
+	listElement.classList.add("list-group-item", isActive ? "active" : "stop");
 	div.appendChild(listElement);
+	return listElement;
 }
 
 /*
 Enable edit mode
 */
 function enableEditMode() {
-	$("#buttons").empty();
+	$("#buttons-div").empty();
 	$("#time-div").empty();
 
-	renderButton("Submit", handleSubmit, document.getElementById("buttons"));
-	renderButton("Cancel", renderUserPreferences, document.getElementById("buttons"));
+	submit = renderButton("Submit", handleSubmit, document.getElementById("buttons-div"));
+	submit.id = "submit-button";
+	renderButton("Cancel", renderUserPreferences, document.getElementById("buttons-div"));
 
-	time = document.createElement("input");
-	time.type = "number";
-	time.min = 0;
-	time.max = 30;
-	time.classList.add("form-control", "input-lg");
-	time.value = cachedRecord["time"];
-	time.id = "timeInput";
-	document.getElementById("time-div").appendChild(time);
+	timeElement = document.createElement("input");
+	timeElement.type = "number";
+	timeElement.min = 0;
+	timeElement.max = 30;
+	timeElement.classList.add("form-control", "input-lg");
+	timeElement.value = cachedRecord["time"];
+	timeElement.id = "time-input";
+	document.getElementById("time-div").appendChild(timeElement);
 
 	renderEditableGroup("home-div");
 	renderEditableGroup("destination-div");
@@ -126,12 +123,12 @@ function enableEditMode() {
 	var newButton = renderButton("New", createNewEditableNickname(groupsDiv), groupsWellDiv);
 	newButton.id = "new-group-button";
 
-	var datalist = document.getElementById("systemStops");
-	if (datalist.childNodes.length === 0){
-		for (var stop in nameToStopId) {
-			var option = document.createElement('option');
-			option.value = stop;
-			document.getElementById("systemStops").appendChild(option);
+	var datalist = document.getElementById("system-stops");
+	if (datalist.childNodes.length === 0) {
+		for (var stopName in nameToStopId) {
+			var option = document.createElement("option");
+			option.value = stopName;
+			datalist.appendChild(option);
 		}
 	}
 }
@@ -152,7 +149,6 @@ function renderEditableGroup(groupDivId) {
 	}
 
 	var inputGroupElement = generateNicknameInputGroup(text, buttonText, buttonBehavior);
-		
 	nicknameElement.parentNode.replaceChild(inputGroupElement, nicknameElement);
 
 	var stopElements = $.extend(true, [], groupDiv.getElementsByClassName("stop"));
@@ -169,18 +165,17 @@ function renderEditableGroup(groupDivId) {
 		}
 	}
 	
-	renderImageButton(imageUrl + "plus.png", appendStop(groupDivId), groupDiv);
+	renderImageButton(imageUrl + "plus.png", appendStop(groupDiv), groupDiv);
 }
 
 /*
-	Returns an input div for nicknames.
-	text is the nickname for a group.
-	buttonText is the string "clear" or "delete".
-	func is the function to be executed by the clear/delete button is pressed.
+Returns an input div for nicknames
+text is the nickname for a group
+buttonText is the string "clear" or "delete"
+func is the function to be executed by the clear/delete button is pressed
 */
 function generateNicknameInputGroup(text, buttonText, func) {
 	var inputDiv = generateInputDiv(text, true);
-
 	var span = document.createElement("span");
 	span.classList.add("input-group-btn");
 	renderButton(buttonText, func, span);
@@ -189,13 +184,12 @@ function generateNicknameInputGroup(text, buttonText, func) {
 }
 
 /*
-	Returns an input div for stop names.
-	text is the stop name.
-	hasButton (true) indicates the stop row has a delete stop button.
+Returns an input div for stop names.
+text is the stop name.
+hasButton (true) indicates the stop row has a delete stop button.
 */
 function generateStopInputGroup(text, hasButton) {
 	var inputDiv = generateInputDiv(text, false);
-
 	if (hasButton) {
 		var span = document.createElement("span");
 		span.classList.add("input-group-btn");
@@ -207,24 +201,19 @@ function generateStopInputGroup(text, hasButton) {
 		inputField.classList.add("form-group", "stop");
 		inputField.classList.remove("list-group-item");
 	}
-	inputDiv.getElementsByTagName("input")[0].setAttribute("list", "systemStops");
-	console.log(inputDiv.getElementsByTagName("input")[0].list);
+	inputDiv.getElementsByTagName("input")[0].setAttribute("list", "system-stops");
 	return inputDiv;
 }
 
 /*
-	Creates a div containing an input type field.
-	text is the text to be present in the field.
-	isNickname indicates whether it is a nickname or a stop.
+Creates a div containing an input type field.
+text is the text to be present in the field.
+isNickname indicates whether it is a nickname or a stop.
 */
 function generateInputDiv(text, isNickname) {
 	var field = document.createElement("input");
 	field.value = text;
-	field.classList.add("list-group-item", "form-control", "input-lg");
-	if (isNickname) {
-		field.classList.add("active");
-	}
-
+	field.classList.add("list-group-item", "form-control", "input-lg", isNickname ? "active" : "stop");
 	var inputDiv = document.createElement("div");
 	inputDiv.classList.add("input-group");
 	inputDiv.appendChild(field);
@@ -232,31 +221,27 @@ function generateInputDiv(text, isNickname) {
 }
 
 /*
-	Create new nickname in the other section
+Create new nickname in the other section
 */
 function createNewEditableNickname(parentNode) {
 	var counter = 0;
 	return function() {
-
 		var div = document.createElement("div");
 		div.id = "newnickname-" + counter++;
 		div.classList.add("list-group");
 
 		var span = document.createElement("span");
+		span.appendChild(generateNicknameInputGroup("", "Delete", deleteGroup(div)));
 		div.appendChild(span);
 
+		renderImageButton(imageUrl + "plus.png", appendStop(div), div);
 		parentNode.appendChild(div);
-
-		span.appendChild(generateNicknameInputGroup("", "Delete", deleteGroup(div)));
-
-		renderImageButton(imageUrl + "plus.png", appendStop(div.id), div);
 	}
 }
 
-function appendStop(parentDivId) {
+function appendStop(parentDiv) {
 	return function() {
-		var span = document.getElementById(parentDivId).childNodes[0];
-
+		var span = parentDiv.childNodes[0];
 		if (span.childNodes.length === 2) {
 			var target = span.childNodes[1];
 			span.replaceChild(generateStopInputGroup(target.childNodes[0].value, true), target);
@@ -269,8 +254,7 @@ function deleteStop(stopElement) {
 	return function() {
 		var span = stopElement.parentNode;
 		stopElement.remove();
-
-		if (span.childNodes.length == 2) {
+		if (span.childNodes.length === 2) {
 			var target = span.childNodes[1];
 			span.replaceChild(generateStopInputGroup(target.childNodes[0].value, false), target);
 		}
@@ -320,19 +304,21 @@ Handle a user submitting their changes
 */
 function handleSubmit() {
 	var updating = false;
-	var timeInput = document.getElementById("timeInput");
-	if (timeInput.value && timeInput.value != cachedRecord["time"]) {
+	var timeInput = document.getElementById("time-input");
+	var value = timeInput.value ? parseInt(timeInput.value) : 0;
+	if (value != cachedRecord["time"]) {
 		updating = true;
 		$.ajax({
 			url: apiUrl + userId + "/time",
 			type: "PUT",
 			contentType: "application/json",
-			data: JSON.stringify({"time": parseInt(timeInput.value)}),
+			data: JSON.stringify({"time": value}),
 			success: function(data) {
 				cachedRecord["time"] = data["time"];
 			},
 			error: function(data) {
 				/* HANDLE THE ERROR */
+				console.log("Failed to update time");
 			}
 		});
 	}
@@ -346,7 +332,7 @@ function handleSubmit() {
 	var groups = document.getElementById("groups-div").getElementsByClassName("list-group");
 	updatedOrder = [];
 	for (var i = 0; i < groups.length; i++) {
-		scrapeGroupData(groups[i].id, updated, updatedOrder);
+		scrapeGroupData(groups[i], updated, updatedOrder);
 	}
 
 	// Delete all groups in cachedRecord and not in updated
@@ -374,7 +360,7 @@ function handleSubmit() {
 	for (var index = 0; index < combinedOrder.length; index++) {
 		updatedNickname = combinedOrder[index];
 		var updatedStops = updated[updatedNickname];
-		var putStops = !(updatedNickname in cachedRecord["groups"])
+		var putStops = !(updatedNickname in cachedRecord["groups"]);
 		if (!putStops) {
 			var cachedStops = cachedRecord["groups"][updatedNickname];
 			var equal = cachedStops.length === updatedStops.length;
@@ -388,7 +374,7 @@ function handleSubmit() {
 			updating = true;
 			var type = updatedNickname === newHome ? "home" : 
 				updatedNickname === newDestination ? "destination" : 
-				"other"
+				"other";
 			$.ajax({
 				url: apiUrl + userId + "/groups/" + updatedNickname,
 				type: "PUT",
@@ -401,7 +387,7 @@ function handleSubmit() {
 				},
 				error: function(data) {
 					/* HANDLE THE ERROR */
-					console.log("Failed put");
+					console.log("Failed to update group");
 				}
 			});
 		}
@@ -429,7 +415,10 @@ function scrapeGroupData(groupDivId, updated, order) {
 		var stopElements = groupDiv.getElementsByClassName("stop");
 		var stopIds = [];
 		for (var i = 0; i < stopElements.length; i++) {
-			stopIds.push(parseInt(nameToStopId[stopElements[i].value]));
+			var stopName = stopElements[i].value;
+			if (stopName) {
+				stopIds.push(parseInt(nameToStopId[stopName]));
+			}
 		}
 		if (stopIds) {
 			updated[nickname] = stopIds;
@@ -453,6 +442,6 @@ function disableInvalidSubmission(fieldId, buttonId) {
 		document.getElementById(buttonId).setAttribute('disabled', 'disabled');
 	} 
 	else {
-		document.getElementById(buttonId).removeAttribute('disabled')
+		document.getElementById(buttonId).removeAttribute('disabled');
 	}
 }
