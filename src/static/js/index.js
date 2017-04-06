@@ -59,7 +59,6 @@ Render the group with the specified nickname in the specified div
 function renderGroup(nickname, divId) {
 	var div = document.getElementById(divId);
 	var span = document.createElement("span");
-	div.classList.add("list-group");
 	if (nickname) {
 		addToList(span, nickname, true);
 		for (var i = 0; i < cachedRecord["groups"][nickname].length; i++) {
@@ -131,55 +130,93 @@ function renderEditableGroup(groupDivId) {
 	var groupDiv = document.getElementById(groupDivId);
 	var nicknameElement = groupDiv.getElementsByClassName("active")[0];
 
-	var field = document.createElement("input");
-	field.value = nicknameElement.classList.contains("warning") ? "" : nicknameElement.textContent;
-	field.classList.add("list-group-item", "form-control", "input-lg", "active");
-
-	var inputDiv = document.createElement("div");
-	inputDiv.classList.add("input-group");
-	inputDiv.appendChild(field);
-
-	var span = document.createElement("span");
-	span.classList.add("input-group-btn");
-	if (groupDivId === "home-div" || groupDivId === "destination-div") {
-		renderButton("Clear", clearGroup(inputDiv), span);
+	var text = nicknameElement.classList.contains("warning") ? "" : nicknameElement.textContent;
+	var buttonText;
+	var buttonBehavior;
+	if (groupDivId.includes("-")) {
+		buttonText = "Clear";
+		buttonBehavior = clearGroup(nicknameElement.parentNode);
+	} else {
+		buttonText = "Delete";
+		buttonBehavior = deleteGroup(groupDiv);
 	}
-	else {
-		renderButton("Delete", deleteGroup(groupDiv), span);
-	}
-	inputDiv.appendChild(span);
+
+	var inputGroupElement = generateNicknameInputGroup(text, buttonText, buttonBehavior);
 		
-	nicknameElement.parentNode.replaceChild(inputDiv, nicknameElement);
+	nicknameElement.parentNode.replaceChild(inputGroupElement, nicknameElement);
 
 	var stopElements = $.extend(true, [], groupDiv.getElementsByClassName("stop"));
 	if (stopElements.length === 1) {
-		var field = document.createElement("input");
-		field.value = stopElements[0].textContent;
-		field.classList.add("form-group", "form-control", "input-lg", "stop");
+		var inputField = generateStopInputGroup(stopElements[0].textContent, false);
 		stopElements[0].remove();
-		inputDiv.parentNode.appendChild(field);
+		inputGroupElement.parentNode.appendChild(inputField);
 	}
 	else {
 		for (var i = 0; i < stopElements.length; i++) {
-			var div = document.createElement("div");
-			div.classList.add("input-group");
-
-			var field = document.createElement("input");
-			field.value = stopElements[i].textContent;
-			field.classList.add("list-group-item", "form-control", "input-lg", "stop");
-			div.appendChild(field);
-
-			var span = document.createElement("span");
-			span.classList.add("input-group-btn");
-			renderImageButton(imageUrl + "x.png", deleteStop(div), span);
-			div.appendChild(span);
-
+			div = generateStopInputGroup(stopElements[i].textContent, true);
 			stopElements[i].remove();
-			inputDiv.parentNode.appendChild(div);
+			inputGroupElement.parentNode.appendChild(div);
 		}
 	}
 
 	renderImageButton(imageUrl + "plus.png", appendStop(groupDivId), groupDiv);
+}
+
+/*
+	Returns an input div for nicknames.
+	text is the nickname for a group.
+	buttonText is the string "clear" or "delete".
+	func is the function to be executed by the clear/delete button is pressed.
+*/
+function generateNicknameInputGroup(text, buttonText, func) {
+	var inputDiv = generateInputDiv(text, true);
+
+	var span = document.createElement("span");
+	span.classList.add("input-group-btn");
+	renderButton(buttonText, func, span);
+	inputDiv.appendChild(span);
+	return inputDiv;
+}
+
+/*
+	Returns an input div for stop names.
+	text is the stop name.
+	hasButton (true) indicates the stop row has a delete stop button.
+*/
+function generateStopInputGroup(text, hasButton) {
+	var inputDiv = generateInputDiv(text, false);
+
+	if (hasButton) {
+		var span = document.createElement("span");
+		span.classList.add("input-group-btn");
+		renderImageButton(imageUrl + "x.png", deleteStop(inputDiv), span);
+		inputDiv.appendChild(span);
+	} else {
+		inputDiv.classList.remove("input-group");
+		var inputField = inputDiv.getElementsByTagName("input")[0];
+		inputField.classList.add("form-group", "stop");
+		inputField.classList.remove("list-group-item");
+	}
+	return inputDiv;
+}
+
+/*
+	Creates a div containing an input type field.
+	text is the text to be present in the field.
+	isNickname indicates whether it is a nickname or a stop.
+*/
+function generateInputDiv(text, isNickname) {
+	var field = document.createElement("input");
+	field.value = text;
+	field.classList.add("list-group-item", "form-control", "input-lg");
+	if (isNickname) {
+		field.classList.add("active");
+	}
+
+	var inputDiv = document.createElement("div");
+	inputDiv.classList.add("input-group");
+	inputDiv.appendChild(field);
+	return inputDiv;
 }
 
 /*
@@ -188,19 +225,7 @@ function renderEditableGroup(groupDivId) {
 function createNewEditableNickname(parentNode) {
 	var counter = 0;
 	return function() {
-		var field = document.createElement("input");
-		field.value = "";
-		field.classList.add("list-group-item", "form-control", "input-lg", "active");
-
-		var inputGroupDiv = document.createElement("div");
-		inputGroupDiv.classList.add("input-group");
-		inputGroupDiv.appendChild(field);
-
-		var span = document.createElement("span");
-		span.classList.add("input-group-btn");
-		renderButton("Delete", deleteGroup(parentNode), span);
-
-		inputGroupDiv.appendChild(span);
+		var inputGroupDiv = createInputGroupDiv()
 
 		var outerSpan = document.createElement("span");
 		outerSpan.appendChild(inputGroupDiv);
@@ -223,19 +248,21 @@ function appendStop(parentDivId) {
 
 function deleteStop(stopElement) {
 	return function() {
+		console.log(stopElement);
 		stopElement.remove();
 	}
 }
 
 function deleteGroup(groupElement) {
 	return function() {
+		console.log(groupElement);
 		groupElement.remove();
 	}
 }
 
-function clearGroup(groupElement) {
+function clearGroup(spanElement) {
 	return function() {
-		console.log(groupElement);
+		console.log(spanElement);
 	}
 }
 
