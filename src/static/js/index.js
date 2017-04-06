@@ -136,7 +136,7 @@ function renderEditableGroup(groupDivId) {
 	var buttonBehavior;
 	if (groupDivId.includes("-")) {
 		buttonText = "Clear";
-		buttonBehavior = clearGroup(nicknameElement.parentNode);
+		buttonBehavior = clearGroup(groupDiv);
 	} else {
 		buttonText = "Delete";
 		buttonBehavior = deleteGroup(groupDiv);
@@ -262,9 +262,11 @@ function deleteGroup(groupElement) {
 	}
 }
 
-function clearGroup(spanElement) {
+function clearGroup(groupDiv) {
 	return function() {
-		console.log(spanElement);
+		var span = groupDiv.childNodes[0];
+		span.innerHTML = "";
+		span.appendChild(generateNicknameInputGroup("", "Clear", clearGroup(groupDiv)));
 	}
 }
 
