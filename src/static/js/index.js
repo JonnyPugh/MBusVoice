@@ -373,12 +373,12 @@ function handleSubmit() {
 	var finishSubmit = true;
 	var errorElements = [];
 	var newHome = scrapeGroupData("home-div", updated, homeDestinationOrder);
-	if (newHome && newHome.constructor === Array) {
+	if (newHome && typeof(newHome) !== "string") {
 		finishSubmit = false;
 		errorElements = errorElements.concat(newHome);
 	}
 	var newDestination = scrapeGroupData("destination-div", updated, homeDestinationOrder);
-	if (newDestination && newDestination.constructor === Array) {
+	if (newDestination && typeof(newDestination) !== "string") {
 		finishSubmit = false;
 		errorElements = errorElements.concat(newDestination);
 	}
@@ -386,7 +386,7 @@ function handleSubmit() {
 	updatedOrder = [];
 	for (var i = 0; i < groups.length; i++) {
 		var result = scrapeGroupData(groups[i].id, updated, updatedOrder);
-		if (result && result.constructor === Array) {
+		if (result && typeof(result) !== "string") {
 			finishSubmit = false;
 			errorElements = errorElements.concat(result);
 		}
@@ -505,30 +505,29 @@ function scrapeGroupData(groupDivId, updated, order) {
 	var nicknameElement = groupDiv.getElementsByClassName("active")[0];
 	var nickname = nicknameElement.value;
 	var stopElements = groupDiv.getElementsByClassName("stop");
+	var elements = [];
 	var stopIds = [];
 	for (var i = 0; i < stopElements.length; i++) {
 		var stopName = stopElements[i].value;
 		if (stopName) {
 			stopIds.push(parseInt(nameToStopId[stopName]));
 		}
+		elements.push(stopElements[i]);
 	}
-	console.log(nickname);
-	console.log(stopIds);
-	if (nickname && stopIds) {
+	if (nickname && stopIds.length > 0) {
 		updated[nickname] = stopIds;
 		order.push(nickname);
 		return nickname;
-	} else if ((!nickname && !stopIds) || groupDivId.includes("-div")) {
+	} else if (!nickname && stopIds.length === 0) {
 		return null;
 	} else if (!nickname) {
 		return [nicknameElement];
 	} else if (stopElements.length === 0) {
 		// Make new stop and return its element
-		var stopDiv = generateStopInputGroup("", false);
-		groupDiv.appendChild(stopDiv);
-		return stopDiv.getElementsByClassName("stop");
+		appendStop(groupDiv)();
+		return [groupDiv.getElementsByClassName("stop")[0]];
 	}
-	return stopElements;
+	return elements;
 }
 
 function setSubmitState(caller, valid) {
