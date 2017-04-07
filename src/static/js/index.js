@@ -320,6 +320,20 @@ function getButton(displayText, callback) {
 	var button = document.createElement("a");
 	button.innerHTML = displayText;
 	button.classList.add("btn", "btn-primary", "btn-lg");
+	if (displayText === "Clear") {
+		button.classList.add("btn-warning");
+		button.classList.remove("btn-primary")
+	} else if (displayText === "Submit") {
+		button.classList.add("btn-success");
+		button.classList.remove("btn-primary")
+
+	} else if (displayText === "Delete") {
+		button.classList.add("btn-danger");
+		button.classList.remove("btn-primary");
+	} else if (displayText === "New") {
+		button.classList.add("btn-success");
+		button.classList.remove("btn-primary");
+	}
 	button.onclick = callback;
 	return button;
 }
