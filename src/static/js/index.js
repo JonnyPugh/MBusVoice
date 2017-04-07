@@ -1,6 +1,7 @@
 var cachedRecord = {};
 var stopIdToName;
 var nameToStopId = {};
+var stateValid = {};
 
 document.addEventListener('DOMContentLoaded', function () {
 	// Get bus stops and the user's preferences from the API
@@ -65,8 +66,7 @@ function renderGroup(nickname, divId) {
 		for (var i = 0; i < cachedRecord["groups"][nickname].length; i++) {
 			addToList(span, stopIdToName[cachedRecord["groups"][nickname][i]], false);
 		}
-	}
-	else {
+	} else {
 		var listElement = addToList(span, 
 			"Click the edit button to set up your " + divId.split("-")[0] + " group", 
 			true);
@@ -110,7 +110,15 @@ function enableEditMode() {
 	timeElement.classList.add("form-control", "input-lg");
 	timeElement.value = cachedRecord["time"];
 	timeElement.id = "time-input";
+	timeElement.onkeypress = function(evt) {
+		var charCode = evt.which ? evt.which : event.keyCode;
+		return charCode <= 31 || (charCode >= 48 && charCode <= 57);
+	};
 	document.getElementById("time-div").appendChild(timeElement);
+
+	$('#time-input').bind("keyup mouseup", function(){
+		validateTime();
+	});
 
 	renderEditableGroup("home-div");
 	renderEditableGroup("destination-div");
@@ -131,6 +139,13 @@ function enableEditMode() {
 			datalist.appendChild(option);
 		}
 	}
+}
+
+function validateTime() {
+	var timeField = document.getElementById("time-input");
+	var valid = (timeField.value >= 0) && (timeField.value <= 30);
+	updateBorder(timeField, valid);
+	setSubmitState("time", valid);
 }
 
 function renderEditableGroup(groupDivId) {
@@ -156,8 +171,7 @@ function renderEditableGroup(groupDivId) {
 		var inputField = generateStopInputGroup(stopElements[0].textContent, false);
 		stopElements[0].remove();
 		inputGroupElement.parentNode.appendChild(inputField);
-	}
-	else {
+	} else {
 		for (var i = 0; i < stopElements.length; i++) {
 			div = generateStopInputGroup(stopElements[i].textContent, true);
 			stopElements[i].remove();
@@ -213,11 +227,62 @@ isNickname indicates whether it is a nickname or a stop.
 function generateInputDiv(text, isNickname) {
 	var field = document.createElement("input");
 	field.value = text;
-	field.classList.add("list-group-item", "form-control", "input-lg", isNickname ? "active" : "stop");
+	field.classList.add("list-group-item", "form-control", "input-lg");
+	if (isNickname) {
+		field.classList.add("active");
+		field.setAttribute("maxlength", 30);
+		field.oninput = function() {
+			validateNickname(field);
+		};
+	} else {
+		field.classList.add("stop");
+		field.oninput = function() {
+			validateStop(field);
+		};
+		// stop validation function
+	}
 	var inputDiv = document.createElement("div");
 	inputDiv.classList.add("input-group");
 	inputDiv.appendChild(field);
 	return inputDiv;
+}
+
+function validateNickname(nicknameField) {
+	var valid = true;
+
+	// Verify nickname is not a duplicate
+	var nicknameElements = document.getElementsByClassName("active");
+	for (var i = 0; i < nicknameElements.length && valid; i++) {
+		if (nicknameField.value === nicknameElements[i].value) {
+			valid = nicknameField === nicknameElements[i];
+		}
+	}
+
+	// Verify all characters are alphanumeric or spaces
+	var regex = new RegExp("^[a-zA-Z0-9 ]+$");
+	valid = valid && regex.test(nicknameField.value);
+
+	updateBorder(nicknameField, valid);
+	
+	setSubmitState("nicknames", valid);
+}
+
+function validateStop(stopField) {
+	var valid = stopField.value in nameToStopId || stopField.value === "";
+
+	updateBorder(stopField, valid);
+	
+	setSubmitState("stops", valid);
+}
+
+function updateBorder(field, valid) {
+	if (valid) {
+		field.style.borderColor = "#dddddd";
+		field.style.borderWidth = "0px"
+	} else {
+		field.style.borderColor = "#b94a48";
+		field.style.borderWidth = "3px";
+	}
 }
 
 /*
@@ -429,19 +494,17 @@ function scrapeGroupData(groupDivId, updated, order) {
 	return null;
 }
 
-// Runs on every change of new origin or destination forms
-function disableInvalidSubmission(fieldId, buttonId) {
-	var listOptions = document.getElementsByClassName('systemLevelStop');
-	systemLevelStops = [];
-	for (var i = 0; i < listOptions.length; i++) {
-		 systemLevelStops.push(listOptions[i].value);
+function setSubmitState(caller, valid) {
+	stateValid[caller] = valid;
+
+	var submitOk = true;
+	for (var key in stateValid) {
+		submitOk = submitOk & stateValid[key];
 	}
 
-	// If the current value entered is not in the list of system stops
-	if (systemLevelStops.indexOf(document.getElementById(fieldId).value) === -1) {
-		document.getElementById(buttonId).setAttribute('disabled', 'disabled');
-	} 
-	else {
-		document.getElementById(buttonId).removeAttribute('disabled');
+	if (submitOk) {
+		document.getElementById("submit-button").removeAttribute('disabled')
+	} else {
+		document.getElementById("submit-button").setAttribute('disabled', 'disabled');	
 	}
 }
