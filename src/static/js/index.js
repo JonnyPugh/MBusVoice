@@ -351,6 +351,16 @@ Verify that the stop is valid
 */
 function validateStop(stopElement) {
 	var isValid = stopElement.value in nameToStopId || stopElement.value === "";
+
+	var groupSpan = stopElement.parentNode.parentNode;
+	var stopElements = groupSpan.getElementsByClassName("stop");
+	for (var i = 0; i < stopElements.length && isValid; i++) {
+		console.log(stopElements[i]);
+		console.log(stopElement);
+		isValid = stopElement.value !== stopElements[i].value 
+			|| stopElement === stopElements[i];
+	}
+
 	updateBorder(stopElement, isValid);
 	updateValidity("stops", isValid);
 }
@@ -360,7 +370,7 @@ Verify that the nickname is valid
 */
 function validateNickname(nicknameElement) {
 	// Verify that all characters in the nickname are alphanumeric or spaces
-	var isValid = new RegExp("^[a-zA-Z0-9 ]+$").test(nicknameElement.value);
+	var isValid = new RegExp("^[a-zA-Z0-9]+$").test(nicknameElement.value.replace(" ", ""));
 
 	// Verify that the nickname is not a duplicate
 	var nicknameElements = document.getElementsByClassName("active");
@@ -391,12 +401,16 @@ status of the submit button based on all elements' validity
 */
 function updateValidity(identifier, isValid) {
 	elementValidity[identifier] = isValid;
+	var submitButton = document.getElementById("submit-button");
 	for (var key in elementValidity) {
 		if (!elementValidity[key]) {
-			document.getElementById("submit-button").setAttribute("disabled", "disabled");
+			submitButton.setAttribute("disabled", "disabled");
+			submitButton.onclick = "";
+			return;
 		}
 	}
-	document.getElementById("submit-button").removeAttribute("disabled");
+	submitButton.onclick = handleSubmit;
+	submitButton.removeAttribute("disabled");
 }
 
 /*
