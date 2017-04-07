@@ -143,13 +143,13 @@ function changeGroupToEdit(groupDivId) {
 	var groupDiv = document.getElementById(groupDivId);
 	var nicknameElement = groupDiv.getElementsByClassName("active")[0];
 	var groupSpan = nicknameElement.parentNode;
-	groupSpan.replaceChild(getNicknameInput(groupDiv, 
-			nicknameElement.classList.contains("warning") ? "" : nicknameElement.textContent, 
-			groupDivId.includes("-") ? "Clear" : "Delete"), 
+	groupSpan.replaceChild(getNicknameInput(groupDiv,
+			nicknameElement.classList.contains("warning") ? "" : nicknameElement.textContent,
+			groupDivId.includes("-") ? "Clear" : "Delete"),
 		nicknameElement);
 	var stopElements = $.extend(true, [], groupDiv.getElementsByClassName("stop"));
 	for (var i = 0; i < stopElements.length; i++) {
-		var stopInput = getStopInput(stopElements[i].textContent, stopElements.length === 1);
+		var stopInput = getStopInput(stopElements[i].textContent, stopElements.length !== 1);
 		stopElements[i].remove();
 		groupSpan.appendChild(stopInput);
 	}
