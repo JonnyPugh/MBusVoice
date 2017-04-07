@@ -351,6 +351,16 @@ Verify that the stop is valid
 */
 function validateStop(stopElement) {
 	var isValid = stopElement.value in nameToStopId || stopElement.value === "";
+
+	var groupSpan = stopElement.parentNode.parentNode;
+	var stopElements = groupSpan.getElementsByClassName("stop");
+	for (var i = 0; i < stopElements.length && isValid; i++) {
+		console.log(stopElements[i]);
+		console.log(stopElement);
+		isValid = stopElement.value !== stopElements[i].value 
+			|| stopElement === stopElements[i];
+	}
+
 	updateBorder(stopElement, isValid);
 	updateValidity("stops", isValid);
 }
@@ -360,7 +370,7 @@ Verify that the nickname is valid
 */
 function validateNickname(nicknameElement) {
 	// Verify that all characters in the nickname are alphanumeric or spaces
-	var isValid = new RegExp("^[a-zA-Z0-9 ]+$").test(nicknameElement.value);
+	var isValid = new RegExp("^[a-zA-Z0-9]+$").test(nicknameElement.value.replace(" ", ""));
 
 	// Verify that the nickname is not a duplicate
 	var nicknameElements = document.getElementsByClassName("active");
