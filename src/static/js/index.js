@@ -401,11 +401,9 @@ Update the border of the specified element depending on the validity
 */
 function updateBorder(element, isValid) {
 	if (isValid) {
-		element.style.borderColor = "#dddddd";
-		element.style.borderWidth = "0px"
+		element.classList.remove("invalid");
 	} else {
-		element.style.borderColor = "#b94a48";
-		element.style.borderWidth = "3px";
+		element.classList.add("invalid");
 	}
 }
 
