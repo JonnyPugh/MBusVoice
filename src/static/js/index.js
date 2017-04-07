@@ -269,9 +269,7 @@ function validateNickname(nicknameField) {
 
 function validateStop(stopField) {
 	var valid = stopField.value in nameToStopId || stopField.value === "";
-
 	updateBorder(stopField, valid);
-	
 	setSubmitState("stops", valid);
 }
 
@@ -368,39 +366,48 @@ function renderButton(displayText, callback, parent) {
 Handle a user submitting their changes
 */
 function handleSubmit() {
-	var updating = false;
-	var timeInput = document.getElementById("time-input");
-	var value = timeInput.value ? parseInt(timeInput.value) : 0;
-	if (value != cachedRecord["time"]) {
-		updating = true;
-		$.ajax({
-			url: apiUrl + userId + "/time",
-			type: "PUT",
-			contentType: "application/json",
-			data: JSON.stringify({"time": value}),
-			success: function(data) {
-				cachedRecord["time"] = data["time"];
-			},
-			error: function(data) {
-				/* HANDLE THE ERROR */
-				console.log("Failed to update time");
-			}
-		});
-	}
-
 	// Scrape the current state of the UI for the 
 	// updated preferences and order of groups
 	updated = {};
 	homeDestinationOrder = [];
+	var finishSubmit = true;
+	var errorElements = [];
 	var newHome = scrapeGroupData("home-div", updated, homeDestinationOrder);
+	if (newHome && newHome.constructor === Array) {
+		finishSubmit = false;
+		errorElements = errorElements.concat(newHome);
+	}
 	var newDestination = scrapeGroupData("destination-div", updated, homeDestinationOrder);
+	if (newDestination && newDestination.constructor === Array) {
+		finishSubmit = false;
+		errorElements = errorElements.concat(newDestination);
+	}
 	var groups = document.getElementById("groups-div").getElementsByClassName("list-group");
 	updatedOrder = [];
 	for (var i = 0; i < groups.length; i++) {
-		scrapeGroupData(groups[i].id, updated, updatedOrder);
+		var result = scrapeGroupData(groups[i].id, updated, updatedOrder);
+		if (result && result.constructor === Array) {
+			finishSubmit = false;
+			errorElements = errorElements.concat(result);
+		}
+	}
+
+	$(".alert").remove();
+	if (!finishSubmit) {
+		for (var i = 0; i < errorElements.length; i++) {
+			updateBorder(errorElements[i], false);
+		}
+
+		// Show an error message to the user
+		var errorDiv = document.createElement("div");
+		errorDiv.classList.add("alert", "alert-dismissible", "alert-danger");
+		errorDiv.innerHTML += "Please fill in or remove the highlighted preferences and submit again.";
+		document.getElementById("buttons-div").appendChild(errorDiv);
+		return;
 	}
 
 	// Delete all groups in cachedRecord and not in updated
+	var updating = false;
 	for (cachedNickname in cachedRecord["groups"]) {
 		if (!(cachedNickname in updated)) {
 			// Delete the cachedNickname from the database using the API
@@ -458,6 +465,26 @@ function handleSubmit() {
 		}
 	}
 
+	// Change the time with the API if the user changed the time
+	var timeInput = document.getElementById("time-input");
+	var value = timeInput.value ? parseInt(timeInput.value) : 0;
+	if (value != cachedRecord["time"]) {
+		updating = true;
+		$.ajax({
+			url: apiUrl + userId + "/time",
+			type: "PUT",
+			contentType: "application/json",
+			data: JSON.stringify({"time": value}),
+			success: function(data) {
+				cachedRecord["time"] = data["time"];
+			},
+			error: function(data) {
+				/* HANDLE THE ERROR */
+				console.log("Failed to update time");
+			}
+		});
+	}
+
 	if (updating) {
 		// When the user's preferences are finished updating, render them
 		$(document).ajaxStop(function() {
@@ -475,23 +502,33 @@ function handleSubmit() {
 
 function scrapeGroupData(groupDivId, updated, order) {
 	var groupDiv = document.getElementById(groupDivId);
-	var nickname = groupDiv.getElementsByClassName("active")[0].value;
-	if (nickname) {
-		var stopElements = groupDiv.getElementsByClassName("stop");
-		var stopIds = [];
-		for (var i = 0; i < stopElements.length; i++) {
-			var stopName = stopElements[i].value;
-			if (stopName) {
-				stopIds.push(parseInt(nameToStopId[stopName]));
-			}
-		}
-		if (stopIds) {
-			updated[nickname] = stopIds;
-			order.push(nickname);
-			return nickname;
+	var nicknameElement = groupDiv.getElementsByClassName("active")[0];
+	var nickname = nicknameElement.value;
+	var stopElements = groupDiv.getElementsByClassName("stop");
+	var stopIds = [];
+	for (var i = 0; i < stopElements.length; i++) {
+		var stopName = stopElements[i].value;
+		if (stopName) {
+			stopIds.push(parseInt(nameToStopId[stopName]));
 		}
 	}
-	return null;
+	console.log(nickname);
+	console.log(stopIds);
+	if (nickname && stopIds) {
+		updated[nickname] = stopIds;
+		order.push(nickname);
+		return nickname;
+	} else if ((!nickname && !stopIds) || groupDivId.includes("-div")) {
+		return null;
+	} else if (!nickname) {
+		return [nicknameElement];
+	} else if (stopElements.length === 0) {
+		// Make new stop and return its element
+		var stopDiv = generateStopInputGroup("", false);
+		groupDiv.appendChild(stopDiv);
+		return stopDiv.getElementsByClassName("stop");
+	}
+	return stopElements;
 }
 
 function setSubmitState(caller, valid) {
@@ -499,7 +536,7 @@ function setSubmitState(caller, valid) {
 
 	var submitOk = true;
 	for (var key in stateValid) {
-		submitOk = submitOk & stateValid[key];
+		submitOk = submitOk && stateValid[key];
 	}
 
 	if (submitOk) {
