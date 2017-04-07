@@ -1,7 +1,7 @@
 var cachedRecord = {};
 var stopIdToName;
 var nameToStopId = {};
-var stateValid = {};
+var elementValidity = {};
 
 document.addEventListener('DOMContentLoaded', function () {
 	// Get bus stops and the user's preferences from the API
@@ -11,21 +11,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			nameToStopId[data[key]] = key;
 		}
 	});
-	$.get(apiUrl + userId + "/time", function(data) {
-		cachedRecord["time"] = data["time"];
-	});
-	$.get(apiUrl + userId + "/home", function(data) {
-		cachedRecord["home"] = data["home"];
-	});
-	$.get(apiUrl + userId + "/destination", function(data) {
-		cachedRecord["destination"] = data["destination"];
-	});
-	$.get(apiUrl + userId + "/groups", function(data) {
-		cachedRecord["groups"] = data["groups"];
-	});
-	$.get(apiUrl + userId + "/order", function(data) {
-		cachedRecord["order"] = data["order"];
-	});
+	dataToCache = ["time", "home", "destination", "groups", "order"];
+	for (var i = 0; i < dataToCache.length; i++) {
+		$.get(apiUrl + userId + "/" + dataToCache[i], function(data) {
+			for (name in data) {
+				cachedRecord[name] = data[name];
+			}
+		});
+	}
 
 	// When the user's preferences are loaded, render them
 	$(document).ajaxStop(function() {
@@ -40,97 +33,99 @@ Render the user preferences in cachedRecord
 function renderUserPreferences() {
 	$(".preferences").empty();
 	$("#new-group-button").remove();
-	renderButton("Edit Preferences", enableEditMode, document.getElementById("buttons-div"));
+	document.getElementById("buttons-div").appendChild(getButton("Edit Preferences", enableEditMode));
 	var time = document.createElement("h4");
 	time.innerHTML = cachedRecord["time"] + " minutes";
 	document.getElementById("time-div").appendChild(time);
-	renderGroup(cachedRecord["home"], "home-div");
-	renderGroup(cachedRecord["destination"], "destination-div");
+	document.getElementById("home-div").appendChild(getGroupElement(cachedRecord["home"]));
+	document.getElementById("destination-div").appendChild(getGroupElement(cachedRecord["destination"]));
 	for (var i = 0; i < cachedRecord["order"].length; i++) {
 		var div = document.createElement("div");
 		div.id = cachedRecord["order"][i];
 		div.classList.add("list-group");
+		div.appendChild(getGroupElement(div.id));
 		document.getElementById("groups-div").appendChild(div);
-		renderGroup(cachedRecord["order"][i], cachedRecord["order"][i]);
 	}
 }
 
 /*
-Render the group with the specified nickname in the specified div
+Get an HTML element for the group with the specified nickname
 */
-function renderGroup(nickname, divId) {
-	var div = document.getElementById(divId);
+function getGroupElement(nickname) {
 	var span = document.createElement("span");
 	if (nickname) {
-		addToList(span, nickname, true);
+		span.appendChild(getListElement(nickname, true));
 		for (var i = 0; i < cachedRecord["groups"][nickname].length; i++) {
-			addToList(span, stopIdToName[cachedRecord["groups"][nickname][i]], false);
+			span.appendChild(getListElement(stopIdToName[cachedRecord["groups"][nickname][i]], false));
 		}
 	} else {
-		var listElement = addToList(span, 
-			"Click the edit button to set up your " + divId.split("-")[0] + " group", 
-			true);
+		var listElement = getListElement("Click the edit button to set up this group", true);
 		listElement.classList.add("warning");
 
 		// Manually change color because list-elements do 
 		// not support color changes using bootswatch
 		listElement.style.backgroundColor = "#ff6600";
 		listElement.style.borderColor = "#ff6600";
+		span.appendChild(listElement);
 	}
-	div.appendChild(span);
+	return span;
 }
 
 /*
-Add an element to the specified list with the specified content
+Get an HTML element for an element in a group
 */
-function addToList(div, content, isActive) {
+function getListElement(content, isActive) {
 	var listElement = document.createElement("a");
 	listElement.innerHTML = content;
 	listElement.style.fontSize = "large";
 	listElement.classList.add("list-group-item", isActive ? "active" : "stop");
-	div.appendChild(listElement);
 	return listElement;
 }
 
 /*
-Enable edit mode
+Enable edit mode by making fields editable and adding buttons
 */
 function enableEditMode() {
+	// Clear the edit button and time div
 	$("#buttons-div").empty();
 	$("#time-div").empty();
 
-	submit = renderButton("Submit", handleSubmit, document.getElementById("buttons-div"));
-	submit.id = "submit-button";
-	renderButton("Cancel", renderUserPreferences, document.getElementById("buttons-div"));
+	// Add the submit and cancel buttons
+	var buttonsDiv = document.getElementById("buttons-div");
+	submitButton = getButton("Submit", handleSubmit);
+	submitButton.id = "submit-button";
+	buttonsDiv.appendChild(submitButton);
+	buttonsDiv.appendChild(getButton("Cancel", renderUserPreferences));
 
+	// Add the editable time element
 	timeElement = document.createElement("input");
 	timeElement.type = "number";
 	timeElement.min = 0;
 	timeElement.max = 30;
+	timeElement.id = "time-input";
 	timeElement.classList.add("form-control", "input-lg");
 	timeElement.value = cachedRecord["time"];
-	timeElement.id = "time-input";
 	timeElement.onkeypress = function(evt) {
 		var charCode = evt.which ? evt.which : event.keyCode;
 		return charCode <= 31 || (charCode >= 48 && charCode <= 57);
 	};
+	timeElement.onkeyup = validateTime;
+	timeElement.onmouseup = validateTime;
 	document.getElementById("time-div").appendChild(timeElement);
 
-	$('#time-input').bind("keyup mouseup", function(){
-		validateTime();
-	});
-
-	renderEditableGroup("home-div");
-	renderEditableGroup("destination-div");
+	// Change all existing groups to edit mode
+	changeGroupToEdit("home-div");
+	changeGroupToEdit("destination-div");
 	for (var i = 0; i < cachedRecord["order"].length; i++) {
-		renderEditableGroup(cachedRecord["order"][i]);
+		changeGroupToEdit(cachedRecord["order"][i]);
 	}
 
-	var groupsWellDiv = document.getElementsByClassName("well-lg")[3];
-	var groupsDiv = document.getElementById("groups-div");
-	var newButton = renderButton("New", createNewEditableNickname(groupsDiv), groupsWellDiv);
+	// Add the new group button
+	var newButton = getButton("New", appendGroup(document.getElementById("groups-div")));
 	newButton.id = "new-group-button";
+	document.getElementsByClassName("well-lg")[3].appendChild(newButton);
 
+	// Populate the datalist for stop names if it is unpopulated
 	var datalist = document.getElementById("system-stops");
 	if (datalist.childNodes.length === 0) {
 		for (var stopName in nameToStopId) {
@@ -141,288 +136,65 @@ function enableEditMode() {
 	}
 }
 
-function validateTime() {
-	var timeField = document.getElementById("time-input");
-	var valid = (timeField.value >= 0) && (timeField.value <= 30);
-	updateBorder(timeField, valid);
-	setSubmitState("time", valid);
-}
-
-function renderEditableGroup(groupDivId) {
+/*
+Change the specified group to edit mode
+*/
+function changeGroupToEdit(groupDivId) {
 	var groupDiv = document.getElementById(groupDivId);
 	var nicknameElement = groupDiv.getElementsByClassName("active")[0];
-
-	var text = nicknameElement.classList.contains("warning") ? "" : nicknameElement.textContent;
-	var buttonText;
-	var buttonBehavior;
-	if (groupDivId.includes("-")) {
-		buttonText = "Clear";
-		buttonBehavior = clearGroup(groupDiv);
-	} else {
-		buttonText = "Delete";
-		buttonBehavior = deleteGroup(groupDiv);
-	}
-
-	var inputGroupElement = generateNicknameInputGroup(text, buttonText, buttonBehavior);
-	nicknameElement.parentNode.replaceChild(inputGroupElement, nicknameElement);
-
+	var groupSpan = nicknameElement.parentNode;
+	groupSpan.replaceChild(getNicknameInput(groupDiv, 
+			nicknameElement.classList.contains("warning") ? "" : nicknameElement.textContent, 
+			groupDivId.includes("-") ? "Clear" : "Delete"), 
+		nicknameElement);
 	var stopElements = $.extend(true, [], groupDiv.getElementsByClassName("stop"));
-	if (stopElements.length === 1) {
-		var inputField = generateStopInputGroup(stopElements[0].textContent, false);
-		stopElements[0].remove();
-		inputGroupElement.parentNode.appendChild(inputField);
-	} else {
-		for (var i = 0; i < stopElements.length; i++) {
-			div = generateStopInputGroup(stopElements[i].textContent, true);
-			stopElements[i].remove();
-			inputGroupElement.parentNode.appendChild(div);
-		}
+	for (var i = 0; i < stopElements.length; i++) {
+		var stopInput = getStopInput(stopElements[i].textContent, stopElements.length === 1);
+		stopElements[i].remove();
+		groupSpan.appendChild(stopInput);
 	}
-	
-	renderImageButton(imageUrl + "plus.png", appendStop(groupDiv), groupDiv);
-}
-
-/*
-Returns an input div for nicknames
-text is the nickname for a group
-buttonText is the string "clear" or "delete"
-func is the function to be executed by the clear/delete button is pressed
-*/
-function generateNicknameInputGroup(text, buttonText, func) {
-	var inputDiv = generateInputDiv(text, true);
-	var span = document.createElement("span");
-	span.classList.add("input-group-btn");
-	renderButton(buttonText, func, span);
-	inputDiv.appendChild(span);
-	return inputDiv;
-}
-
-/*
-Returns an input div for stop names.
-text is the stop name.
-hasButton (true) indicates the stop row has a delete stop button.
-*/
-function generateStopInputGroup(text, hasButton) {
-	var inputDiv = generateInputDiv(text, false);
-	if (hasButton) {
-		var span = document.createElement("span");
-		span.classList.add("input-group-btn");
-		renderImageButton(imageUrl + "x.png", deleteStop(inputDiv), span);
-		inputDiv.appendChild(span);
-	} else {
-		inputDiv.classList.remove("input-group");
-		var inputField = inputDiv.getElementsByTagName("input")[0];
-		inputField.classList.add("form-group", "stop");
-		inputField.classList.remove("list-group-item");
-	}
-	inputDiv.getElementsByTagName("input")[0].setAttribute("list", "system-stops");
-	return inputDiv;
-}
-
-/*
-Creates a div containing an input type field.
-text is the text to be present in the field.
-isNickname indicates whether it is a nickname or a stop.
-*/
-function generateInputDiv(text, isNickname) {
-	var field = document.createElement("input");
-	field.value = text;
-	field.classList.add("list-group-item", "form-control", "input-lg");
-	if (isNickname) {
-		field.classList.add("active");
-		field.setAttribute("maxlength", 30);
-		field.oninput = function() {
-			validateNickname(field);
-		};
-	} else {
-		field.classList.add("stop");
-		field.oninput = function() {
-			validateStop(field);
-		};
-		// stop validation function
-	}
-	var inputDiv = document.createElement("div");
-	inputDiv.classList.add("input-group");
-	inputDiv.appendChild(field);
-	return inputDiv;
-}
-
-function validateNickname(nicknameField) {
-	var valid = true;
-
-	// Verify nickname is not a duplicate
-	var nicknameElements = document.getElementsByClassName("active");
-	for (var i = 0; i < nicknameElements.length && valid; i++) {
-		if (nicknameField.value === nicknameElements[i].value) {
-			valid = nicknameField === nicknameElements[i];
-		}
-	}
-
-	// Verify all characters are alphanumeric or spaces
-	var regex = new RegExp("^[a-zA-Z0-9 ]+$");
-	valid = valid && regex.test(nicknameField.value);
-
-	updateBorder(nicknameField, valid);
-	
-	setSubmitState("nicknames", valid);
-}
-
-function validateStop(stopField) {
-	var valid = stopField.value in nameToStopId || stopField.value === "";
-	updateBorder(stopField, valid);
-	setSubmitState("stops", valid);
-}
-
-function updateBorder(field, valid) {
-	if (valid) {
-		field.style.borderColor = "#dddddd";
-		field.style.borderWidth = "0px"
-	} else {
-		field.style.borderColor = "#b94a48";
-		field.style.borderWidth = "3px";
-	}
-}
-
-/*
-Create new nickname in the other section
-*/
-function createNewEditableNickname(parentNode) {
-	var counter = 0;
-	return function() {
-		var div = document.createElement("div");
-		div.id = "newnickname-" + counter++;
-		div.classList.add("list-group");
-
-		var span = document.createElement("span");
-		span.appendChild(generateNicknameInputGroup("", "Delete", deleteGroup(div)));
-		div.appendChild(span);
-
-		renderImageButton(imageUrl + "plus.png", appendStop(div), div);
-		parentNode.appendChild(div);
-	}
-}
-
-function appendStop(parentDiv) {
-	return function() {
-		var span = parentDiv.childNodes[0];
-		if (span.childNodes.length === 2) {
-			var target = span.childNodes[1];
-			span.replaceChild(generateStopInputGroup(target.childNodes[0].value, true), target);
-		}
-		span.appendChild(generateStopInputGroup("", span.childNodes.length !== 1));
-	}
-}
-
-function deleteStop(stopElement) {
-	return function() {
-		var span = stopElement.parentNode;
-		stopElement.remove();
-		if (span.childNodes.length === 2) {
-			var target = span.childNodes[1];
-			span.replaceChild(generateStopInputGroup(target.childNodes[0].value, false), target);
-		}
-	}
-}
-
-function deleteGroup(groupElement) {
-	return function() {
-		groupElement.remove();
-	}
-}
-
-function clearGroup(groupDiv) {
-	return function() {
-		var span = groupDiv.childNodes[0];
-		span.innerHTML = "";
-		span.appendChild(generateNicknameInputGroup("", "Clear", clearGroup(groupDiv)));
-	}
-}
-
-/*
-Render a button with the image and callback function
-*/
-function renderImageButton(image, callback, parent) {
-	var button = document.createElement("img");
-	button.style.display = "block";
-	button.style.margin = "0 auto";
-	button.src = image;
-	button.onclick = callback;
-	parent.appendChild(button);
-}
-
-/*
-Render a button with the specified text and callback function
-*/
-function renderButton(displayText, callback, parent) {
-	var button = document.createElement("a");
-	button.innerHTML = displayText;
-	button.classList.add("btn", "btn-primary", "btn-lg");
-	button.onclick = callback;
-	parent.appendChild(button);
-	return button;
+	groupDiv.appendChild(getImageButton(imageUrl + "plus.png", appendStop(groupDiv)));
 }
 
 /*
 Handle a user submitting their changes
+If the user has invalid groups, point out their errors
+Otherwise, make API calls to match the user's changes
 */
 function handleSubmit() {
 	// Scrape the current state of the UI for the 
 	// updated preferences and order of groups
 	updated = {};
 	homeDestinationOrder = [];
-	var finishSubmit = true;
 	var errorElements = [];
-	var newHome = scrapeGroupData("home-div", updated, homeDestinationOrder);
-	if (newHome && typeof(newHome) !== "string") {
-		finishSubmit = false;
-		errorElements = errorElements.concat(newHome);
-	}
-	var newDestination = scrapeGroupData("destination-div", updated, homeDestinationOrder);
-	if (newDestination && typeof(newDestination) !== "string") {
-		finishSubmit = false;
-		errorElements = errorElements.concat(newDestination);
-	}
-	var groups = document.getElementById("groups-div").getElementsByClassName("list-group");
+	var newHome = scrapeGroupData("home-div", updated, homeDestinationOrder, errorElements);
+	var newDestination = scrapeGroupData("destination-div", updated, homeDestinationOrder, errorElements);
+	var groupElements = document.getElementById("groups-div").getElementsByClassName("list-group");
 	updatedOrder = [];
-	for (var i = 0; i < groups.length; i++) {
-		var result = scrapeGroupData(groups[i].id, updated, updatedOrder);
-		if (result && typeof(result) !== "string") {
-			finishSubmit = false;
-			errorElements = errorElements.concat(result);
-		}
+	for (var i = 0; i < groupElements.length; i++) {
+		scrapeGroupData(groupElements[i].id, updated, updatedOrder, errorElements);
 	}
 
+	// If there are any errors, display an error message 
+	// and highlight the invalid elements
 	$(".alert").remove();
-	if (!finishSubmit) {
+	if (errorElements.length > 0) {
 		for (var i = 0; i < errorElements.length; i++) {
 			updateBorder(errorElements[i], false);
 		}
-
-		// Show an error message to the user
 		var errorDiv = document.createElement("div");
 		errorDiv.classList.add("alert", "alert-dismissible", "alert-danger");
-		errorDiv.innerHTML += "Please fill in or remove the highlighted preferences and submit again.";
+		errorDiv.innerHTML = "Please fill in or remove the highlighted preferences and submit again.";
 		document.getElementById("buttons-div").appendChild(errorDiv);
 		return;
 	}
 
-	// Delete all groups in cachedRecord and not in updated
+	// Delete all groups that are in cachedRecord and not in updated
 	var updating = false;
 	for (cachedNickname in cachedRecord["groups"]) {
 		if (!(cachedNickname in updated)) {
-			// Delete the cachedNickname from the database using the API
 			updating = true;
-			$.ajax({
-				url: apiUrl + userId + "/groups/" + cachedNickname,
-				type: "DELETE",
-				success: function(data) {
-					console.log("Deleted " + data["nickname"]);
-				},
-				error: function(data) {
-					/* HANDLE THE ERROR */
-					console.log("Failed delete");
-				}
-			});
+			makeAPIRequest("groups/" + cachedNickname, "DELETE", {});
 		}
 	}
 
@@ -444,51 +216,31 @@ function handleSubmit() {
 		if (putStops) {
 			// Put the updated group into the database using the API
 			updating = true;
-			var type = updatedNickname === newHome ? "home" : 
-				updatedNickname === newDestination ? "destination" : 
-				"other";
-			$.ajax({
-				url: apiUrl + userId + "/groups/" + updatedNickname,
-				type: "PUT",
-				contentType: "application/json",
-				data: JSON.stringify({"stops": updatedStops, "type": type}),
-				success: function(data) {
-					for (nickname in data) {
-						console.log("Put " + nickname);
-					}
-				},
-				error: function(data) {
-					/* HANDLE THE ERROR */
-					console.log("Failed to update group");
+			makeAPIRequest("groups/" + updatedNickname, 
+				"PUT", 
+				{
+					"stops": updatedStops, 
+					"type": updatedNickname === newHome ? "home" : 
+						updatedNickname === newDestination ? "destination" : 
+						"other"
 				}
-			});
+			);
 		}
 	}
 
 	// Change the time with the API if the user changed the time
-	var timeInput = document.getElementById("time-input");
-	var value = timeInput.value ? parseInt(timeInput.value) : 0;
-	if (value != cachedRecord["time"]) {
+	var timeValue = document.getElementById("time-input").value;
+	var updatedTime = timeValue ? parseInt(timeValue) : 0;
+	if (updatedTime != cachedRecord["time"]) {
 		updating = true;
-		$.ajax({
-			url: apiUrl + userId + "/time",
-			type: "PUT",
-			contentType: "application/json",
-			data: JSON.stringify({"time": value}),
-			success: function(data) {
-				cachedRecord["time"] = data["time"];
-			},
-			error: function(data) {
-				/* HANDLE THE ERROR */
-				console.log("Failed to update time");
-			}
-		});
+		makeAPIRequest("time", "PUT", {"time": updatedTime});
 	}
 
 	if (updating) {
 		// When the user's preferences are finished updating, render them
 		$(document).ajaxStop(function() {
 			$(this).unbind("ajaxStop");
+			cachedRecord["time"] = updatedTime;
 			cachedRecord["home"] = newHome;
 			cachedRecord["destination"] = newDestination;
 			cachedRecord["groups"] = updated;
@@ -500,47 +252,276 @@ function handleSubmit() {
 	}
 }
 
-function scrapeGroupData(groupDivId, updated, order) {
+/*
+Scrape information from the UI about the specified group
+to update the user's preferences in updated and order
+Return the group's nickname for a valid group, null for
+an empty group, and for invalid groups add the elements that
+are causing their errors to errorElements
+*/
+function scrapeGroupData(groupDivId, updated, order, errorElements) {
 	var groupDiv = document.getElementById(groupDivId);
 	var nicknameElement = groupDiv.getElementsByClassName("active")[0];
 	var nickname = nicknameElement.value;
 	var stopElements = groupDiv.getElementsByClassName("stop");
-	var elements = [];
 	var stopIds = [];
 	for (var i = 0; i < stopElements.length; i++) {
 		var stopName = stopElements[i].value;
 		if (stopName) {
 			stopIds.push(parseInt(nameToStopId[stopName]));
 		}
-		elements.push(stopElements[i]);
 	}
+
+	// Verify the validity of this group
 	if (nickname && stopIds.length > 0) {
 		updated[nickname] = stopIds;
 		order.push(nickname);
 		return nickname;
-	} else if (!nickname && stopIds.length === 0) {
-		return null;
-	} else if (!nickname) {
-		return [nicknameElement];
-	} else if (stopElements.length === 0) {
-		// Make new stop and return its element
-		appendStop(groupDiv)();
-		return [groupDiv.getElementsByClassName("stop")[0]];
 	}
-	return elements;
+	if (!nickname && stopIds.length === 0) {
+		return null;
+	}
+
+	// This group is invalid, determine which elements are invalid
+	if (!nickname) {
+		errorElements.push(nicknameElement);
+	} else if (stopElements.length === 0) {
+		// There are no stops so add an empty stop for the user
+		appendStop(groupDiv)();
+		errorElements.push(groupDiv.getElementsByClassName("stop")[0]);
+	} else {
+		// There are only empty stops so all stops are erroneous
+		for (var i = 0; i < stopElements.length; i++) {
+			errorElements.push(stopElements[i]);
+		}
+	}
 }
 
-function setSubmitState(caller, valid) {
-	stateValid[caller] = valid;
+/*
+Make a PUT or DELETE request to the specified API route
+*/
+function makeAPIRequest(route, type, json) {
+	$.ajax({
+		url: apiUrl + userId + "/" + route,
+		type: type,
+		contentType: "application/json",
+		data: JSON.stringify(json),
+		error: function(data) {
+			/* HANDLE THE ERROR */
+			console.log("Failed to update time");
+		}
+	});
+}
 
-	var submitOk = true;
-	for (var key in stateValid) {
-		submitOk = submitOk && stateValid[key];
+/*
+Get a button element with the specified text and callback function
+*/
+function getButton(displayText, callback) {
+	var button = document.createElement("a");
+	button.innerHTML = displayText;
+	button.classList.add("btn", "btn-primary", "btn-lg");
+	button.onclick = callback;
+	return button;
+}
+
+/*
+Get a button element with the specified image and callback function
+*/
+function getImageButton(image, callback) {
+	var button = document.createElement("img");
+	button.style.display = "block";
+	button.style.margin = "0 auto";
+	button.src = image;
+	button.onclick = callback;
+	return button;
+}
+
+/*
+Verify that the time is between 0 and 30
+*/
+function validateTime() {
+	var timeField = document.getElementById("time-input");
+	var isValid = timeField.value >= 0 && timeField.value <= 30;
+	updateBorder(timeField, isValid);
+	updateValidity("time", isValid);
+}
+
+/*
+Verify that the stop is valid
+*/
+function validateStop(stopElement) {
+	var isValid = stopElement.value in nameToStopId || stopElement.value === "";
+	updateBorder(stopElement, isValid);
+	updateValidity("stops", isValid);
+}
+
+/*
+Verify that the nickname is valid
+*/
+function validateNickname(nicknameElement) {
+	// Verify that all characters in the nickname are alphanumeric or spaces
+	var isValid = new RegExp("^[a-zA-Z0-9 ]+$").test(nicknameElement.value);
+
+	// Verify that the nickname is not a duplicate
+	var nicknameElements = document.getElementsByClassName("active");
+	for (var i = 0; i < nicknameElements.length && isValid; i++) {
+		isValid = nicknameElement.value !== nicknameElements[i].value 
+			|| nicknameElement === nicknameElements[i];
 	}
+	updateBorder(nicknameElement, isValid);
+	updateValidity("nicknames", isValid);
+}
 
-	if (submitOk) {
-		document.getElementById("submit-button").removeAttribute('disabled')
+/*
+Update the border of the specified element depending on the validity
+*/
+function updateBorder(element, isValid) {
+	if (isValid) {
+		element.style.borderColor = "#dddddd";
+		element.style.borderWidth = "0px"
 	} else {
-		document.getElementById("submit-button").setAttribute('disabled', 'disabled');	
+		element.style.borderColor = "#b94a48";
+		element.style.borderWidth = "3px";
 	}
+}
+
+/*
+Update the validity of the specified element and update the
+status of the submit button based on all elements' validity
+*/
+function updateValidity(identifier, isValid) {
+	elementValidity[identifier] = isValid;
+	for (var key in elementValidity) {
+		if (!elementValidity[key]) {
+			document.getElementById("submit-button").setAttribute("disabled", "disabled");
+		}
+	}
+	document.getElementById("submit-button").removeAttribute("disabled");
+}
+
+/*
+Get a callback for appending stops to the specified group
+*/
+function appendStop(groupDiv) {
+	return function() {
+		var span = groupDiv.childNodes[0];
+		if (span.childNodes.length === 2) {
+			// Give the existing stop a delete button now that there is another stop
+			var target = span.childNodes[1];
+			span.replaceChild(getStopInput(target.childNodes[0].value, true), target);
+		}
+		span.appendChild(getStopInput("", span.childNodes.length !== 1));
+	}
+}
+
+/*
+Get a callback for deleting the specified stop
+*/
+function deleteStop(stopElement) {
+	return function() {
+		var span = stopElement.parentNode;
+		stopElement.remove();
+		if (span.childNodes.length === 2) {
+			// Remove the existing stop's delete button now that there is only 1 stop
+			var target = span.childNodes[1];
+			span.replaceChild(getStopInput(target.childNodes[0].value, false), target);
+		}
+	}
+}
+
+/*
+Get a callback for appending new groups to the existing groups
+*/
+function appendGroup(groupsDiv) {
+	var counter = 0;
+	return function() {
+		var groupDiv = document.createElement("div");
+		groupDiv.id = "newnickname-" + counter++;
+		groupDiv.classList.add("list-group");
+		var span = document.createElement("span");
+		span.appendChild(getNicknameInput(groupDiv, "", "Delete"));
+		groupDiv.appendChild(span);
+		groupDiv.appendChild(getImageButton(imageUrl + "plus.png", appendStop(groupDiv)));
+		groupsDiv.appendChild(groupDiv);
+	}
+}
+
+/*
+Get a callback for deleting the specified group
+*/
+function deleteGroup(groupElement) {
+	return function() {
+		groupElement.remove();
+	}
+}
+
+/*
+Get a callback for clearing the specified group
+*/
+function clearGroup(groupDiv) {
+	return function() {
+		var span = groupDiv.childNodes[0];
+		span.innerHTML = "";
+		span.appendChild(getNicknameInput(groupDiv, "", "Clear"));
+	}
+}
+
+/*
+Get a nickname div in the specified group with the specified type of button
+*/
+function getNicknameInput(groupDiv, nickname, buttonType) {
+	var nicknameDiv = document.createElement("div");
+	nicknameDiv.classList.add("input-group");
+	nicknameDiv.appendChild(getInputElement(nickname, true));
+	var span = document.createElement("span");
+	span.classList.add("input-group-btn");
+	span.appendChild(getButton(buttonType, 
+		buttonType === "Delete" ? 
+			deleteGroup(groupDiv) : 
+			clearGroup(groupDiv)));
+	nicknameDiv.appendChild(span);
+	return nicknameDiv;
+}
+
+/*
+Get a stop div with the specified stop name and an optional delete button
+*/
+function getStopInput(stopName, hasButton) {
+	var stopDiv = document.createElement("div");
+	var stopInput = getInputElement(stopName, false);
+	stopDiv.appendChild(stopInput);
+	if (hasButton) {
+		stopDiv.classList.add("input-group");
+		var span = document.createElement("span");
+		span.classList.add("input-group-btn");
+		span.appendChild(getImageButton(imageUrl + "x.png", deleteStop(stopDiv)));
+		stopDiv.appendChild(span);
+	} else {
+		stopInput.classList.add("form-group", "stop");
+		stopInput.classList.remove("list-group-item");
+	}
+	stopInput.setAttribute("list", "system-stops");
+	return stopDiv;
+}
+
+/*
+Get an input element that is either a nickname or stop with the specified content
+*/
+function getInputElement(content, isNickname) {
+	var input = document.createElement("input");
+	input.value = content;
+	input.classList.add("list-group-item", "form-control", "input-lg");
+	if (isNickname) {
+		input.classList.add("active");
+		input.setAttribute("maxlength", 30);
+		input.oninput = function() {
+			validateNickname(input);
+		};
+	} else {
+		input.classList.add("stop");
+		input.oninput = function() {
+			validateStop(input);
+		};
+	}
+	return input;
 }
