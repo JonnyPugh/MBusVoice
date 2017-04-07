@@ -391,12 +391,16 @@ status of the submit button based on all elements' validity
 */
 function updateValidity(identifier, isValid) {
 	elementValidity[identifier] = isValid;
+	var submitButton = document.getElementById("submit-button");
 	for (var key in elementValidity) {
 		if (!elementValidity[key]) {
-			document.getElementById("submit-button").setAttribute("disabled", "disabled");
+			submitButton.setAttribute("disabled", "disabled");
+			submitButton.onclick = "";
+			return;
 		}
 	}
-	document.getElementById("submit-button").removeAttribute("disabled");
+	submitButton.onclick = handleSubmit;
+	submitButton.removeAttribute("disabled");
 }
 
 /*
