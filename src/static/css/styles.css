@@ -1,0 +1,8 @@
+/*
+Custom CSS outside of Bootswatch stylesheet
+*/
+
+.invalid {
+	border-color: #b94a48 !important;
+	border-width: 3px !important;
+}
