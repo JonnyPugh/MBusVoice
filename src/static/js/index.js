@@ -184,7 +184,7 @@ function handleSubmit() {
 		}
 		var errorDiv = document.createElement("div");
 		errorDiv.classList.add("alert", "alert-dismissible", "alert-danger");
-		errorDiv.innerHTML = "Please fill in or remove the highlighted preferences and submit again.";
+		errorDiv.innerHTML = "Groups need to have nicknames and at least one stop.";
 		document.getElementById("buttons-div").appendChild(errorDiv);
 		return;
 	}
@@ -544,6 +544,7 @@ function getInputElement(content, isNickname) {
 			validateNickname(input);
 		};
 	} else {
+		input.placeholder = "Stop Name (Rackham)";
 		input.classList.add("stop");
 		input.oninput = function() {
 			validateStop(input);
