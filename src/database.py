@@ -1,4 +1,5 @@
 from config import bitly_token
+from bus_info import BusInfo
 from request_error import RequestError
 from requests import get
 from boto3 import resource
@@ -103,12 +104,14 @@ class Record(object):
 	# If the nickname is for the home, the home flag should be True
 	# If the nickname is for the destination, the home flag should be False
 	# Otherwise, the home flag should be None
-	# Setting the home flag is only necessary when initially creating a
-	# home or destination group but it will not be a problem if it is set
-	# when the home or destination group already exists
+	# Raise an exception if the nickname or any stop IDs are invalid
 	def put_group(self, nickname, stops, home=None):
 		if not nickname.replace(" ", "").isalnum():
-			raise _InvalidNickname(nickname)
+			raise _InvalidNickname
+		bus_info = BusInfo()
+		for stop_id in stops:
+			if stop_id not in bus_info.stops:
+				raise _InvalidStop(stop_id)
 		if home:
 			self.__home = nickname
 		elif home == False:
@@ -150,8 +153,12 @@ class _InvalidTime(_InvalidInput):
 		super(_InvalidTime, self).__init__("The time must be between 0 and 30")
 
 class _InvalidNickname(_InvalidInput):
-	def __init__(self, nickname):
+	def __init__(self):
 		super(_InvalidNickname, self).__init__("Nicknames must only contain alphanumeric characters and spaces")
+
+class _InvalidStop(_InvalidInput):
+	def __init__(self, stop_id):
+		super(_InvalidStop, self).__init__("The stop ID '" + str(stop_id) + "' is invalid")
 
 class _NicknameDoesNotExist(_InvalidInput):
 	def __init__(self, nickname):
