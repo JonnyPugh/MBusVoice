@@ -413,11 +413,7 @@ Get a callback for appending stops to the specified group
 function appendStop(groupDiv) {
 	return function() {
 		var span = groupDiv.childNodes[0];
-		if (span.childNodes.length === 2) {
-			// Give the existing stop a delete button now that there is another stop
-			var target = span.childNodes[1];
-			span.replaceChild(getStopInput(target.childNodes[0].value, true), target);
-		}
+		replaceFirstStop(span, true);
 		span.appendChild(getStopInput("", span.childNodes.length !== 1));
 	}
 }
@@ -429,12 +425,25 @@ function deleteStop(stopElement) {
 	return function() {
 		var span = stopElement.parentNode;
 		stopElement.remove();
-		if (span.childNodes.length === 2) {
-			// Remove the existing stop's delete button now that there is only 1 stop
-			var target = span.childNodes[1];
-			span.replaceChild(getStopInput(target.childNodes[0].value, false), target);
-		}
+		replaceFirstStop(span, false);
 		updateSubmitState();
+	}
+}
+
+/*
+If the specified group has only 1 stop and another one is being 
+added or the second to last stop was just deleted, replace the 
+only stop with a new stop that optionally has a delete button
+*/
+function replaceFirstStop(groupSpan, hasButton) {
+	if (groupSpan.childNodes.length === 2) {
+		var stopDiv = groupSpan.childNodes[1];
+		var stopField = stopDiv.childNodes[0];
+		var newStopDiv = getStopInput(stopField.value, hasButton);
+		if (stopField.classList.contains("invalid")) {
+			newStopDiv.childNodes[0].classList.add("invalid");
+		}
+		groupSpan.replaceChild(newStopDiv, stopDiv);
 	}
 }
 
