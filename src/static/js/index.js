@@ -255,7 +255,7 @@ Scrape information from the UI about the specified group
 to update the user's preferences in updated and order
 Return the group's nickname for a valid group, null for
 an empty group, and for invalid groups add the elements that
-are causing their errors to errorElements
+are causing the errors to errorElements
 */
 function scrapeGroupData(groupDivId, updated, order, errorElements) {
 	var groupDiv = document.getElementById(groupDivId);
@@ -280,18 +280,16 @@ function scrapeGroupData(groupDivId, updated, order, errorElements) {
 		return null;
 	}
 
-	// This group is invalid, determine which elements are invalid
+	// Determine if the nicknames or stops are empty
 	if (!nickname) {
 		errorElements.push(nicknameElement);
-	} else if (!stopElements.length) {
-		// There are no stops so add an empty stop for the user
-		appendStop(groupDiv)();
-		errorElements.push(groupDiv.getElementsByClassName("stop")[0]);
 	} else {
-		// There are only empty stops so all stops are erroneous
-		for (var i = 0; i < stopElements.length; i++) {
-			errorElements.push(stopElements[i]);
+		// Remove all empty stops so a new highlighted one can be added
+		while (stopElements.length) {
+			stopElements[0].parentNode.remove();
 		}
+		appendStop(groupDiv)();
+		errorElements.push(stopElements[0]);
 	}
 }
 
