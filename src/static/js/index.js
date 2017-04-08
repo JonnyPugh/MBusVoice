@@ -2,6 +2,14 @@ var cachedRecord = {};
 var stopIdToName;
 var nameToStopId = {};
 
+/*
+Add an event handler for using hashes to navigate on the page
+Since there is a navbar we want to scroll up 50 pixels when using hashes
+*/
+window.addEventListener("hashchange", function() {
+	scrollBy(0, -50);
+});
+
 document.addEventListener('DOMContentLoaded', function () {
 	// Get bus stops and the user's preferences from the API
 	$.get(apiUrl + "stops", function(data) {

@@ -12,9 +12,10 @@
 {% block navbar %}
 	<ul class="nav navbar-nav navbar-left">
 		<li><a href="#map">Map</a></li>
-		<li><a href="#home-div">Home</a></li>
-		<li><a href="#destination-div">Destination</a></li>
-		<li><a href="#groups-div">Groups</a></li>
+		<li><a href="#time-section">Time</a></li>
+		<li><a href="#home-section">Home</a></li>
+		<li><a href="#destination-section">Destination</a></li>
+		<li><a href="#groups-section">Groups</a></li>
 	</ul>
 {% endblock %}
 {% block heading %}
@@ -27,19 +28,19 @@
 	<br></br>
 	<div class="panel panel-default panel-body container">
 		<div id="buttons-div" class="preferences"></div>
-		<div class="well well-lg">
+		<div class="well well-lg" id="time-section">
 			<h3>How long does it take you to get to the bus stop?</h3>
 			<div id="time-div" class="preferences"></div>
 		</div>
-		<div class="well well-lg">
+		<div class="well well-lg" id="home-section">
 			<h3>Where do you get on the bus?</h3>
 			<div id="home-div" class="preferences list-group"></div>
 		</div>
-		<div class="well well-lg">
+		<div class="well well-lg" id="destination-section">
 			<h3>Where do you get off the bus?</h3>
 			<div id="destination-div" class="preferences list-group"></div>
 		</div>
-		<div class="well well-lg">
+		<div class="well well-lg" id="groups-section">
 			<h3>What do you call bus stops?</h3>
 			<div id="groups-div" class="preferences"></div>
 		</div>
