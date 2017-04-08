@@ -184,7 +184,7 @@ function handleSubmit() {
 		}
 		var errorDiv = document.createElement("div");
 		errorDiv.classList.add("alert", "alert-dismissible", "alert-danger");
-		errorDiv.innerHTML = "Groups need to have nicknames and at least one stop.";
+		errorDiv.innerHTML = "Groups need to have a nickname and at least one stop.";
 		document.getElementById("buttons-div").appendChild(errorDiv);
 		return;
 	}
