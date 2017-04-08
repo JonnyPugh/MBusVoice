@@ -412,9 +412,9 @@ Get a callback for appending stops to the specified group
 */
 function appendStop(groupDiv) {
 	return function() {
-		var span = groupDiv.childNodes[0];
-		replaceFirstStop(span, true);
-		span.appendChild(getStopInput("", span.childNodes.length !== 1));
+		var groupSpan = groupDiv.childNodes[0];
+		replaceFirstStop(groupSpan, true);
+		groupSpan.appendChild(getStopInput("", groupSpan.childNodes.length !== 1));
 	}
 }
 
@@ -423,9 +423,9 @@ Get a callback for deleting the specified stop
 */
 function deleteStop(stopElement) {
 	return function() {
-		var span = stopElement.parentNode;
+		var groupSpan = stopElement.parentNode;
 		stopElement.remove();
-		replaceFirstStop(span, false);
+		replaceFirstStop(groupSpan, false);
 		updateSubmitState();
 	}
 }
