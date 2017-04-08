@@ -319,22 +319,16 @@ Get a button element with the specified text and callback function
 function getButton(displayText, callback) {
 	var button = document.createElement("a");
 	button.innerHTML = displayText;
-	button.classList.add("btn", "btn-primary", "btn-lg");
-	if (displayText === "Clear") {
-		button.classList.add("btn-warning");
-		button.classList.remove("btn-primary")
-	} else if (displayText === "Submit") {
-		button.classList.add("btn-success");
-		button.classList.remove("btn-primary")
-
-	} else if (displayText === "Delete") {
-		button.classList.add("btn-danger");
-		button.classList.remove("btn-primary");
-	} else if (displayText === "New") {
-		button.classList.add("btn-success");
-		button.classList.remove("btn-primary");
-	}
 	button.onclick = callback;
+	if (typeof getButton.buttonClasses === "undefined") {
+		getButton.buttonClasses = {
+			"Submit": "btn-success",
+			"New": "btn-success",
+			"Clear": "btn-warning",
+			"Delete": "btn-danger"
+		};
+	}
+	button.classList.add("btn", "btn-lg", getButton.buttonClasses[displayText] || "btn-primary");
 	return button;
 }
 
@@ -365,16 +359,12 @@ Verify that the stop is valid
 */
 function validateStop(stopElement) {
 	var isValid = stopElement.value in nameToStopId || stopElement.value === "";
-
 	var groupSpan = stopElement.parentNode.parentNode;
 	var stopElements = groupSpan.getElementsByClassName("stop");
 	for (var i = 0; i < stopElements.length && isValid; i++) {
-		console.log(stopElements[i]);
-		console.log(stopElement);
 		isValid = stopElement.value !== stopElements[i].value 
 			|| stopElement === stopElements[i];
 	}
-
 	updateBorder(stopElement, isValid);
 	updateValidity("stops", isValid);
 }
@@ -544,7 +534,7 @@ function getInputElement(content, isNickname) {
 			validateNickname(input);
 		};
 	} else {
-		input.placeholder = "Stop Name (Rackham)";
+		input.placeholder = "Bus stop name (Rackham)";
 		input.classList.add("stop");
 		input.oninput = function() {
 			validateStop(input);
