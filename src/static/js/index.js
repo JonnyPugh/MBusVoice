@@ -436,7 +436,7 @@ function deleteStop(stopElement) {
 			var target = span.childNodes[1];
 			span.replaceChild(getStopInput(target.childNodes[0].value, false), target);
 		}
-		updateSubmitState()
+		updateSubmitState();
 	}
 }
 
@@ -463,7 +463,7 @@ Get a callback for deleting the specified group
 function deleteGroup(groupElement) {
 	return function() {
 		groupElement.remove();
-		updateSubmitState()
+		updateSubmitState();
 	}
 }
 
@@ -475,7 +475,7 @@ function clearGroup(groupDiv) {
 		var span = groupDiv.childNodes[0];
 		span.innerHTML = "";
 		span.appendChild(getNicknameInput(groupDiv, "", "Clear"));
-		updateSubmitState()
+		updateSubmitState();
 	}
 }
 
