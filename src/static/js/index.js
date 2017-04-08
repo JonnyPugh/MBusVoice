@@ -1,7 +1,6 @@
 var cachedRecord = {};
 var stopIdToName;
 var nameToStopId = {};
-var elementValidity = {};
 
 document.addEventListener('DOMContentLoaded', function () {
 	// Get bus stops and the user's preferences from the API
@@ -127,7 +126,7 @@ function enableEditMode() {
 
 	// Populate the datalist for stop names if it is unpopulated
 	var datalist = document.getElementById("system-stops");
-	if (datalist.childNodes.length === 0) {
+	if (!datalist.childNodes.length) {
 		for (var stopName in nameToStopId) {
 			var option = document.createElement("option");
 			option.value = stopName;
@@ -177,14 +176,13 @@ function handleSubmit() {
 
 	// If there are any errors, display an error message 
 	// and highlight the invalid elements
-	$(".alert").remove();
-	if (errorElements.length > 0) {
+	if (errorElements.length) {
 		for (var i = 0; i < errorElements.length; i++) {
-			updateBorder(errorElements[i], false);
+			updateValidity(errorElements[i], false);
 		}
 		var errorDiv = document.createElement("div");
 		errorDiv.classList.add("alert", "alert-dismissible", "alert-danger");
-		errorDiv.innerHTML = "Groups need to have a nickname and at least one stop.";
+		errorDiv.innerHTML = "Groups need to have a nickname and at least one stop. Please fix the highlighted preferences.";
 		document.getElementById("buttons-div").appendChild(errorDiv);
 		return;
 	}
@@ -273,19 +271,19 @@ function scrapeGroupData(groupDivId, updated, order, errorElements) {
 	}
 
 	// Verify the validity of this group
-	if (nickname && stopIds.length > 0) {
+	if (nickname && stopIds.length) {
 		updated[nickname] = stopIds;
 		order.push(nickname);
 		return nickname;
 	}
-	if (!nickname && stopIds.length === 0) {
+	if (!nickname && !stopIds.length) {
 		return null;
 	}
 
 	// This group is invalid, determine which elements are invalid
 	if (!nickname) {
 		errorElements.push(nicknameElement);
-	} else if (stopElements.length === 0) {
+	} else if (!stopElements.length) {
 		// There are no stops so add an empty stop for the user
 		appendStop(groupDiv)();
 		errorElements.push(groupDiv.getElementsByClassName("stop")[0]);
@@ -350,8 +348,7 @@ Verify that the time is between 0 and 30
 function validateTime() {
 	var timeField = document.getElementById("time-input");
 	var isValid = timeField.value >= 0 && timeField.value <= 30;
-	updateBorder(timeField, isValid);
-	updateValidity("time", isValid);
+	updateValidity(timeField, isValid);
 }
 
 /*
@@ -365,8 +362,7 @@ function validateStop(stopElement) {
 		isValid = stopElement.value !== stopElements[i].value 
 			|| stopElement === stopElements[i];
 	}
-	updateBorder(stopElement, isValid);
-	updateValidity("stops", isValid);
+	updateValidity(stopElement, isValid);
 }
 
 /*
@@ -382,37 +378,35 @@ function validateNickname(nicknameElement) {
 		isValid = nicknameElement.value !== nicknameElements[i].value 
 			|| nicknameElement === nicknameElements[i];
 	}
-	updateBorder(nicknameElement, isValid);
-	updateValidity("nicknames", isValid);
-}
-
-/*
-Update the border of the specified element depending on the validity
-*/
-function updateBorder(element, isValid) {
-	if (isValid) {
-		element.classList.remove("invalid");
-	} else {
-		element.classList.add("invalid");
-	}
+	updateValidity(nicknameElement, isValid);
 }
 
 /*
 Update the validity of the specified element and update the
 status of the submit button based on all elements' validity
 */
-function updateValidity(identifier, isValid) {
-	elementValidity[identifier] = isValid;
-	var submitButton = document.getElementById("submit-button");
-	for (var key in elementValidity) {
-		if (!elementValidity[key]) {
-			submitButton.setAttribute("disabled", "disabled");
-			submitButton.onclick = "";
-			return;
-		}
+function updateValidity(element, isValid) {
+	if (isValid) {
+		element.classList.remove("invalid");
+	} else {
+		element.classList.add("invalid");
 	}
-	submitButton.onclick = handleSubmit;
-	submitButton.removeAttribute("disabled");
+	updateSubmitState();
+}
+
+/*
+Update the state of the submit button based on the validity of all elements
+*/
+function updateSubmitState() {
+	var submitButton = document.getElementById("submit-button");
+	if ($(".invalid").length) {
+    	submitButton.setAttribute("disabled", "disabled");
+		submitButton.onclick = "";
+	} else {
+		$(".alert").remove();
+	    submitButton.removeAttribute("disabled");
+	    submitButton.onclick = handleSubmit;
+	}
 }
 
 /*
@@ -442,6 +436,7 @@ function deleteStop(stopElement) {
 			var target = span.childNodes[1];
 			span.replaceChild(getStopInput(target.childNodes[0].value, false), target);
 		}
+		updateSubmitState()
 	}
 }
 
@@ -468,6 +463,7 @@ Get a callback for deleting the specified group
 function deleteGroup(groupElement) {
 	return function() {
 		groupElement.remove();
+		updateSubmitState()
 	}
 }
 
@@ -479,6 +475,7 @@ function clearGroup(groupDiv) {
 		var span = groupDiv.childNodes[0];
 		span.innerHTML = "";
 		span.appendChild(getNicknameInput(groupDiv, "", "Clear"));
+		updateSubmitState()
 	}
 }
 
