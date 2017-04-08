@@ -361,14 +361,14 @@ function validateTime() {
 Verify that the stop is valid
 */
 function validateStop(stopElement) {
-	var isValid = stopElement.value in nameToStopId || stopElement.value === "";
+	var isValid = stopElement.value in nameToStopId;
 	var groupSpan = stopElement.parentNode.parentNode;
 	var stopElements = groupSpan.getElementsByClassName("stop");
 	for (var i = 0; i < stopElements.length && isValid; i++) {
 		isValid = stopElement.value !== stopElements[i].value 
 			|| stopElement === stopElements[i];
 	}
-	updateValidity(stopElement, isValid);
+	updateValidity(stopElement, isValid || stopElement.value === "");
 }
 
 /*
