@@ -18,19 +18,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			nameToStopId[data[key]] = key;
 		}
 	});
-	dataToCache = ["time", "home", "destination", "groups", "order"];
-	for (var i = 0; i < dataToCache.length; i++) {
-		$.get(apiUrl + userId + "/" + dataToCache[i], function(data) {
-			for (name in data) {
-				cachedRecord[name] = data[name];
-			}
-		});
-	}
+	$.get(apiUrl + userId + "/preferences", function(data) {
+		cachedRecord = data;
+	});
 
 	// When the user's preferences are loaded, render them
 	$(document).ajaxStop(function() {
 		$(this).unbind("ajaxStop");
-		console.log(cachedRecord);
 		renderUserPreferences();
 	});
 });
@@ -177,6 +171,8 @@ function handleSubmit() {
 
 	// Scrape the current state of the UI for the 
 	// updated preferences and order of groups
+	var timeValue = document.getElementById("time-input").value;
+	var updatedTime = timeValue ? parseInt(timeValue) : 0;
 	updated = {};
 	homeDestinationOrder = [];
 	var errorElements = [];
@@ -201,90 +197,29 @@ function handleSubmit() {
 		return;
 	}
 
-	// Delete all groups that are in cachedRecord and not in updated
-	var updating = false;
-	for (cachedNickname in cachedRecord["groups"]) {
-		if (!(cachedNickname in updated)) {
-			updating = true;
-			$.ajax({
-				url: apiUrl + userId + "/groups/" + cachedNickname,
-				type: "DELETE",
-				contentType: "application/json",
-				error: function(data) {
-					/* HANDLE THE ERROR */
-					console.log("Failed to delete group");
-				}
-			});
-		}
-	}
-
-	// Update all groups that are either in updated and not in cachedRecord
-	// or have different stops in updated and cachedRecord
-	combinedOrder = homeDestinationOrder.concat(updatedOrder);
-	for (var index = 0; index < combinedOrder.length; index++) {
-		updatedNickname = combinedOrder[index];
-		var updatedStops = updated[updatedNickname];
-		var putStops = !(updatedNickname in cachedRecord["groups"]);
-		if (!putStops) {
-			var cachedStops = cachedRecord["groups"][updatedNickname];
-			var equal = cachedStops.length === updatedStops.length;
-			for (var i = 0; i < cachedStops.length && equal; i++) {
-				equal = cachedStops[i] === updatedStops[i];
-			}
-			putStops = !equal;
-		}
-		if (putStops) {
-			// Put the updated group into the database using the API
-			updating = true;
-			$.ajax({
-				url: apiUrl + userId + "/groups/" + updatedNickname,
-				type: "PUT",
-				contentType: "application/json",
-				data: JSON.stringify({
-					"stops": updatedStops, 
-					"type": updatedNickname === newHome ? "home" : 
-						updatedNickname === newDestination ? "destination" : 
-						"other"
-				}),
-				error: function(data) {
-					/* HANDLE THE ERROR */
-					console.log("Failed to update group");
-				}
-			});
-		}
-	}
-
-	// Change the time with the API if the user changed the time
-	var timeValue = document.getElementById("time-input").value;
-	var updatedTime = timeValue ? parseInt(timeValue) : 0;
-	if (updatedTime != cachedRecord["time"]) {
-		updating = true;
-		$.ajax({
-			url: apiUrl + userId + "/time",
-			type: "PUT",
-			contentType: "application/json",
-			data: JSON.stringify({"time": updatedTime}),
-			error: function(data) {
-				/* HANDLE THE ERROR */
-				console.log("Failed to update time");
-			}
-		});
-	}
-
-	if (updating) {
-		// When the user's preferences are finished updating, render them
-		$(document).ajaxStop(function() {
-			$(this).unbind("ajaxStop");
-			cachedRecord["time"] = updatedTime;
-			cachedRecord["home"] = newHome;
-			cachedRecord["destination"] = newDestination;
-			cachedRecord["groups"] = updated;
-			cachedRecord["order"] = updatedOrder;
+	// Update the user's preferences in the database
+	$.ajax({
+		url: apiUrl + userId + "/preferences",
+		type: "PUT",
+		contentType: "application/json",
+		data: JSON.stringify({
+			"time": updatedTime,
+			"home": newHome,
+			"destination": newDestination,
+			"groups": updated,
+			"order": updatedOrder
+		}),
+		success: function(data) {
+			cachedRecord = data;
 			renderUserPreferences();
-		});
-	} else {
-		renderUserPreferences();
-	}
+		},
+		error: function(data) {
+			/* HANDLE THE ERROR */
+			console.log("Failed to update group");
+			submitButton.removeAttribute("disabled");
+	    	submitButton.onclick = handleSubmit;
+		}
+	});
 }
 
 /*

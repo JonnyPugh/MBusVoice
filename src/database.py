@@ -72,68 +72,75 @@ class Record(object):
 			except ClientError:
 				raise _DynamoError
 
-	# Define getters for all user preferences and a
-	# setter for time
-	@property
-	def home(self):
-		return self.__home
-	@property
-	def destination(self):
-		return self.__destination
-	@property
-	def groups(self):
-		return self.__groups
-	@property
-	def order(self):
-		return self.__order
+	# Define getters and setters for all user preferences
 	@property
 	def time(self):
 		return self.__time
 	@time.setter
 	def time(self, time):
 		if time < 0 or time > 30:
+			self.__write = False
 			raise _InvalidTime
 		self.__time = time
 		self.__write = True
+
+	@property
+	def home(self):
+		return self.__home
+	@home.setter
+	def home(self, home):
+		if home != None and home not in self.__groups:
+			self.__write = False
+			raise _NicknameDoesNotExist(home)
+		self.__home = home
+		self.__write = True
+
+	@property
+	def destination(self):
+		return self.__destination
+	@destination.setter
+	def destination(self, destination):
+		if destination != None and destination not in self.__groups:
+			self.__write = False
+			raise _NicknameDoesNotExist(destination)
+		self.__destination = destination
+		self.__write = True
+
+	@property
+	def groups(self):
+		return self.__groups
+	@groups.setter
+	def groups(self, groups):
+		for nickname in groups:
+			if not nickname.replace(" ", "").isalnum():
+				self.__write = False
+				raise _InvalidNickname
+			bus_info = BusInfo()
+			for stop_id in groups[nickname]:
+				if stop_id not in bus_info.stops:
+					self.__write = False
+					raise _InvalidStop(stop_id)
+		self.__groups = groups
+		self.__write = True
+
+	@property
+	def order(self):
+		return self.__order
+	@order.setter
+	def order(self, order):
+		for nickname in order:
+			if nickname not in self.__groups:
+				self.__write = False
+				raise _InvalidNickname(nickname)
+			if nickname in [self.__home, self.__destination]:
+				self.write = False
+				raise _InvalidOrder
+		self.__order = order
+		self.__write = True
+
 	@property
 	def url(self):
 		return self.__url
-
-	# Give the specified group the specified stops
-	# This is used for both creating new groups and modifying existing groups
-	# If the nickname is for the home, the home flag should be True
-	# If the nickname is for the destination, the home flag should be False
-	# Otherwise, the home flag should be None
-	# Raise an exception if the nickname or any stop IDs are invalid
-	def put_group(self, nickname, stops, home=None):
-		if not nickname.replace(" ", "").isalnum():
-			raise _InvalidNickname
-		bus_info = BusInfo()
-		for stop_id in stops:
-			if stop_id not in bus_info.stops:
-				raise _InvalidStop(stop_id)
-		if home:
-			self.__home = nickname
-		elif home == False:
-			self.__destination = nickname
-		elif nickname not in self.__groups:
-			self.__order.append(nickname)
-		self.__groups[nickname] = stops
-		self.__write = True
-		
-	# Delete the specified group
-	# Raise an exception if the nickname does not exist
-	def delete_group(self, nickname):
-		if nickname not in self.__groups:
-			raise _NicknameDoesNotExist(nickname)
-		if nickname == self.__home:
-			self.__home = None
-		elif nickname == self.__destination:
-			self.__destination = None
-		else:
-			self.__order.remove(nickname)
-		del self.__groups[nickname]
-		self.__write = True		
 
 # Internal Exception types used by Records
 class _NoUser(RequestError):
@@ -163,3 +170,7 @@ class _InvalidStop(_InvalidInput):
 class _NicknameDoesNotExist(_InvalidInput):
 	def __init__(self, nickname):
 		super(_NicknameDoesNotExist, self).__init__("The nickname '" + nickname + "' does not exist")
+
+class _InvalidOrder(_InvalidInput):
+	def __init__(self):
+		super(_InvalidOrder, self).__init__("The order must not contain the home or destination")
