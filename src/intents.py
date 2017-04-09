@@ -166,31 +166,3 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 			"busInfo": message
 		})
 	return statement(render_template(template, **options))
-
-# Get the next bus coming to a specified stop
-@ask.intent("GetNextBusAtStop")
-def getNextBuses(StopName):
-	bus_info = BusInfo()
-	try:
-		record = getUserData()
-		StopName, start_stops = clarifyStopName(StopName, record.home, record.groups, bus_info)
-	except __InvalidPhrase as e:
-		return statement(e.message)
-
-	# Determine the soonest eta to the specified stop
-	eta = None
-	for start_stop in start_stops:
-		for stop_eta in bus_info.get_eta(start_stop):
-			if not eta or stop_eta.time < eta.time:
-				eta = stop_eta
-				eta_stop = start_stop
-
-	# If there are no etas, return an error message
-	if not eta:
-		return statement(render_template("NoBuses", origin=StopName))
-
-	# Form the response and return it to the user
-	return statement(render_template("GetNextBusAtStop", 
-		origin=(StopName if len(start_stops) == 1 else bus_info.stops[eta_stop].name).replace(" -", ""),
-		route=bus_info.routes[eta.route].name,
-		minutes=eta.time))

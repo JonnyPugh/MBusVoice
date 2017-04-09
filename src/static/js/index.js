@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	// When the user's preferences are loaded, render them
 	$(document).ajaxStop(function() {
 		$(this).unbind("ajaxStop");
+		console.log(cachedRecord);
 		renderUserPreferences();
 	});
 });
@@ -169,6 +170,11 @@ If the user has invalid groups, point out their errors
 Otherwise, make API calls to match the user's changes
 */
 function handleSubmit() {
+	// Disable the submit button while this submit is being handled
+	var submitButton = document.getElementById("submit-button");
+    submitButton.setAttribute("disabled", "disabled");
+	submitButton.onclick = "";
+
 	// Scrape the current state of the UI for the 
 	// updated preferences and order of groups
 	updated = {};
@@ -200,7 +206,15 @@ function handleSubmit() {
 	for (cachedNickname in cachedRecord["groups"]) {
 		if (!(cachedNickname in updated)) {
 			updating = true;
-			makeAPIRequest("groups/" + cachedNickname, "DELETE", {});
+			$.ajax({
+				url: apiUrl + userId + "/groups/" + cachedNickname,
+				type: "DELETE",
+				contentType: "application/json",
+				error: function(data) {
+					/* HANDLE THE ERROR */
+					console.log("Failed to delete group");
+				}
+			});
 		}
 	}
 
@@ -222,15 +236,21 @@ function handleSubmit() {
 		if (putStops) {
 			// Put the updated group into the database using the API
 			updating = true;
-			makeAPIRequest("groups/" + updatedNickname, 
-				"PUT", 
-				{
+			$.ajax({
+				url: apiUrl + userId + "/groups/" + updatedNickname,
+				type: "PUT",
+				contentType: "application/json",
+				data: JSON.stringify({
 					"stops": updatedStops, 
 					"type": updatedNickname === newHome ? "home" : 
 						updatedNickname === newDestination ? "destination" : 
 						"other"
+				}),
+				error: function(data) {
+					/* HANDLE THE ERROR */
+					console.log("Failed to update group");
 				}
-			);
+			});
 		}
 	}
 
@@ -239,7 +259,16 @@ function handleSubmit() {
 	var updatedTime = timeValue ? parseInt(timeValue) : 0;
 	if (updatedTime != cachedRecord["time"]) {
 		updating = true;
-		makeAPIRequest("time", "PUT", {"time": updatedTime});
+		$.ajax({
+			url: apiUrl + userId + "/time",
+			type: "PUT",
+			contentType: "application/json",
+			data: JSON.stringify({"time": updatedTime}),
+			error: function(data) {
+				/* HANDLE THE ERROR */
+				console.log("Failed to update time");
+			}
+		});
 	}
 
 	if (updating) {
@@ -299,22 +328,6 @@ function scrapeGroupData(groupDivId, updated, order, errorElements) {
 		appendStop(groupDiv)();
 		errorElements.push(stopElements[0]);
 	}
-}
-
-/*
-Make a PUT or DELETE request to the specified API route
-*/
-function makeAPIRequest(route, type, json) {
-	$.ajax({
-		url: apiUrl + userId + "/" + route,
-		type: type,
-		contentType: "application/json",
-		data: JSON.stringify(json),
-		error: function(data) {
-			/* HANDLE THE ERROR */
-			console.log("Failed to update time");
-		}
-	});
 }
 
 /*

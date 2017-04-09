@@ -20,15 +20,6 @@
           "type": "ROUTES"
         }
       ]
-    }, 
-    {
-      "intent": "GetNextBusAtStop",
-      "slots": [
-        {
-          "name": "StopName",
-          "type": "STOPS"
-        }
-      ]
     }
   ]
 }
