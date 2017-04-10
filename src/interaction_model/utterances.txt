@@ -4,14 +4,10 @@ GetNextBuses for {NumBuses} buses
 GetNextBuses for the next {NumBuses} buses
 GetNextBuses for a {RouteName} bus
 GetNextBuses for the next {RouteName} bus
-GetNextBuses for {NumBuses} {RouteName} buses
-GetNextBuses for the next {NumBuses} {RouteName} buses
 GetNextBuses for a bus to {EndStop}
 GetNextBuses for the next bus to {EndStop}
 GetNextBuses for {NumBuses} buses to {EndStop}
 GetNextBuses for the next {NumBuses} buses to {EndStop}
-GetNextBuses for {NumBuses} {RouteName} buses to {EndStop}
-GetNextBuses for the next {NumBuses} {RouteName} buses to {EndStop}
 GetNextBuses for a bus from {StartStop} to {EndStop}
 GetNextBuses for the next bus from {StartStop} to {EndStop}
 GetNextBuses for {NumBuses} buses from {StartStop} to {EndStop}
