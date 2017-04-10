@@ -141,7 +141,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	options = {
 		"destination": EndStop
 	}
-	if len(etas) == 1:
+	if NumBuses == 1 or len(etas) == 1:
 		template = "GetNextBus"
 		eta_info = etas[0]
 		eta = eta_info[0]
