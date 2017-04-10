@@ -11,17 +11,19 @@ blueprint = Blueprint("BlueBus_blueprint", __name__, url_prefix="/")
 ask = Ask(blueprint=blueprint)
 
 # Exception class used to indicate invalid stop names
-class __InvalidPhrase(Exception):
+class _InvalidPhrase(Exception):
 	def __init__(self, stop_name):
-		super(__InvalidPhrase, self).__init__(stop_name+" is not a valid stop name")
+		super(_InvalidPhrase, self).__init__(stop_name+" is not a valid stop name")
 
 # Take the user's spoken stop name and figure out which stop 
 # id(s) they are referring to and return it/them as a list.
-def clarifyStopName(user_phrase, user_stop, groups, bus_info):
+def clarifyStopName(user_phrase, groups, bus_info):
 	# If the specified stop name is similar to a user level alias,
 	# return the stop ids associated with that alias
-	if get_close_matches(user_phrase, [user_stop] if user_stop != None else []):
-		return user_stop, grouops[user_stop]
+	close_matches = get_close_matches(user_phrase, groups.keys())
+	if close_matches:
+		name = close_matches[0]
+		return name, groups[name]
 
 	# Use system level aliases and the stops given by the API and 
 	# see if the user was referring to one of those stops
@@ -43,7 +45,7 @@ def clarifyStopName(user_phrase, user_stop, groups, bus_info):
 		return name, stop_aliases[name]
 
 	# Raise an error if the user_phrase couldn't be clarified
-	raise __InvalidPhrase(user_phrase)
+	raise _InvalidPhrase(user_phrase)
 
 # If the current user is not in the database, add them to the database 
 # Return the current user's data
@@ -85,28 +87,28 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	# Get user preferences from the database
 	record = getUserData()
 	groups = record.groups
-	home = record.home
-	destination = record.destination
 	template = "MissingFavorite"
 	bus_info = BusInfo()
 
 	try:
 		# Try to understand which stops the user is talking about
 		if StartStop:
-			StartStop, start_stops = clarifyStopName(StartStop, home, groups, bus_info)
+			StartStop, start_stops = clarifyStopName(StartStop, groups, bus_info)
 		else:
+			home = record.home
 			if home not in groups:
 				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard(record.url))
 			start_stops = groups[home]
 			StartStop = home
 		if EndStop:
-			EndStop, end_stops = clarifyStopName(EndStop, destination, groups, bus_info)
+			EndStop, end_stops = clarifyStopName(EndStop, groups, bus_info)
 		else:
+			destination = record.destination
 			if destination not in groups:
 				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard(record.url))
 			end_stops = groups[destination]
 			EndStop = destination
-	except __InvalidPhrase as e:
+	except _InvalidPhrase as e:
 		return statement(e.message)
 
 	# If the origin and destination are the same, return an error message
@@ -139,7 +141,7 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	options = {
 		"destination": EndStop
 	}
-	if NumBuses == 1:
+	if NumBuses == 1 or len(etas) == 1:
 		template = "GetNextBus"
 		eta_info = etas[0]
 		eta = eta_info[0]
