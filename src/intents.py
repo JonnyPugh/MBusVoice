@@ -17,11 +17,13 @@ class _InvalidPhrase(Exception):
 
 # Take the user's spoken stop name and figure out which stop 
 # id(s) they are referring to and return it/them as a list.
-def clarifyStopName(user_phrase, user_stop, groups, bus_info):
+def clarifyStopName(user_phrase, groups, bus_info):
 	# If the specified stop name is similar to a user level alias,
 	# return the stop ids associated with that alias
-	if get_close_matches(user_phrase, [user_stop] if user_stop != None else []):
-		return user_stop, grouops[user_stop]
+	close_matches = get_close_matches(user_phrase, groups.keys())
+	if close_matches:
+		name = close_matches[0]
+		return name, groups[name]
 
 	# Use system level aliases and the stops given by the API and 
 	# see if the user was referring to one of those stops
@@ -85,23 +87,23 @@ def getNextBuses(StartStop, EndStop, RouteName, NumBuses):
 	# Get user preferences from the database
 	record = getUserData()
 	groups = record.groups
-	home = record.home
-	destination = record.destination
 	template = "MissingFavorite"
 	bus_info = BusInfo()
 
 	try:
 		# Try to understand which stops the user is talking about
 		if StartStop:
-			StartStop, start_stops = clarifyStopName(StartStop, home, groups, bus_info)
+			StartStop, start_stops = clarifyStopName(StartStop, groups, bus_info)
 		else:
+			home = record.home
 			if home not in groups:
 				return statement(render_template(template, stopType="starting", favoriteType="home")).simple_card("No Home Stops Set", getPreferencesCard(record.url))
 			start_stops = groups[home]
 			StartStop = home
 		if EndStop:
-			EndStop, end_stops = clarifyStopName(EndStop, destination, groups, bus_info)
+			EndStop, end_stops = clarifyStopName(EndStop, groups, bus_info)
 		else:
+			destination = record.destination
 			if destination not in groups:
 				return statement(render_template(template, stopType="ending", favoriteType="destination")).simple_card("No Destination Stop Set", getPreferencesCard(record.url))
 			end_stops = groups[destination]
